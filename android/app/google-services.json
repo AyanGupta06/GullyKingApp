@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001975724374",
+    "project_id": "gullyking-37920",
+    "storage_bucket": "gullyking-37920.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001975724374:android:6bbd1de98107198ef07ef7",
+        "android_client_info": {
+          "package_name": "com.example.gully_king"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHHLj-hqYDw8Qafmm_xGZsfxo5DAVR3Gg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
