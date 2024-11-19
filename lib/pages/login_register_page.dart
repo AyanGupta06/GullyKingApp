@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -23,105 +22,210 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+  final TextEditingController _controllerConfirmPassword =
+      TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
-    try{
-      await Auth().signInWithEmailAndPassword(email: _controllerEmail.text, password: _controllerPassword.text);
-    } on FirebaseAuthException catch (e) {
-      errorMessage = e.message;
-    }
-  }
-  Future<void> createUserWithEmailAndPassword() async {
     try {
-      await Auth().createUserWithEmailAndPassword(email: _controllerEmail.text, password: _controllerPassword.text);
+      await Auth().signInWithEmailAndPassword(
+        email: _controllerEmail.text,
+        password: _controllerPassword.text,
+      );
+      setState(() {
+        errorMessage = '';
+      });
     } on FirebaseAuthException catch (e) {
-      errorMessage = e.message;
+      setState(() {
+        errorMessage = e.message;
+      });
     }
   }
 
-  //Widget creation tree
-  Widget _title() {
-    return const Text ("Gully King App");
+  Future<void> createUserWithEmailAndPassword() async {
+    if (_controllerPassword.text != _controllerConfirmPassword.text) {
+      setState(() {
+        errorMessage = "Passwords do not match!";
+      });
+      return;
+    }
+
+    try {
+      await Auth().createUserWithEmailAndPassword(
+        email: _controllerEmail.text,
+        password: _controllerPassword.text,
+      );
+      setState(() {
+        errorMessage = '';
+      });
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
   }
-  Widget _entryField(String title, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: title
+
+  Widget _title() {
+    return const Text(
+      "Gully King",
+      style: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: Colors.blueAccent,
       ),
     );
   }
-  Widget _passwordField(String title, TextEditingController controller) {
+
+  Widget _entryField(String hintText, TextEditingController controller,{bool isPassword = false}) {
     return TextField(
       controller: controller,
+      obscureText: isPassword ? _obscureText : false,
       decoration: InputDecoration(
-        labelText: 'Password',
-        labelStyle: TextStyle(color: Colors.grey),
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Colors.blueAccent),
         filled: true,
-        fillColor: Colors.grey[300],
+        fillColor: Colors.grey[100],
+        prefixIcon: Icon(
+          isPassword ? Icons.lock : Icons.email,
+          color: Colors.blueAccent,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(20.0),
           borderSide: BorderSide.none,
         ),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey,
-          ),
-          onPressed: _togglePasswordVisibility,
-        ),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey,
+                ),
+                onPressed: _togglePasswordVisibility,
+              )
+            : null,
       ),
-
     );
   }
 
   Widget _errorMessage() {
     return Text(
-      errorMessage == '' ? '': 'Error: ? $errorMessage',
+      errorMessage == '' ? '' : 'Error: $errorMessage',
+      style: const TextStyle(color: Colors.white),
+    );
+  }
 
-    );
-  }
-  
-  Widget _sumbit () {
+  Widget _submitButton() {
     return ElevatedButton(
-        onPressed: isLogin? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-        child: Text(isLogin? 'Login' : 'Register'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      onPressed: _validateAndSubmit,
+    child: Text(isLogin ? 'Login' : 'Register'),
     );
   }
+
+  Future<void> _validateAndSubmit() async {
+  setState(() {
+    errorMessage = ''; 
+  });
+
+  if (_controllerEmail.text.isEmpty) {
+    setState(() {
+      errorMessage = 'Please fill this field: Email';
+    });
+    return;
+  }
+
+  if (_controllerPassword.text.isEmpty) {
+    setState(() {
+      errorMessage = 'Please fill this field: Password';
+    });
+    return;
+  }
+
+  if (!isLogin && _controllerConfirmPassword.text.isEmpty) {
+    setState(() {
+      errorMessage = 'Please fill this field: Confirm Password';
+    });
+    return;
+  }
+
+  if (!isLogin && _controllerPassword.text != _controllerConfirmPassword.text) {
+    setState(() {
+      errorMessage = 'Passwords do not match!';
+    });
+    return;
+  }
+  //final
+  if (isLogin) {
+    await signInWithEmailAndPassword();
+  } else {
+    await createUserWithEmailAndPassword();
+  }
+}
+
 
   Widget _loginOrRegister() {
     return TextButton(
       onPressed: () {
         setState(() {
           isLogin = !isLogin;
+          _controllerEmail.clear();
+          _controllerPassword.clear();
+          _controllerConfirmPassword.clear();
+          errorMessage = '';
         });
       },
-      child: Text (isLogin? "Register Instead" : "Login Instead"),
+      child: Text(
+        isLogin ? "Don't have an account? Create" : "Already have an account? Sign in",
+        style: const TextStyle(color: Colors.blueAccent),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar (
-        title: _title(),
-      ),
       body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column (
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            _entryField("Email", _controllerEmail),
-            _entryField("Password", _controllerPassword),
-            _errorMessage(),
-            _sumbit(),
-            _loginOrRegister(),
-          ],
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/bg2_enhanced.jpg'), 
+          fit: BoxFit.cover, 
         ),
-      )
+      ),
+        child: SingleChildScrollView(
+          child: Container(
+            height: double.infinity, //MediaQuery.of(context).size.height - if given error try this.
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 150),
+                _title(),
+                const SizedBox(height: 20),
+                
+                _entryField("Email", _controllerEmail),
+                const SizedBox(height: 10),
+                _entryField("Password", _controllerPassword, isPassword: true),
+                const SizedBox(height: 10),
+                if (!isLogin) 
+                  _entryField("Confirm Password", _controllerConfirmPassword,
+                      isPassword: true),
+                      const SizedBox(height: 10),
+                _errorMessage(),
+                const SizedBox(height: 20),
+                _submitButton(),
+                const SizedBox(height: 20),
+                _loginOrRegister(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
