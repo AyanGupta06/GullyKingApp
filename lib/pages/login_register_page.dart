@@ -13,6 +13,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String? errorMessage = '';
   bool isLogin = true;
+  bool _obscureText = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -44,9 +51,35 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+  Widget _passwordField(String title, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        labelStyle: TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.grey[300],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15.0),
+          borderSide: BorderSide.none,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey,
+          ),
+          onPressed: _togglePasswordVisibility,
+        ),
+      ),
+
+    );
+  }
 
   Widget _errorMessage() {
-    return Text(errorMessage == '' ? '': 'Humm ? $errorMessage');
+    return Text(
+      errorMessage == '' ? '': 'Error: ? $errorMessage',
+
+    );
   }
   
   Widget _sumbit () {
