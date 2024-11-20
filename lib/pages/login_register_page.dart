@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
         child: SingleChildScrollView(
           child: Container(
-            height: double.infinity, //MediaQuery.of(context).size.height - if given error try this.
+            height: MediaQuery.of(context).size.height, //MediaQuery.of(context).size.height - if given error try this.
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             child: Column(
