@@ -66,9 +66,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _title() {
     return const Text(
-      "Gully King",
+      "GullyKing",
       style: TextStyle(
-        fontSize: 32,
+        fontSize: 42,
         fontWeight: FontWeight.bold,
         color: Colors.blueAccent,
       ),
@@ -191,13 +191,13 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/bg2_enhanced.jpg'), 
+          image: AssetImage('assets/bg4.png'),
           fit: BoxFit.cover, 
         ),
       ),
         child: SingleChildScrollView(
           child: Container(
-            height: double.infinity, //MediaQuery.of(context).size.height - if given error try this.
+            height: MediaQuery.of(context).size.height,// - if given error try this.
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             child: Column(
