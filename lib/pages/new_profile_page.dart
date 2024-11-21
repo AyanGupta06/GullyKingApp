@@ -30,6 +30,23 @@ class _LoginPageState extends State<NewProfilePage> {
       ),
     );
   }
+
+  Widget _usernameEntry (String hintText, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.blueAccent),
+          filled: true,
+          fillColor: const Color.fromRGBO(245, 245, 245, 0.6),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide.none,
+          ),
+        ),
+    );
+  }
+
   void _navigateToPage(int index) {
     setState(() {
       _selectedIndex = index;
@@ -87,6 +104,7 @@ class _LoginPageState extends State<NewProfilePage> {
       body: Container(
         height: double.infinity,
         width: double.infinity,
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -94,6 +112,7 @@ class _LoginPageState extends State<NewProfilePage> {
             const SizedBox(height: 150),
             _title(),
             const SizedBox(height: 20),
+            _usernameEntry("Enter your username", _controllerUsername),
 
           ],
         ),
