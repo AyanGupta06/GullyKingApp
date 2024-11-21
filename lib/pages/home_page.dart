@@ -1,112 +1,140 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
+import 'new_game_page.dart'; 
 
-class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
   final User? user = Auth().currentUser;
+  int _selectedIndex = 2; //default homeIndez
 
   Future<void> signOut() async {
     await Auth().signOut();
   }
 
-  Widget _title() {
-    return const Text("Gully King");
-  }
 
   Widget _userId() {
-    return Text(user?.email ?? "User Email");
+    return Text(
+      user?.email ?? "User Email",
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
   }
-
-  Widget _signOutClick() {
+    Widget _signOutClick() {
     return ElevatedButton(
       onPressed: signOut,
-      child: const Text("SignOut"),
+      child: const Text("Sign Out"),
     );
+  }
+
+  void _navigateToPage(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0: //new game
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewGamePage()),
+        );
+        break;
+      case 1: //old games
+        break;
+      case 2: //home
+        break;
+      case 3: //friends
+        break;
+      case 2: //profile
+        break;
+
+      default:
+      //idk
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: _title(),
-        ),
-        body: Container (
-          height: double.infinity,
-          padding: const EdgeInsets.all(20),
-          width: double.infinity,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _userId(),
-                _signOutClick(),
-              ],
-            )
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                  icon: Icon(Icons.add_box_rounded),
-                  color: Colors.black,
-
-                  onPressed: () {
-                    print("NewGamePressed");
-                  }),
-              IconButton(
-                  icon: Icon(Icons.file_present_sharp),
-                  color: Colors.black,
-                  onPressed: () {
-                    print("RecordsPressed");
-                  }),
-              IconButton(
-                  icon: Icon(Icons.home_sharp),
-                  color: Colors.black,
-                  onPressed: () {
-                    print("HomePressed");
-                  }),
-              IconButton(
-                  icon: Icon(Icons.people_alt_sharp),
-                  color: Colors.black,
-                  onPressed: () {
-                    print("FriendsPressed");
-                  }),
-              IconButton(
-                  icon: Icon(Icons.person),
-                  color: Colors.black,
-                  onPressed: () {
-                    print("AccountPressed");
-                  }),
-            ],
+      appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 180 * 3.14159 / 180, 
+          child: Tooltip(
+            message: 'Logout',
+            child: IconButton(
+              icon: const Icon(Icons.logout_sharp),
+              onPressed: () {
+                signOut(); 
+              },
+            ),
           ),
-
-          color: Color.fromRGBO(53, 150, 207, 1),
-          // color: Colors.blue
-          height: 70,
-        ));
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _userId(),
+            _signOutClick(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildBottomBarIcon(
+              icon: Icons.add_box_rounded,
+              index: 0,
+              label: 'New Game',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.file_present_sharp,
+              index: 1,
+              label: 'Records',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.home_sharp,
+              index: 2,
+              label: 'Home',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.people_alt_sharp,
+              index: 3,
+              label: 'Friends',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.person,
+              index: 4,
+              label: 'Account',
+            ),
+          ],
+        ),
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
+      ),
+    );
   }
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //       appBar: AppBar(
-  //         title: _title(),
-  //       ),
-  //     body: Container (
-  //       height: double.infinity,
-  //       padding: const EdgeInsets.all(20),
-  //       width: double.infinity,
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: <Widget>[
-  //           _userId(),
-  //           _signOutClick(),
-  //         ],
-  //       )
-  //     )
-  //   );
-  // }
+//fyi tooltip is what gives the user the hint on what the button is
+  Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
+    return Tooltip(
+      message: label,
+      child: IconButton(
+        icon: Icon(icon),
+        color: _selectedIndex == index ? const Color.fromARGB(255, 161, 100, 100) : Colors.black,
+        onPressed: () => _navigateToPage(index),
+        iconSize: 30,
+      ),
+    );
+  }
 }
