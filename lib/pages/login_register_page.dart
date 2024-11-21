@@ -22,8 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
-  final TextEditingController _controllerConfirmPassword =
-      TextEditingController();
+  final TextEditingController _controllerConfirmPassword = TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
     try {
@@ -35,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         errorMessage = '';
       });
     } on FirebaseAuthException catch (e) {
+
       setState(() {
         errorMessage = e.message;
       });
@@ -219,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                 _errorMessage(),
                 const SizedBox(height: 20),
                 _submitButton(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 _loginOrRegister(),
               ],
             ),

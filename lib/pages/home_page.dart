@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
-import 'new_game_page.dart'; 
+import 'new_game_page.dart';
+import 'new_profile_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -48,7 +49,11 @@ class _HomePageState extends State<HomePage> {
         break;
       case 3: //friends
         break;
-      case 2: //profile
+      case 4: //profile
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewProfilePage()),
+        );
         break;
 
       default:
@@ -89,40 +94,40 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildBottomBarIcon(
-              icon: Icons.add_box_rounded,
-              index: 0,
-              label: 'New Game',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.file_present_sharp,
-              index: 1,
-              label: 'Records',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.home_sharp,
-              index: 2,
-              label: 'Home',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.people_alt_sharp,
-              index: 3,
-              label: 'Friends',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.person,
-              index: 4,
-              label: 'Account',
-            ),
-          ],
-        ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildBottomBarIcon(
+            icon: Icons.add_box_rounded,
+            index: 0,
+            label: 'New Game',
+          ),
+          _buildBottomBarIcon(
+            icon: Icons.file_present_sharp,
+            index: 1,
+            label: 'Records',
+          ),
+          _buildBottomBarIcon(
+            icon: Icons.home_sharp,
+            index: 2,
+            label: 'Home',
+          ),
+          _buildBottomBarIcon(
+            icon: Icons.people_alt_sharp,
+            index: 3,
+            label: 'Friends',
+          ),
+          _buildBottomBarIcon(
+            icon: Icons.person,
+            index: 4,
+            label: 'Account',
+          ),
+        ],
       ),
+      color: const Color.fromRGBO(53, 150, 207, 1),
+      height: 70,
+    ),
     );
   }
 //fyi tooltip is what gives the user the hint on what the button is
@@ -131,7 +136,7 @@ class _HomePageState extends State<HomePage> {
       message: label,
       child: IconButton(
         icon: Icon(icon),
-        color: _selectedIndex == index ? const Color.fromARGB(255, 161, 100, 100) : Colors.black,
+         color: _selectedIndex == index ? Colors.white : Colors.black,
         onPressed: () => _navigateToPage(index),
         iconSize: 30,
       ),

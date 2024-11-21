@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gully_king/pages/home_page.dart';
 
 class NewGamePage extends StatelessWidget {
   const NewGamePage({Key? key}) : super(key: key);
@@ -10,7 +11,12 @@ class NewGamePage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); 
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => HomePage()),
+            // );
+            Navigator.pop(context);
+
           },
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
