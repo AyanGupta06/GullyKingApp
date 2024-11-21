@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +11,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _auth.authStateChanges().listen((event){
+      setState(() {
+        _user = event;
+      });
+    });
+  }
+
   String? errorMessage = '';
   bool isLogin = true;
   bool _obscureText = true;
@@ -188,10 +204,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: _user != null
+      ? _userInfo()
+      : Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/bg2_enhanced.jpg'), 
+          image: AssetImage('assets/bg2_enhanced.jpg'),
           fit: BoxFit.cover, 
         ),
       ),
@@ -221,6 +239,8 @@ class _LoginPageState extends State<LoginPage> {
                 _submitButton(),
                 const SizedBox(height: 20),
                 _loginOrRegister(),
+                const SizedBox(height: 20),
+                _googleSignInButton(),
               ],
             ),
           ),
@@ -228,4 +248,26 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  Widget _googleSignInButton(){
+    return Center(child: SizedBox(
+      height: 50,
+      child: SignInButton(Buttons.google, text: "Sign Up with Google", onPressed: (){},
+        ),
+      ),
+    );
+  }
+  Widget _userInfo(){
+    return SizedBox();
+  }
+
+  void _handleGoogleSignIn(){
+    try {
+      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
+      _auth.signInWithProvider(_googleAuthProvider);
+    } catch (error){
+      print(error);
+    }
+  }
+
 }
