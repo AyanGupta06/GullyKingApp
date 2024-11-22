@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import "package:cloud_firestore/cloud_firestore.dart";
+import 'package:gully_king/pages/additional_details_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
         errorMessage = '';
       });
     } on FirebaseAuthException catch (e) {
-
       setState(() {
         errorMessage = e.message;
       });
@@ -50,13 +51,17 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     try {
-      await Auth().createUserWithEmailAndPassword(
+      UserCredential userCredential = await Auth().createUserWithEmailAndPassword(
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
-      setState(() {
-        errorMessage = '';
-      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AdditionalDetailsPage(userCredential: userCredential, password: _controllerPassword.text,),
+        ),
+      );
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -75,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _entryField(String hintText, TextEditingController controller,{bool isPassword = false}) {
+  Widget _entryField(String hintText, TextEditingController controller, {bool isPassword = false}) {
     return TextField(
       controller: controller,
       obscureText: isPassword ? _obscureText : false,
@@ -122,50 +127,49 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       onPressed: _validateAndSubmit,
-    child: Text(isLogin ? 'Login' : 'Register'),
+      child: Text(isLogin ? 'Login' : 'Register'),
     );
   }
 
   Future<void> _validateAndSubmit() async {
-  setState(() {
-    errorMessage = ''; 
-  });
-
-  if (_controllerEmail.text.isEmpty) {
     setState(() {
-      errorMessage = 'Please fill this field: Email';
+      errorMessage = '';
     });
-    return;
-  }
 
-  if (_controllerPassword.text.isEmpty) {
-    setState(() {
-      errorMessage = 'Please fill this field: Password';
-    });
-    return;
-  }
+    if (_controllerEmail.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill this field: Email';
+      });
+      return;
+    }
 
-  if (!isLogin && _controllerConfirmPassword.text.isEmpty) {
-    setState(() {
-      errorMessage = 'Please fill this field: Confirm Password';
-    });
-    return;
-  }
+    if (_controllerPassword.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill this field: Password';
+      });
+      return;
+    }
 
-  if (!isLogin && _controllerPassword.text != _controllerConfirmPassword.text) {
-    setState(() {
-      errorMessage = 'Passwords do not match!';
-    });
-    return;
-  }
-  //final
-  if (isLogin) {
-    await signInWithEmailAndPassword();
-  } else {
-    await createUserWithEmailAndPassword();
-  }
-}
+    if (!isLogin && _controllerConfirmPassword.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill this field: Confirm Password';
+      });
+      return;
+    }
 
+    if (!isLogin && _controllerPassword.text != _controllerConfirmPassword.text) {
+      setState(() {
+        errorMessage = 'Passwords do not match!';
+      });
+      return;
+    }
+
+    if (isLogin) {
+      await signInWithEmailAndPassword();
+    } else {
+      await createUserWithEmailAndPassword();
+    }
+  }
 
   Widget _loginOrRegister() {
     return TextButton(
@@ -189,15 +193,15 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/bg4.png'),
-          fit: BoxFit.cover, 
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/bg4.png'),
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
         child: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height,// - if given error try this.
+            height: MediaQuery.of(context).size.height,
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -207,15 +211,13 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 150),
                 _title(),
                 const SizedBox(height: 20),
-                
                 _entryField("Email", _controllerEmail),
                 const SizedBox(height: 10),
                 _entryField("Password", _controllerPassword, isPassword: true),
                 const SizedBox(height: 10),
-                if (!isLogin) 
-                  _entryField("Confirm Password", _controllerConfirmPassword,
-                      isPassword: true),
-                      const SizedBox(height: 10),
+                if (!isLogin)
+                  _entryField("Confirm Password", _controllerConfirmPassword, isPassword: true),
+                const SizedBox(height: 10),
                 _errorMessage(),
                 const SizedBox(height: 20),
                 _submitButton(),
