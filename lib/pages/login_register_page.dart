@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerConfirmPassword =
-      TextEditingController();
+  TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
     try {
@@ -110,12 +110,12 @@ class _LoginPageState extends State<LoginPage> {
         ),
         suffixIcon: isPassword
             ? IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
-                ),
-                onPressed: _togglePasswordVisibility,
-              )
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey,
+          ),
+          onPressed: _togglePasswordVisibility,
+        )
             : null,
       ),
     );
@@ -138,49 +138,49 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       onPressed: _validateAndSubmit,
-    child: Text(isLogin ? 'Login' : 'Register'),
+      child: Text(isLogin ? 'Login' : 'Register'),
     );
   }
 
   Future<void> _validateAndSubmit() async {
-  setState(() {
-    errorMessage = ''; 
-  });
-
-  if (_controllerEmail.text.isEmpty) {
     setState(() {
-      errorMessage = 'Please fill this field: Email';
+      errorMessage = '';
     });
-    return;
-  }
 
-  if (_controllerPassword.text.isEmpty) {
-    setState(() {
-      errorMessage = 'Please fill this field: Password';
-    });
-    return;
-  }
+    if (_controllerEmail.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill this field: Email';
+      });
+      return;
+    }
 
-  if (!isLogin && _controllerConfirmPassword.text.isEmpty) {
-    setState(() {
-      errorMessage = 'Please fill this field: Confirm Password';
-    });
-    return;
-  }
+    if (_controllerPassword.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill this field: Password';
+      });
+      return;
+    }
 
-  if (!isLogin && _controllerPassword.text != _controllerConfirmPassword.text) {
-    setState(() {
-      errorMessage = 'Passwords do not match!';
-    });
-    return;
+    if (!isLogin && _controllerConfirmPassword.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill this field: Confirm Password';
+      });
+      return;
+    }
+
+    if (!isLogin && _controllerPassword.text != _controllerConfirmPassword.text) {
+      setState(() {
+        errorMessage = 'Passwords do not match!';
+      });
+      return;
+    }
+    //final
+    if (isLogin) {
+      await signInWithEmailAndPassword();
+    } else {
+      await createUserWithEmailAndPassword();
+    }
   }
-  //final
-  if (isLogin) {
-    await signInWithEmailAndPassword();
-  } else {
-    await createUserWithEmailAndPassword();
-  }
-}
 
 
   Widget _loginOrRegister() {
@@ -205,14 +205,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _user != null
-      ? _userInfo()
-      : Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/bg2_enhanced.jpg'),
-          fit: BoxFit.cover, 
+          ? _userInfo()
+          : Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/bg2_enhanced.jpg'),
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
         child: SingleChildScrollView(
           child: Container(
             height: MediaQuery.of(context).size.height, //MediaQuery.of(context).size.height - if given error try this.
@@ -225,15 +225,15 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 150),
                 _title(),
                 const SizedBox(height: 20),
-                
+
                 _entryField("Email", _controllerEmail),
                 const SizedBox(height: 10),
                 _entryField("Password", _controllerPassword, isPassword: true),
                 const SizedBox(height: 10),
-                if (!isLogin) 
+                if (!isLogin)
                   _entryField("Confirm Password", _controllerConfirmPassword,
                       isPassword: true),
-                      const SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _errorMessage(),
                 const SizedBox(height: 20),
                 _submitButton(),
@@ -252,13 +252,38 @@ class _LoginPageState extends State<LoginPage> {
   Widget _googleSignInButton(){
     return Center(child: SizedBox(
       height: 50,
-      child: SignInButton(Buttons.google, text: "Sign Up with Google", onPressed: (){},
-        ),
+      child: SignInButton(Buttons.google, text: "Sign Up with Google", onPressed: _handleGoogleSignIn,
       ),
+    ),
     );
   }
-  Widget _userInfo(){
-    return SizedBox();
+  Widget _userInfo() {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Container(
+            height: 100,
+            width: 100,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(_user!.photoURL!),
+              ),
+            ),
+          ),
+          Text(_user!.email!),
+          Text(_user!.displayName ?? ""),
+          MaterialButton(
+            color: Colors.red,
+            child: const Text("Sign Out"),
+            onPressed: _auth.signOut,
+          )
+        ],
+      ),
+    );
   }
 
   void _handleGoogleSignIn(){
