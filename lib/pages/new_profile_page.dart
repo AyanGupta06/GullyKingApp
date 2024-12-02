@@ -14,6 +14,8 @@ class NewProfilePage extends StatefulWidget {
 
 class _LoginPageState extends State<NewProfilePage> {
   int _selectedIndex = 4; //default homeIndex
+  final User? user = Auth().currentUser;
+
 
 
 
@@ -23,11 +25,18 @@ class _LoginPageState extends State<NewProfilePage> {
   Widget _title() {
     return const Text(
       "GullyKing",
+      textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 42,
         fontWeight: FontWeight.bold,
         color: Colors.blueAccent,
       ),
+    );
+  }
+  Widget _userId() {
+    return Text(
+      user?.email ?? "User Email",
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
     );
   }
 
@@ -44,6 +53,34 @@ class _LoginPageState extends State<NewProfilePage> {
             borderSide: BorderSide.none,
           ),
         ),
+    );
+  }
+
+  Widget _username() {
+    return const Text (
+      "Username: ", 
+      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
+    );
+  }
+
+  Widget _settingsText() {
+    return const Text (
+      "Settings", 
+      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
+
+    );
+  }
+
+  Widget _profileView() {
+    return const Text (
+      "Profile View: ", 
+      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
+    );
+  }
+  Widget _colorScheme() {
+    return const Text (
+      "App Theme: ", 
+      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
     );
   }
 
@@ -86,33 +123,22 @@ class _LoginPageState extends State<NewProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => HomePage()),
-            // );
-          },
-        ),
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-        title: const Text('Create a New Game'),
-      ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 150),
+            const SizedBox(height: 50),
             _title(),
             const SizedBox(height: 20),
-            _usernameEntry("Enter your username", _controllerUsername),
+            _userId(),
+            const SizedBox(height: 20),
+            _settingsText(),
+            const SizedBox(height: 20),
+            _colorScheme(),
 
           ],
         ),

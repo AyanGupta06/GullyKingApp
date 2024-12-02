@@ -114,8 +114,10 @@ class _LoginPageState extends State<LoginPage> {
     return Text(
       errorMessage == '' ? '' : 'Error: $errorMessage',
       style: const TextStyle(color: Colors.white),
+      textAlign: TextAlign.left,
     );
   }
+
 
   Widget _submitButton() {
     return ElevatedButton(
