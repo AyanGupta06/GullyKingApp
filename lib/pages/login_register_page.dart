@@ -235,12 +235,12 @@ class _LoginPageState extends State<LoginPage> {
                       isPassword: true),
                 const SizedBox(height: 10),
                 _errorMessage(),
+                const SizedBox(height: 0),
+                _googleSignInButton(),
                 const SizedBox(height: 20),
                 _submitButton(),
                 const SizedBox(height: 20),
                 _loginOrRegister(),
-                const SizedBox(height: 20),
-                _googleSignInButton(),
               ],
             ),
           ),
@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _googleSignInButton(){
     return Center(child: SizedBox(
-      height: 50,
+      height: 40,
       child: SignInButton(Buttons.google, text: "Sign Up with Google", onPressed: _handleGoogleSignIn,
       ),
     ),
