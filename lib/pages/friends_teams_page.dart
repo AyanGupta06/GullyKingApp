@@ -5,17 +5,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'home_page.dart';
 import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import 'new_profile_page.dart';
 
-class NewProfilePage extends StatefulWidget {
-  const NewProfilePage({super.key});
+class FriendsTeamsPage extends StatefulWidget {
+  const FriendsTeamsPage({super.key});
 
   @override
-  State<NewProfilePage> createState() => _NewProfilePageState();
+  State<FriendsTeamsPage> createState() => _NewProfilePageState();
 }
 
-class _NewProfilePageState extends State<NewProfilePage> {
-  int _selectedIndex = 4; // Default home index
+class _NewProfilePageState extends State<FriendsTeamsPage> {
+  int _selectedIndex = 3; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -178,7 +178,25 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-    
+      appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: 'Friends/Teams',
+            child: IconButton(
+              icon: const Icon(Icons.people_alt_sharp),
+              onPressed: () {
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          'Friends/Team', 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

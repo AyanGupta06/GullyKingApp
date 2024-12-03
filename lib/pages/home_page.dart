@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 import 'new_game_page.dart'; 
+import 'friends_teams_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -48,6 +49,10 @@ class _HomePageState extends State<HomePage> {
       case 2: //home
         break;
       case 3: //friends
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+        );
         break;
       case 4: //profile
       Navigator.push(
@@ -77,6 +82,10 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
+        ),
+        title: const Text(
+          'Home', 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
