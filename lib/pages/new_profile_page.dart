@@ -18,9 +18,17 @@ class _NewProfilePageState extends State<NewProfilePage> {
   int _selectedIndex = 4; // Default home index
   final User? user = Auth().currentUser;
 
+<<<<<<< Updated upstream
   String username = "";
   String position = "";
 
+=======
+  // Variables to hold Firestore data
+  String username = "";
+  String position = "";
+
+  // Fetch user details from Firestore
+>>>>>>> Stashed changes
   Future<void> _fetchUserData() async {
     if (user == null) return;
 
@@ -43,6 +51,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
       );
     }
   }
+<<<<<<< Updated upstream
 
   @override
   void initState() {
@@ -76,38 +85,44 @@ class _NewProfilePageState extends State<NewProfilePage> {
       ),
     );
   }
+=======
+>>>>>>> Stashed changes
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
   Widget _title() {
-    return const Text(
-      "GullyKing",
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 42,
-        fontWeight: FontWeight.bold,
-        color: Colors.blueAccent,
+    return const Center(
+      child: Text(
+        "GullyKing",
+        style: TextStyle(
+          fontSize: 52,
+          fontWeight: FontWeight.bold,
+          color: Colors.blueAccent,
+        ),
       ),
     );
   }
-  Widget _userId() {
-    return Text(
-      user?.email ?? "User Email",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
-  }
 
-  Widget _usernameEntry (String hintText, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.blueAccent),
-          filled: true,
-          fillColor: const Color.fromRGBO(245, 245, 245, 0.6),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide.none,
+  Widget _infoRow({required String label, required String value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              
+            ),
           ),
+<<<<<<< Updated upstream
         ),
     );
   }
@@ -131,6 +146,17 @@ class _NewProfilePageState extends State<NewProfilePage> {
     return const Text (
       "App Theme: ", 
       style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
+=======
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 25,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+>>>>>>> Stashed changes
     );
   }
 
@@ -142,27 +168,31 @@ class _NewProfilePageState extends State<NewProfilePage> {
     });
 
     switch (index) {
-      case 0: //new game
+      case 0: // New game
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewGamePage()),
         );
         break;
-      case 1: //old games
+      case 1: // Old games
         break;
-      case 2: //home
+      case 2: // Home
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
         break;
+<<<<<<< Updated upstream
       case 3: //friends
       Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
         );
+=======
+      case 3: // Friends
+>>>>>>> Stashed changes
         break;
-      case 4: //profile
+      case 4: // Profile
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
@@ -170,15 +200,24 @@ class _NewProfilePageState extends State<NewProfilePage> {
         break;
 
       default:
-      //idk
         break;
     }
   }
 
+<<<<<<< Updated upstream
 
   Widget build(BuildContext context) {
     return Scaffold(
     
+=======
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        title: const Text('Profile Settings'),
+      ),
+>>>>>>> Stashed changes
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -192,9 +231,15 @@ class _NewProfilePageState extends State<NewProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+<<<<<<< Updated upstream
             const SizedBox(height: 30), 
             _title(),
             const SizedBox(height: 20), 
+=======
+            const SizedBox(height: 30), // Reduced white space above title
+            _title(),
+            const SizedBox(height: 20), // Reduced space below title
+>>>>>>> Stashed changes
             _infoRow(label: "Username:", value: username),
             _infoRow(label: "Position:", value: position),
           ],
