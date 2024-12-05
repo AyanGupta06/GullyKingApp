@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/friends_teams_page.dart';
 
 import 'home_page.dart';
 import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import 'new_profile_page.dart';
 
-class NewProfilePage extends StatefulWidget {
-  const NewProfilePage({super.key});
+class YourTeamsPage extends StatefulWidget {
+  const YourTeamsPage({super.key});
 
   @override
-  State<NewProfilePage> createState() => _NewProfilePageState();
+  State<YourTeamsPage> createState() => _NewProfilePageState();
 }
 
-class _NewProfilePageState extends State<NewProfilePage> {
-  int _selectedIndex = 4; // Default home index
+class _NewProfilePageState extends State<YourTeamsPage> {
+  int _selectedIndex = 3; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -77,62 +78,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
     );
   }
 
-
-  Widget _title() {
-    return const Text(
-      "GullyKing",
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 42,
-        fontWeight: FontWeight.bold,
-        color: Colors.blueAccent,
-      ),
-    );
-  }
-  Widget _userId() {
-    return Text(
-      user?.email ?? "User Email",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
-  }
-
-  Widget _usernameEntry (String hintText, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.blueAccent),
-          filled: true,
-          fillColor: const Color.fromRGBO(245, 245, 245, 0.6),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide.none,
-          ),
-        ),
-    );
-  }
-
-
-  Widget _settingsText() {
-    return const Text (
-      "Settings", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-
-    );
-  }
-
-  Widget _profileView() {
-    return const Text (
-      "Profile View: ", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-    );
-  }
-  Widget _colorScheme() {
-    return const Text (
-      "App Theme: ", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-    );
-  }
+ 
 
   
 
@@ -178,7 +124,14 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-    
+      appBar: AppBar(
+        title: const Text(
+          'Your Team', 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -190,14 +143,10 @@ class _NewProfilePageState extends State<NewProfilePage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 30), 
-            _title(),
-            const SizedBox(height: 20), 
-            _infoRow(label: "Username:", value: username),
-            _infoRow(label: "Position:", value: position),
-          ],
+            
+          ]
+          
         ),
       ),
       bottomNavigationBar: BottomAppBar(

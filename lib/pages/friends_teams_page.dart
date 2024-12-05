@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/your_teams_page.dart';
 
 import 'home_page.dart';
 import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import 'new_profile_page.dart';
+import 'your_teams_page.dart';
 
-class NewProfilePage extends StatefulWidget {
-  const NewProfilePage({super.key});
+class FriendsTeamsPage extends StatefulWidget {
+  const FriendsTeamsPage({super.key});
 
   @override
-  State<NewProfilePage> createState() => _NewProfilePageState();
+  State<FriendsTeamsPage> createState() => _NewProfilePageState();
 }
 
-class _NewProfilePageState extends State<NewProfilePage> {
-  int _selectedIndex = 4; // Default home index
+class _NewProfilePageState extends State<FriendsTeamsPage> {
+  int _selectedIndex = 3; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -77,60 +79,70 @@ class _NewProfilePageState extends State<NewProfilePage> {
     );
   }
 
-
-  Widget _title() {
-    return const Text(
-      "GullyKing",
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 42,
-        fontWeight: FontWeight.bold,
-        color: Colors.blueAccent,
-      ),
-    );
-  }
-  Widget _userId() {
-    return Text(
-      user?.email ?? "User Email",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
-  }
-
-  Widget _usernameEntry (String hintText, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.blueAccent),
-          filled: true,
-          fillColor: const Color.fromRGBO(245, 245, 245, 0.6),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide.none,
-          ),
+ 
+  Widget _yourTeams() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1), 
+        side: BorderSide(width: 1.0, color: const Color.fromARGB(255, 187, 191, 194)),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 120),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
         ),
+      ),
+       onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const YourTeamsPage()),
+        );
+      },
+      child: Text(
+        "Your Teams",
+        style: const TextStyle(color: Colors.black, fontSize: 18),
+      )
+      
     );
   }
 
-
-  Widget _settingsText() {
-    return const Text (
-      "Settings", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-
+  Widget _addFriends() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1), 
+        side: BorderSide(width: 1.0, color: const Color.fromARGB(255, 187, 191, 194)),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 120),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+      ),
+       onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewProfilePage()),
+        );
+      },
+      child: Text(
+        "Add Friends",
+        style: const TextStyle(color: Colors.black, fontSize: 18),
+      )
     );
   }
-
-  Widget _profileView() {
-    return const Text (
-      "Profile View: ", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-    );
-  }
-  Widget _colorScheme() {
-    return const Text (
-      "App Theme: ", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
+  Widget _yourFriends() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1), 
+        side: BorderSide(width: 1.0, color: const Color.fromARGB(255, 187, 191, 194)),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 120),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+      ),
+       onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewProfilePage()),
+        );
+      },
+      child: Text(
+        "Your Friends",
+        style: const TextStyle(color: Colors.black, fontSize: 18),
+      )
     );
   }
 
@@ -178,7 +190,25 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-    
+      appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: 'Friends/Teams',
+            child: IconButton(
+              icon: const Icon(Icons.people_alt_sharp),
+              onPressed: () {
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          'Friends/Team', 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -190,14 +220,15 @@ class _NewProfilePageState extends State<NewProfilePage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 30), 
-            _title(),
             const SizedBox(height: 20), 
-            _infoRow(label: "Username:", value: username),
-            _infoRow(label: "Position:", value: position),
-          ],
+            _yourTeams(),
+            const SizedBox(height: 20), 
+            _addFriends(),
+            const SizedBox(height: 20), 
+            _yourFriends(),
+          ]
+          
         ),
       ),
       bottomNavigationBar: BottomAppBar(
