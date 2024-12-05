@@ -3,22 +3,20 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/new_ranked_game_page.dart';
-import 'package:gully_king/pages/new_unranked_game_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
 
 import 'home_page.dart';
 import 'new_game_page.dart';
 import 'friends_teams_page.dart';
 
-class NewGamePage extends StatefulWidget {
-  const NewGamePage({super.key});
+class NewRankedGamePage extends StatefulWidget {
+  const NewRankedGamePage({super.key});
 
   @override
-  State<NewGamePage> createState() => _NewGamePageState();
+  State<NewRankedGamePage> createState() => _NewRankedGamePageState();
 }
 
-class _NewGamePageState extends State<NewGamePage> {
+class _NewRankedGamePageState extends State<NewRankedGamePage> {
   int _selectedIndex = 0; // Default home index
   final User? user = Auth().currentUser;
 
@@ -53,44 +51,6 @@ class _NewGamePageState extends State<NewGamePage> {
     super.initState();
     _fetchUserData();
   }
-
-  
-
-  Widget _unrankedMatchButton() {
-    return FloatingActionButton.extended(
-      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewUnrankedGamePage()),
-        );
-      },
-    
-      label: const Text(
-        "                                 Create New Unranked Game                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-  Widget _rankedMatchButton() {
-    return FloatingActionButton.extended(
-      
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewRankedGamePage()),
-        );
-      },
-      
-      label: const Text(
-        "                                 Create New Ranked Game                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-
-
-  
-  
-
   
 
   void _navigateToPage(int index) {
@@ -136,19 +96,9 @@ class _NewGamePageState extends State<NewGamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 0, 
-          child: Tooltip(
-            message: 'New Game Page',
-            child: IconButton(
-              icon: const Icon(Icons.add_box_rounded),
-              onPressed: () {
-              },
-            ),
-          ),
-        ),
+        
         title: const Text(
-          'New Game', 
+          'New Ranked Game', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
@@ -174,10 +124,7 @@ class _NewGamePageState extends State<NewGamePage> {
             //     _unrankedMatchButton(),
 
             // ],)
-            const SizedBox(height: 20), 
-            _unrankedMatchButton(),
-            const SizedBox(height: 20), 
-            _rankedMatchButton(),
+            
           ],
         ),
       ),
