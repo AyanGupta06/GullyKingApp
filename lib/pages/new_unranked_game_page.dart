@@ -20,8 +20,14 @@ class NewUnrankedGamePage extends StatefulWidget {
 class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
   int _selectedIndex = 0; // Default home index
   final TextEditingController _overSelectValue = TextEditingController();
+  final TextEditingController _controllerTeam1 = TextEditingController();
+  final TextEditingController _controllerTeam2 = TextEditingController();
+
   final User? user = Auth().currentUser;
   String? errorMessage = '';
+
+  List<String> team1Players = [];
+  List<String> team2Players = [];
 
   String username = "";
   String position = "";
@@ -96,7 +102,7 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
   }
 
 
-  Widget _entryField(String hintText, TextEditingController controller, {bool isPassword = false}) {
+  Widget _entryField(String hintText, TextEditingController controller) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -104,8 +110,8 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
         hintStyle: const TextStyle(color: Colors.blueAccent),
         filled: true,
         fillColor: Colors.grey[100],
-        prefixIcon: Icon(
-          isPassword ? Icons.lock : Icons.email,
+        prefixIcon: const Icon(
+          Icons.sports_cricket_sharp,
           color: Colors.blueAccent,
         ),
         border: OutlineInputBorder(
@@ -116,6 +122,109 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
       ),
     );
   }
+
+  Widget _entryFieldTeam(String hintText, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Colors.blueAccent),
+        filled: true,
+        fillColor: Colors.grey[100],
+        prefixIcon: const Icon(
+          Icons.people_alt_sharp,
+          color: Colors.blueAccent,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20.0),
+          borderSide: BorderSide.none,
+        ),
+        
+      ),
+    );
+  }
+
+  Widget _addToTeam1Button() {
+     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      onPressed: _addToTeam1,
+      child: const Text("Add to Team 1"),
+    );
+  }
+
+  void _addToTeam1() {
+    final playerName = _controllerTeam1.text.trim();
+    if(playerName.isNotEmpty) {
+      setState(() {
+        team1Players.add(playerName);
+        _controllerTeam1.clear(); 
+      });
+    }
+  }
+
+  Widget _addToTeam2Button() {
+     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      onPressed: _addToTeam2,
+      child: const Text("Add to Team 2"),
+    );
+  }
+
+  void _addToTeam2() {
+    final playerName = _controllerTeam2.text.trim();
+    if(playerName.isNotEmpty) {
+      setState(() {
+        team2Players.add(playerName);
+        _controllerTeam2.clear(); 
+      });
+    }
+  }
+
+  Widget _teamSection(String teamName, List<String> players) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          teamName,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 10),
+        players.isEmpty
+            ? const Text(
+                "No players added yet",
+                style: TextStyle(color: Colors.white70),
+              )
+            : Column(
+                children: players.map((player) {
+                  return ListTile(
+                    leading: const Icon(Icons.person, color: Colors.blueAccent),
+                    title: Text(
+                      player,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+              ),
+      ],
+    );
+  }
+
 
   Widget _errorMessage() {
     return Text(
@@ -149,10 +258,30 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
         errorMessage = 'Please fill this field: Number of Overs';
       });
       return;
-    } else {
+    } 
+     else if (team1Players.isEmpty) {
+      setState(() {
+        errorMessage = 'Please add People to Team 1';
+      });
+      return;
+    }
+
+     else if (team2Players.isEmpty) {
+      setState(() {
+        errorMessage = 'Please add People to Team 2';
+      });
+      return;
+    }
+    
+    else {
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => StartedNewUnrankedGamePage(numberOfOvers: _overSelectValue.text)),
+          MaterialPageRoute(builder: (context) => StartedNewUnrankedGamePage(
+          numberOfOvers: _overSelectValue.text,
+          team1Players: team1Players,
+          team2Players: team2Players,
+        ),
+      ),
         );
     }
   }
@@ -187,6 +316,32 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
                 const SizedBox(height: 15),
                 _entryField("Enter Number of Overs", _overSelectValue),
                 const SizedBox(height: 15),
+                _entryFieldTeam("Add Players to Team 1", _controllerTeam1),
+                const SizedBox(height: 15),
+                _addToTeam1Button(),
+                const SizedBox(height: 15),
+                _entryFieldTeam("Add Players to Team 2", _controllerTeam2),
+                const SizedBox(height: 15),
+                _addToTeam2Button(),
+                const SizedBox(height: 15),
+                Expanded(
+                  child: Scrollbar(
+                    thumbVisibility: true, 
+                    thickness: 6.0, 
+                    radius: const Radius.circular(10.0), 
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _teamSection("Team 1", team1Players),
+                          const SizedBox(height: 20),
+                          _teamSection("Team 2", team2Players),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
                 _errorMessage(),
                 const SizedBox(height: 15),
                 _startButton(),

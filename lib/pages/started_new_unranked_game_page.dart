@@ -1,61 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:gully_king/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/friends_teams_page.dart';
+import 'package:gully_king/pages/home_page.dart';
+import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/new_ranked_game_page.dart';
-import 'package:gully_king/pages/new_unranked_game_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
-
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import 'package:gully_king/pages/unranked_scorecard_page.dart';
 
 class StartedNewUnrankedGamePage extends StatefulWidget {
   final String numberOfOvers;
-  const StartedNewUnrankedGamePage({super.key, required this.numberOfOvers});
+  final List<String> team1Players;
+  final List<String> team2Players;
+
+  const StartedNewUnrankedGamePage({
+    super.key,
+    required this.numberOfOvers,
+    required this.team1Players,
+    required this.team2Players,
+  });
 
   @override
-  State<StartedNewUnrankedGamePage> createState() => _StartedNewUnrankedGamePageState();
+  State<StartedNewUnrankedGamePage> createState() =>
+      _StartedNewUnrankedGamePageState();
 }
 
 class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage> {
-  int _selectedIndex = 0; // Default home index
-  final User? user = Auth().currentUser;
-
-  String username = "";
-  String position = "";
-
-
-  Future<void> _fetchUserData() async {
-    if (user == null) return;
-
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      setState(() {
-        username = userDoc['username'] ?? "N/A";
-        position = userDoc['position'] ?? "N/A";
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error fetching user data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
-  }
-
+  int _selectedIndex = 0; 
+  String? battingFirstTeam;
+  String? batsmanOnStrike;
+  String? batsmanOnNonStrike;
+  String? bowler;
 
   void _navigateToPage(int index) {
     setState(() {
@@ -96,28 +68,200 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
     }
   }
 
+  
 
+  Widget _selectBattingTeam() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Select Batting Team:",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _teamButton("Team 1", widget.team1Players),
+            const SizedBox(width: 20),
+            _teamButton("Team 2", widget.team2Players),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _teamButton(String teamName, List<String> players) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: battingFirstTeam == teamName
+            ? Colors.blueAccent
+            : Colors.grey.shade300,
+      ),
+      onPressed: () {
+        setState(() {
+          battingFirstTeam = teamName;
+          batsmanOnStrike = null;
+          batsmanOnNonStrike = null;
+          bowler = null;
+        });
+      },
+      child: Text(
+        teamName,
+        style: const TextStyle(color: Colors.black),
+      ),
+    );
+  }
+
+  Widget _selectOpeners() {
+    final players = battingFirstTeam == "Team 1"
+        ? widget.team1Players
+        : widget.team2Players;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Select Openers:",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        DropdownButton<String>(
+          value: batsmanOnStrike,
+          hint: const Text("Batsman on Strike"),
+          items: players.map((player) {
+            return DropdownMenuItem(value: player, child: Text(player));
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              batsmanOnStrike = value;
+            });
+          },
+        ),
+        DropdownButton<String>(
+          value: batsmanOnNonStrike,
+          hint: const Text("Batsman on Non-Strike"),
+          items: players.map((player) {
+            return DropdownMenuItem(value: player, child: Text(player));
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              batsmanOnNonStrike = value;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _selectBowler() {
+    final bowlers = battingFirstTeam == "Team 1"
+        ? widget.team2Players
+        : widget.team1Players;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Select Bowler:",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        DropdownButton<String>(
+          value: bowler,
+          hint: const Text("Select Bowler"),
+          items: bowlers.map((player) {
+            return DropdownMenuItem(value: player, child: Text(player));
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              bowler = value;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _startGameButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      onPressed: _validateAndNavigate,
+      child: const Text(
+        "Start Game",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  void _validateAndNavigate() {
+    if (battingFirstTeam == null) {
+      _showErrorDialog("Please select which team is batting first.");
+      return;
+    }
+
+    else if (batsmanOnStrike == null || batsmanOnNonStrike == null) {
+      _showErrorDialog("Please select the two opening batsmen.");
+      return;
+    }
+
+    else if (bowler == null) {
+      _showErrorDialog("Please select the first bowler.");
+      return;
+    }
+
+    else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UnrankedScorecardPage( 
+            battingFirstTeam: battingFirstTeam,
+            bowler: bowler,
+            batsmanOnStrike: batsmanOnStrike,
+            batsmanOnNonStrike: batsmanOnNonStrike,
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 180 * 3.14159 / 180, 
-          child: Tooltip(
-            message: 'Enter Your Game Records',
-            child: IconButton(
-              icon: const Icon(Icons.sports_cricket),
-              onPressed: () {
-              },
-            ),
-          ),
-        ),
         title: const Text(
-          'Enter Your Game Records', 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+          'Unranked Game Setup',
+          style: TextStyle(color: Colors.black),
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -128,17 +272,32 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: const Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     _unrankedMatchButton(),
-            //     _unrankedMatchButton(),
-
-            // ],)
-            SizedBox(height: 20), 
+            Text(
+              "Overs: ${widget.numberOfOvers}",
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _selectBattingTeam(),
+            const SizedBox(height: 20),
+            if (battingFirstTeam != null) _selectOpeners(),
+            const SizedBox(height: 20),
+            if (batsmanOnStrike != null && batsmanOnNonStrike != null)
+              _selectBowler(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (batsmanOnStrike != null && batsmanOnNonStrike != null && bowler != null)
+                    const SizedBox(height: 30),
+                  _startGameButton(), // Add the Start Game button
+                ],
+              )
 
           ],
         ),
@@ -180,7 +339,6 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
       ),
     );
   }
-
   Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
     return Tooltip(
       message: label,
