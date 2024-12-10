@@ -275,10 +275,12 @@ class UnrankedScorecardPage extends StatefulWidget {
     required this.bowler,
     required this.batsmanOnStrike,
     required this.batsmanOnNonStrike,
+    
   });
 
   @override
-  _UnrankedScorecardPageState createState() => _UnrankedScorecardPageState();
+  _UnrankedScorecardPageState createState() => _UnrankedScorecardPageState();  
+
 }
 
 class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
@@ -294,6 +296,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   late String batsmanOnStrike;
   late String batsmanOnNonStrike;
+  late String bowler;
+  
   
 
   @override
@@ -305,7 +309,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     print(player1.name);
     var player2 = Player(name: batsmanOnNonStrike);
     print(player2.name);
-  }
+  } 
     
 
 
@@ -357,10 +361,30 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
     ); 
   }
+
+  Widget _team2() {
+    return const Text(
+      "Team 2",
+      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
+    ); 
+  }
   
 
   @override
   Widget build(BuildContext context) {
+    batsmanOnStrike = widget.batsmanOnStrike!;
+    batsmanOnNonStrike = widget.batsmanOnNonStrike!;
+    bowler = widget.bowler!;
+    var playerBowler = Player(name: bowler);
+    var player1 = Player(name: batsmanOnStrike);
+
+    print(player1.name);
+    var player2 = Player(name: batsmanOnNonStrike);
+    print(player2.name);
+    int teamRuns = player1.runs + player2.runs;
+    String teamRunsString = teamRuns.toString();
+    int teamBallsFaced = player1.ballsFaced + player2.ballsFaced;
+    String teamBallsFacedString = teamBallsFaced.toString();
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -375,15 +399,71 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
+            const SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children:  [
-                      _team1(),
-                      Text(
-                        "Team 1",
+                    children: [
+                      const Text(
+                        "Team 1 Runs",
                         style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        teamRunsString+ "/" + teamBallsFacedString,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 20, width: 40),
+                      Text(
+                        player1.name + " - " + player1.runs.toString() + "/" + player1.ballsFaced.toString(),
+                        style: TextStyle (
+                          color: Colors.black,
+                          fontSize: 16,
+                        )
+                      ),
+                      Text(
+                        player2.name + " - " + player2.runs.toString() + "/" + player2.ballsFaced.toString(),
+                        style: TextStyle (
+                          color: Colors.black,
+                          fontSize: 16,
+                        )
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        "Team 2 Runs",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const Text(
+                        "Yet to Bat",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        playerBowler.name,
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
                         ),
@@ -391,7 +471,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                     ],
                   ),
                 ),
-            const SizedBox(height: 140),
+              ]
+            ),
+              
+             const SizedBox(height: 40),
             Wrap(
               alignment: WrapAlignment.center,
               spacing: 10,
