@@ -3,8 +3,10 @@ class Player {
   String name;
   int runs;
   int ballsFaced;
+  int runsOnBalls;
+  int ballsBowled;
 
-  Player({required this.name, this.runs = 0, this.ballsFaced = 0});
+  Player({required this.name, this.runs = 0, this.ballsFaced = 0, this.runsOnBalls = 0, this.ballsBowled = 0});
 
   void addRuns(int amount) {
     runs += amount;
@@ -13,6 +15,13 @@ class Player {
   void addBallsFaced() {
     ballsFaced ++;
   }
+  void addRunsOnBalls(int amount) {
+    runsOnBalls += amount;
+  }
+  void addBallsBowled() {
+    ballsBowled ++;
+  }
+  
 
   int get playerRuns {
     return runs;
@@ -22,20 +31,15 @@ class Player {
     return ballsFaced;
   }
 
+  int get playerBallsBowled {
+    return ballsBowled;
+  }
+
+  int get playerRunsOnBalls {
+    return runsOnBalls;
+  }
+
+
+
 
 }
-
-
-
-
-// void main() {
-
-//   var player1 = Player(name: "John Doe");
-
-//   player1.attack();
-
-//   player1.takeDamage(20);
-
-//   print("Player health: ${player1.health}");
-
-// }

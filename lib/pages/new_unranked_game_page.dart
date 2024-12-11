@@ -10,6 +10,27 @@ import 'home_page.dart';
 import 'new_game_page.dart';
 import 'friends_teams_page.dart';
 
+// Player class
+class Player {
+  String name;
+  int runs;
+  int ballsFaced;
+  int runsOnBalls;
+  int ballsBowled;
+  int wicketsTaken;
+  bool hasBatted;
+
+  Player({
+    required this.name,
+    this.runs = 0,
+    this.ballsFaced = 0,
+    this.runsOnBalls = 0,
+    this.ballsBowled = 0,
+    this.wicketsTaken = 0,
+    this.hasBatted = false,
+  });
+}
+
 class NewUnrankedGamePage extends StatefulWidget {
   const NewUnrankedGamePage({super.key});
 
@@ -18,7 +39,7 @@ class NewUnrankedGamePage extends StatefulWidget {
 }
 
 class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
-  int _selectedIndex = 0; // Default home index
+  int _selectedIndex = 0;
   final TextEditingController _overSelectValue = TextEditingController();
   final TextEditingController _controllerTeam1 = TextEditingController();
   final TextEditingController _controllerTeam2 = TextEditingController();
@@ -26,8 +47,8 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
   final User? user = Auth().currentUser;
   String? errorMessage = '';
 
-  List<String> team1Players = [];
-  List<String> team2Players = [];
+  List<Player> team1Players = []; // List of Player objects for Team 1
+  List<Player> team2Players = []; // List of Player objects for Team 2
 
   String username = "";
   String position = "";
@@ -60,7 +81,6 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
     super.initState();
     _fetchUserData();
   }
-  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -68,39 +88,36 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
     });
 
     switch (index) {
-      case 0: //new game
+      case 0:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewGamePage()),
         );
         break;
-      case 1: //old games
+      case 1:
         break;
-      case 2: //home
+      case 2:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
         break;
-      case 3: //friends
-      Navigator.push(
+      case 3:
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
         );
         break;
-      case 4: //profile
+      case 4:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
         );
         break;
-
       default:
-      //idk
         break;
     }
   }
-
 
   Widget _entryField(String hintText, TextEditingController controller) {
     return TextField(
@@ -118,7 +135,6 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
           borderRadius: BorderRadius.circular(20.0),
           borderSide: BorderSide.none,
         ),
-        
       ),
     );
   }
@@ -139,13 +155,12 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
           borderRadius: BorderRadius.circular(20.0),
           borderSide: BorderSide.none,
         ),
-        
       ),
     );
   }
 
   Widget _addToTeam1Button() {
-     return ElevatedButton(
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
@@ -160,16 +175,16 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
 
   void _addToTeam1() {
     final playerName = _controllerTeam1.text.trim();
-    if(playerName.isNotEmpty) {
+    if (playerName.isNotEmpty) {
       setState(() {
-        team1Players.add(playerName);
-        _controllerTeam1.clear(); 
+        team1Players.add(Player(name: playerName)); // Add Player object
+        _controllerTeam1.clear();
       });
     }
   }
 
   Widget _addToTeam2Button() {
-     return ElevatedButton(
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
@@ -184,15 +199,15 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
 
   void _addToTeam2() {
     final playerName = _controllerTeam2.text.trim();
-    if(playerName.isNotEmpty) {
+    if (playerName.isNotEmpty) {
       setState(() {
-        team2Players.add(playerName);
-        _controllerTeam2.clear(); 
+        team2Players.add(Player(name: playerName)); // Add Player object
+        _controllerTeam2.clear();
       });
     }
   }
 
-  Widget _teamSection(String teamName, List<String> players) {
+  Widget _teamSection(String teamName, List<Player> players) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,7 +230,7 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
                   return ListTile(
                     leading: const Icon(Icons.person, color: Colors.blueAccent),
                     title: Text(
-                      player,
+                      player.name, // Display Player name
                       style: const TextStyle(color: Colors.white),
                     ),
                   );
@@ -224,7 +239,6 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
       ],
     );
   }
-
 
   Widget _errorMessage() {
     return Text(
@@ -248,7 +262,7 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
     );
   }
 
-   void _validateAndStart () {
+  void _validateAndStart() {
     setState(() {
       errorMessage = '';
     });
@@ -258,47 +272,41 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
         errorMessage = 'Please fill this field: Number of Overs';
       });
       return;
-    } 
-     else if (team1Players.isEmpty) {
+    } else if (team1Players.isEmpty) {
       setState(() {
         errorMessage = 'Please add People to Team 1';
       });
       return;
-    }
-
-     else if (team2Players.isEmpty) {
+    } else if (team2Players.isEmpty) {
       setState(() {
         errorMessage = 'Please add People to Team 2';
       });
       return;
-    }
-    
-    else {
+    } else {
       Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => StartedNewUnrankedGamePage(
-          numberOfOvers: _overSelectValue.text,
-          team1Players: team1Players,
-          team2Players: team2Players,
+        context,
+        MaterialPageRoute(
+          builder: (context) => StartedNewUnrankedGamePage(
+            numberOfOvers: _overSelectValue.text,
+            team1Players: team1Players,
+            team2Players: team2Players,
+          ),
         ),
-      ),
-        );
+      );
     }
   }
-
-  
-
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Unranked Game', 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+          'Unranked Game',
+          style: TextStyle(
+              fontSize: 22, fontWeight: FontWeight.normal, color: Colors.black),
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -309,91 +317,36 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-         child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 15),
-                _entryField("Enter Number of Overs", _overSelectValue),
-                const SizedBox(height: 15),
-                _entryFieldTeam("Add Players to Team 1", _controllerTeam1),
-                const SizedBox(height: 15),
-                _addToTeam1Button(),
-                const SizedBox(height: 15),
-                _entryFieldTeam("Add Players to Team 2", _controllerTeam2),
-                const SizedBox(height: 15),
-                _addToTeam2Button(),
-                const SizedBox(height: 15),
-                Expanded(
-                  child: Scrollbar(
-                    thumbVisibility: true, 
-                    thickness: 6.0, 
-                    radius: const Radius.circular(10.0), 
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _teamSection("Team 1", team1Players),
-                          const SizedBox(height: 20),
-                          _teamSection("Team 2", team2Players),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                _errorMessage(),
-                const SizedBox(height: 15),
-                _startButton(),
-              ],
-            ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildBottomBarIcon(
-              icon: Icons.add_box_rounded,
-              index: 0,
-              label: 'New Game',
+            const SizedBox(height: 15),
+            _entryField("Select Number of Overs", _overSelectValue),
+            const SizedBox(height: 20),
+            _entryFieldTeam("Add Team 1 Player", _controllerTeam1),
+            _addToTeam1Button(),
+            _entryFieldTeam("Add Team 2 Player", _controllerTeam2),
+            _addToTeam2Button(),
+            const SizedBox(height: 15),
+            _errorMessage(),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: _teamSection("Team 1", team1Players),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: _teamSection("Team 2", team2Players),
+                  ),
+                ],
+              ),
             ),
-            _buildBottomBarIcon(
-              icon: Icons.file_present_sharp,
-              index: 1,
-              label: 'Records',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.home_sharp,
-              index: 2,
-              label: 'Home',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.people_alt_sharp,
-              index: 3,
-              label: 'Friends',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.person,
-              index: 4,
-              label: 'Account',
-            ),
+            _startButton(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
-    return Tooltip(
-      message: label,
-      child: IconButton(
-        icon: Icon(icon),
-        color: _selectedIndex == index ? Colors.white : Colors.black,
-        onPressed: () => _navigateToPage(index),
-        iconSize: 30,
       ),
     );
   }

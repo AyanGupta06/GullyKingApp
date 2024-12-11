@@ -3,12 +3,13 @@ import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/new_unranked_game_page.dart';
 import 'package:gully_king/pages/unranked_scorecard_page.dart';
 
 class StartedNewUnrankedGamePage extends StatefulWidget {
   final String numberOfOvers;
-  final List<String> team1Players;
-  final List<String> team2Players;
+  final List<Player> team1Players;
+  final List<Player> team2Players;
 
   const StartedNewUnrankedGamePage({
     super.key,
@@ -23,11 +24,11 @@ class StartedNewUnrankedGamePage extends StatefulWidget {
 }
 
 class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage> {
-  int _selectedIndex = 0; 
+  int _selectedIndex = 0;
   String? battingFirstTeam;
-  String? batsmanOnStrike;
-  String? batsmanOnNonStrike;
-  String? bowler;
+  Player? batsmanOnStrike;
+  Player? batsmanOnNonStrike;
+  Player? bowler;
 
   void _navigateToPage(int index) {
     setState(() {
@@ -35,27 +36,27 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
     });
 
     switch (index) {
-      case 0: //new game
+      case 0: // new game
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewGamePage()),
         );
         break;
-      case 1: //old games
+      case 1: // old games
         break;
-      case 2: //home
+      case 2: // home
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
         break;
-      case 3: //friends
-      Navigator.push(
+      case 3: // friends
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
         );
         break;
-      case 4: //profile
+      case 4: // profile
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
@@ -63,12 +64,9 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
         break;
 
       default:
-      //idk
         break;
     }
   }
-
-  
 
   Widget _selectBattingTeam() {
     return Column(
@@ -90,7 +88,7 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
     );
   }
 
-  Widget _teamButton(String teamName, List<String> players) {
+  Widget _teamButton(String teamName, List<Player> players) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: battingFirstTeam == teamName
@@ -125,11 +123,11 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        DropdownButton<String>(
+        DropdownButton<Player>(
           value: batsmanOnStrike,
           hint: const Text("Batsman on Strike"),
           items: players.map((player) {
-            return DropdownMenuItem(value: player, child: Text(player));
+            return DropdownMenuItem(value: player, child: Text(player.name));
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -137,11 +135,11 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
             });
           },
         ),
-        DropdownButton<String>(
+        DropdownButton<Player>(
           value: batsmanOnNonStrike,
           hint: const Text("Batsman on Non-Strike"),
           items: players.map((player) {
-            return DropdownMenuItem(value: player, child: Text(player));
+            return DropdownMenuItem(value: player, child: Text(player.name));
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -166,11 +164,11 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        DropdownButton<String>(
+        DropdownButton<Player>(
           value: bowler,
           hint: const Text("Select Bowler"),
           items: bowlers.map((player) {
-            return DropdownMenuItem(value: player, child: Text(player));
+            return DropdownMenuItem(value: player, child: Text(player.name));
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -205,29 +203,28 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
       return;
     }
 
-    else if (batsmanOnStrike == null || batsmanOnNonStrike == null) {
+    if (batsmanOnStrike == null || batsmanOnNonStrike == null) {
       _showErrorDialog("Please select the two opening batsmen.");
       return;
     }
 
-    else if (bowler == null) {
+    if (bowler == null) {
       _showErrorDialog("Please select the first bowler.");
       return;
     }
 
-    else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => UnrankedScorecardPage( 
-            battingFirstTeam: battingFirstTeam,
-            bowler: bowler,
-            batsmanOnStrike: batsmanOnStrike,
-            batsmanOnNonStrike: batsmanOnNonStrike,
-          ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UnrankedScorecardPage(
+          battingFirstTeam: battingFirstTeam,
+          bowler: bowler,
+          batsmanOnStrike: batsmanOnStrike,
+          batsmanOnNonStrike: batsmanOnNonStrike,
+          maxOvers: int.parse(widget.numberOfOvers),
         ),
-      );
-    }
+      ),
+    );
   }
 
   void _showErrorDialog(String message) {
@@ -249,7 +246,6 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -290,15 +286,14 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
             const SizedBox(height: 20),
             if (batsmanOnStrike != null && batsmanOnNonStrike != null)
               _selectBowler(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (batsmanOnStrike != null && batsmanOnNonStrike != null && bowler != null)
-                    const SizedBox(height: 30),
-                  _startGameButton(), // Add the Start Game button
-                ],
-              )
-
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (batsmanOnStrike != null && batsmanOnNonStrike != null && bowler != null)
+                  const SizedBox(height: 30),
+                _startGameButton(),
+              ],
+            ),
           ],
         ),
       ),
@@ -326,6 +321,7 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
             ),
             _buildBottomBarIcon(
               icon: Icons.people_alt_sharp,
+
               index: 3,
               label: 'Friends',
             ),
@@ -339,7 +335,9 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
       ),
     );
   }
-  Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
+
+  Widget _buildBottomBarIcon(
+      {required IconData icon, required int index, required String label}) {
     return Tooltip(
       message: label,
       child: IconButton(
