@@ -177,7 +177,7 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
     final playerName = _controllerTeam1.text.trim();
     if (playerName.isNotEmpty) {
       setState(() {
-        team1Players.add(Player(name: playerName)); // Add Player object
+        team1Players.add(Player(name: playerName)); 
         _controllerTeam1.clear();
       });
     }
@@ -201,7 +201,7 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
     final playerName = _controllerTeam2.text.trim();
     if (playerName.isNotEmpty) {
       setState(() {
-        team2Players.add(Player(name: playerName)); // Add Player object
+        team2Players.add(Player(name: playerName)); 
         _controllerTeam2.clear();
       });
     }
@@ -325,10 +325,13 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
             _entryField("Select Number of Overs", _overSelectValue),
             const SizedBox(height: 20),
             _entryFieldTeam("Add Team 1 Player", _controllerTeam1),
+            const SizedBox(height: 10),
             _addToTeam1Button(),
+            const SizedBox(height: 10),
             _entryFieldTeam("Add Team 2 Player", _controllerTeam2),
+            const SizedBox(height: 10),
             _addToTeam2Button(),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             _errorMessage(),
             Expanded(
               child: Row(

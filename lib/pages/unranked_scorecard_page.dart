@@ -509,12 +509,17 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       if (currentWickets == battingTeam.length - 1) {
         _endInnings();
       } else {
-        // Update the available players list, excluding the batsmen who have already batted
         List<Player> availableBatsmen = battingTeam
-            .where((player) => !player.hasBatted) // Filter out players who have already batted
+            .where((player) => !player.hasBatted) 
             .toList();
 
-        _showNewBatsmanDialog(availableBatsmen); // Pass available batsmen to the dialog
+        List<Player> availableTest = [];
+        for(int i = 0; i < battingTeam.length; i++) {
+          print(battingTeam[i].hasBatted);
+        }
+        print(battingTeam.length);
+
+        _showNewBatsmanDialog(availableBatsmen);
       }
     });
   }
@@ -534,7 +539,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
-                _setupSecondInnings(battingTeam, bowlingTeam); // Pass both teams
+                _setupSecondInnings(battingTeam, bowlingTeam); 
               },
             ),
           ],
@@ -548,8 +553,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _setupSecondInnings(List<Player> battingTeam, List<Player> bowlingTeam) {
     setState(() {
-      this.battingTeam = battingTeam; // Set the batting team for the second innings
-      this.bowlingTeam = bowlingTeam; // Set the bowling team for the second innings
+      this.battingTeam = battingTeam; 
+      this.bowlingTeam = bowlingTeam; 
       batsmanOnStrike = null;
       batsmanOnNonStrike = null;
       bowler = null;
@@ -571,8 +576,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       context: context,
       builder: (BuildContext context) {
         return NewInningsSetupDialog(
-          availableBatsmen: battingTeam, // Pass the batting team for batsmen selection
-          availableBowlers: bowlingTeam, // Pass the bowling team for bowler selection
+          availableBatsmen: battingTeam, 
+          availableBowlers: bowlingTeam, 
           onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike, Player newBowler) {
             setState(() {
               batsmanOnStrike = newStrike;
@@ -585,24 +590,54 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
+   void _showNewBatsmanDialog(List<Player> availableBatsmen) {
+    // print(availableBatsmen.toString());
+    // availableBatsmen.add(new Player(name: "James"));
+
+    // test to see why dialog box was returning as empty
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select a New Batsman"),
+          content: DropdownButton<Player>(
+            hint: const Text("Select Batsman"),
+            items: availableBatsmen.map((Player player) {
+              return DropdownMenuItem<Player>(
+                value: player,
+                child: Text(player.name),
+              );
+            }).toList(),
+            onChanged: (Player? selectedPlayer) {
+              if (selectedPlayer != null) {
+                // onBatsmanSelected(selectedPlayer);
+                Navigator.pop(context);
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
 
 
-  void _showNewBatsmanDialog(List<Player> availableBatsmen) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return NewBatsmanDialog(
-        availableBatsmen: availableBatsmen, // Pass available batsmen
-        onBatsmanSelected: (Player newBatsman) {
-          setState(() {
-            batsmanOnStrike = newBatsman;
-            batsmanOnStrike!.hasBatted = true; // Mark the selected batsman as batted
-          });
-        },
-      );
-    },
-  );
-}
+
+  // void _showNewBatsmanDialog(List<Player> availableBatsmen) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return NewBatsmanDialog(
+  //         availableBatsmen: availableBatsmen, 
+  //         onBatsmanSelected: (Player newBatsman) {
+  //           setState(() {
+  //             batsmanOnStrike = newBatsman;
+  //             batsmanOnStrike!.hasBatted = true; 
+  //           });
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
 
   void _changeStrike() {
