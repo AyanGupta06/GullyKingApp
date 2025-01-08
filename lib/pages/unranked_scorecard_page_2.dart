@@ -1,12 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:gully_king/pages/new_batsman_dialog.dart';
 import 'package:gully_king/pages/new_innings_setup_dialog.dart';
 import 'package:gully_king/pages/new_unranked_game_page.dart';
-import 'package:gully_king/pages/unranked_scorecard_page_2.dart';
 
-class UnrankedScorecardPage extends StatefulWidget {
-  final String? battingFirstTeam;
+class UnrankedScorecardPage2 extends StatefulWidget {
   final Player? batsmanOnStrike;
   final Player? batsmanOnNonStrike;
   final Player? bowler;
@@ -14,9 +11,8 @@ class UnrankedScorecardPage extends StatefulWidget {
   final List<Player> battingTeam;
   final List<Player> bowlingTeam;
 
-  const UnrankedScorecardPage({
+  const UnrankedScorecardPage2({
     super.key,
-    required this.battingFirstTeam,
     required this.batsmanOnStrike,
     required this.batsmanOnNonStrike,
     required this.bowler,
@@ -24,10 +20,10 @@ class UnrankedScorecardPage extends StatefulWidget {
   });
 
   @override
-  State<UnrankedScorecardPage> createState() => _UnrankedScorecardPageState();
+  State<UnrankedScorecardPage2> createState() => _UnrankedScorecardPage2State();
 }
 
-class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
+class _UnrankedScorecardPage2State extends State<UnrankedScorecardPage2> {
   Player? batsmanOnStrike;
   Player? batsmanOnNonStrike;
   Player? bowler;
@@ -73,21 +69,6 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
-  // void _recordWicket() {
-  //   setState(() {
-  //     currentWickets++;
-  //     bowler?.wicketsTaken++;
-
-  //     if (currentWickets == battingTeam.length - 1) {
-  //       _endInnings();
-  //     } else {
-  //       List<Player> availableBatsmen = battingTeam
-  //           .where((player) => !player.hasBatted) 
-  //           .toList();
-  //       _showNewBatsmanDialog(availableBatsmen);
-  //     }
-  //   });
-  // }
   void _recordWicket() {
     setState(() {
       batsmanOnStrike?.ballsFaced++;
@@ -131,7 +112,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
-                _setupSecondInnings(battingTeam, bowlingTeam); 
+                // _setupSecondInnings(battingTeam, bowlingTeam); 
               },
             ),
           ],
@@ -140,82 +121,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
-
-
-
-  void _setupSecondInnings(List<Player> battingTeam, List<Player> bowlingTeam) {
-    setState(() {
-      this.battingTeam = bowlingTeam; 
-      this.bowlingTeam = battingTeam; 
-      batsmanOnStrike = null;
-      batsmanOnNonStrike = null;
-      bowler = null;
-      totalOvers = 0;
-      totalBalls = 0;
-      teamScore = 0;
-      currentWickets = 0;
-    });
-
-    _showNewInningsSetupDialog(bowlingTeam, battingTeam);
-  }
-
-
-
-
-
-  // void _showNewInningsSetupDialog(List<Player> battingTeam, List<Player> bowlingTeam) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return NewInningsSetupDialog(
-  //         availableBatsmen: battingTeam, 
-  //         availableBowlers: bowlingTeam, 
-  //         onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike, Player newBowler) {
-  //           setState(() {
-  //             batsmanOnStrike = newStrike;
-  //             batsmanOnNonStrike = newNonStrike;
-  //             bowler = newBowler;
-  //           });
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
-  void _showNewInningsSetupDialog(List<Player> battingTeam, List<Player> bowlingTeam) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return NewInningsSetupDialog(
-          availableBatsmen: battingTeam, 
-          availableBowlers: bowlingTeam, 
-          onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike, Player newBowler) {
-            // setState(() {
-            //   batsmanOnStrike = newStrike;
-            //   batsmanOnNonStrike = newNonStrike;
-            //   bowler = newBowler;
-            // });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UnrankedScorecardPage2(
-                  bowler: bowler,
-                  batsmanOnStrike: batsmanOnStrike,
-                  batsmanOnNonStrike: batsmanOnNonStrike,
-                  maxOvers: totalOvers,
-                  battingTeam: battingTeam,
-                  bowlingTeam: bowlingTeam, 
-
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-   void _showNewBatsmanDialog(List<Player> availableBatsmen) {
+  void _showNewBatsmanDialog(List<Player> availableBatsmen) {
     // print(availableBatsmen.toString());
     // availableBatsmen.add(new Player(name: "James"));
 
@@ -350,7 +256,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "${widget.battingFirstTeam} Scorecard",
+          "${"Team 2"} Scorecard",
           style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
@@ -405,5 +311,4 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 }
-
 

@@ -29,6 +29,10 @@ class Player {
     this.wicketsTaken = 0,
     this.hasBatted = false,
   });
+
+  void setHasBatted(bool test) {
+    hasBatted = test;
+  }
 }
 
 class NewUnrankedGamePage extends StatefulWidget {

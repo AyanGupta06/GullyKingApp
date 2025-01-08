@@ -29,6 +29,7 @@ class NewInningsSetupDialog extends StatelessWidget {
             value: newStrike,
             onChanged: (Player? player) {
               newStrike = player;
+              
             },
             items: availableBatsmen.map((Player batsman) {
               return DropdownMenuItem<Player>(
@@ -72,7 +73,6 @@ class NewInningsSetupDialog extends StatelessWidget {
               onBatsmenAndBowlerSelected(newStrike!, newNonStrike!, newBowler!);
               Navigator.of(context).pop();
             } else {
-              // Handle the case where all values are not selected (optional)
             }
           },
           child: const Text('Start'),
