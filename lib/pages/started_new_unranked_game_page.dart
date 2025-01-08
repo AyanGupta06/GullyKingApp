@@ -29,6 +29,8 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
   Player? batsmanOnStrike;
   Player? batsmanOnNonStrike;
   Player? bowler;
+  List<Player> battingFirstPlayers = [];
+  List<Player> bowlingFirstPlayers = [];
 
   void _navigateToPage(int index) {
     setState(() {
@@ -213,6 +215,17 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
       return;
     }
 
+    if(battingFirstTeam == "Team 1") {
+      battingFirstPlayers = widget.team1Players;
+      bowlingFirstPlayers = widget.team2Players;
+    } else if (battingFirstTeam == "Team 2") {
+      battingFirstPlayers = widget.team2Players;
+      bowlingFirstPlayers = widget.team1Players;
+    } 
+
+    print("Batting Test " + battingFirstPlayers[0].name);
+    print(bowlingFirstPlayers);
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -222,6 +235,9 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
           batsmanOnStrike: batsmanOnStrike,
           batsmanOnNonStrike: batsmanOnNonStrike,
           maxOvers: int.parse(widget.numberOfOvers),
+          battingTeam: battingFirstPlayers,
+          bowlingTeam: bowlingFirstPlayers, 
+
         ),
       ),
     );
