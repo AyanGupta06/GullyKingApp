@@ -210,6 +210,11 @@ class _StartedNewUnrankedGamePageState extends State<StartedNewUnrankedGamePage>
       return;
     }
 
+    if(batsmanOnStrike == batsmanOnNonStrike) {
+      _showErrorDialog("Please select two different players for each batting posiiton.");
+      return;
+    }
+
     if (bowler == null) {
       _showErrorDialog("Please select the first bowler.");
       return;

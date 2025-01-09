@@ -37,6 +37,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int totalOvers = 0;
   int totalBalls = 0;
   int currentWickets = 0;
+  bool isSecondInnings = false;
 
   @override
   void initState() {
@@ -94,6 +95,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       currentWickets++;
       bowler?.wicketsTaken++;
       totalBalls++;
+      batsmanOnStrike?.setHasBatted(true);
+      batsmanOnNonStrike?.setHasBatted(true);
+      print(batsmanOnStrike?.hasBatted);
       
 
       print("Length " + battingTeam.length.toString());
@@ -124,14 +128,19 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("End of Innings"),
-          content: const Text(
-              "The innings is over. Please select the batsmen and bowler for the next innings."),
+          content: Text(
+            !isSecondInnings
+                ? "The innings is over. Please select the batsmen and bowler for the next innings."
+                : "The game is over.",
+          ),
           actions: [
             TextButton(
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
-                _setupSecondInnings(battingTeam, bowlingTeam); 
+                if (!isSecondInnings) {
+                  _setupSecondInnings(battingTeam, bowlingTeam);
+                }
               },
             ),
           ],
@@ -139,6 +148,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       },
     );
   }
+
 
 
 
@@ -154,6 +164,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       totalBalls = 0;
       teamScore = 0;
       currentWickets = 0;
+      isSecondInnings = true;
     });
 
     _showNewInningsSetupDialog(bowlingTeam, battingTeam);
@@ -190,25 +201,25 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
           availableBatsmen: battingTeam, 
           availableBowlers: bowlingTeam, 
           onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike, Player newBowler) {
-            // setState(() {
-            //   batsmanOnStrike = newStrike;
-            //   batsmanOnNonStrike = newNonStrike;
-            //   bowler = newBowler;
-            // });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UnrankedScorecardPage2(
-                  bowler: bowler,
-                  batsmanOnStrike: batsmanOnStrike,
-                  batsmanOnNonStrike: batsmanOnNonStrike,
-                  maxOvers: totalOvers,
-                  battingTeam: battingTeam,
-                  bowlingTeam: bowlingTeam, 
+            setState(() {
+              batsmanOnStrike = newStrike;
+              batsmanOnNonStrike = newNonStrike;
+              bowler = newBowler;
+            });
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => UnrankedScorecardPage2(
+            //       bowler: bowler,
+            //       batsmanOnStrike: batsmanOnStrike,
+            //       batsmanOnNonStrike: batsmanOnNonStrike,
+            //       maxOvers: totalOvers,
+            //       battingTeam: battingTeam,
+            //       bowlingTeam: bowlingTeam, 
 
-                ),
-              ),
-            );
+            //     ),
+            //   ),
+            // );
           },
         );
       },
@@ -405,5 +416,4 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 }
-
 
