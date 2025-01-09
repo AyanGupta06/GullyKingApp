@@ -1,9 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_batsman_dialog.dart';
+import 'package:gully_king/pages/new_bowler_dialog.dart';
+
 import 'package:gully_king/pages/new_innings_setup_dialog.dart';
 import 'package:gully_king/pages/new_unranked_game_page.dart';
-import 'package:gully_king/pages/unranked_scorecard_page_2.dart';
 
 class UnrankedScorecardPage extends StatefulWidget {
   final String? battingFirstTeam;
@@ -38,6 +40,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int totalBalls = 0;
   int currentWickets = 0;
   bool isSecondInnings = false;
+  int firstTeamScore = 0;
 
   @override
   void initState() {
@@ -59,13 +62,25 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       bowler?.runsOnBalls += runs;
       teamScore += runs;
 
+      if (firstTeamScore < teamScore && isSecondInnings) {
+        _endGame();
+      }
+
       totalBalls++;
       if (totalBalls % 6 == 0) {
         totalOvers++;
+        _showNewBowlerDialog();
+        _changeStrike();
       }
 
       if (totalOvers >= widget.maxOvers) {
-        _endInnings();
+        print("Total Overs" + totalOvers.toString());
+        print("Max Overs" + widget.maxOvers.toString());
+        if(!isSecondInnings){
+          _endInnings();
+        } else {
+          _endGame();
+        }
       }
 
       if (runs % 2 != 0) {
@@ -74,21 +89,33 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
-  // void _recordWicket() {
-  //   setState(() {
-  //     currentWickets++;
-  //     bowler?.wicketsTaken++;
+  void _showNewBowlerDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select a New Bowler"),
+          content: DropdownButton<Player>(
+            hint: const Text("Select New Bowler"),
+            items: bowlingTeam.map((Player player) {
+              return DropdownMenuItem<Player>(
+                value: player,
+                child: Text(player.name),
+              );
+            }).toList(),
+            onChanged: (Player? selectedPlayer) {
+              if (selectedPlayer != null) {
+                 onBowlerSelected(selectedPlayer, bowler);
+                Navigator.pop(context);
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
 
-  //     if (currentWickets == battingTeam.length - 1) {
-  //       _endInnings();
-  //     } else {
-  //       List<Player> availableBatsmen = battingTeam
-  //           .where((player) => !player.hasBatted) 
-  //           .toList();
-  //       _showNewBatsmanDialog(availableBatsmen);
-  //     }
-  //   });
-  // }
+
   void _recordWicket() {
     setState(() {
       batsmanOnStrike?.ballsFaced++;
@@ -128,10 +155,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("End of Innings"),
-          content: Text(
-            !isSecondInnings
-                ? "The innings is over. Please select the batsmen and bowler for the next innings."
-                : "The game is over.",
+          content: const Text(
+            "The innings is over. Please follow the next instructions."
           ),
           actions: [
             TextButton(
@@ -140,7 +165,45 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                 Navigator.of(context).pop();
                 if (!isSecondInnings) {
                   _setupSecondInnings(battingTeam, bowlingTeam);
+                } else {
+                  _endGame();
                 }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _endGame() {
+    String temp = "";
+    if(firstTeamScore > teamScore) {
+      print("Team 1 Won!");
+      temp = "Team 1 Won!";
+    } else if (firstTeamScore < teamScore) {
+      print("Team 2 Won!");
+      temp = "Team 2 Won!";
+    } else {
+      print("Tie Game!");
+      temp = "Tie Game!";
+    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("End of Game"),
+          content: Text(
+            "The game is over. " + temp,
+          ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
               },
             ),
           ],
@@ -162,9 +225,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       bowler = null;
       totalOvers = 0;
       totalBalls = 0;
+      firstTeamScore = teamScore;
       teamScore = 0;
       currentWickets = 0;
       isSecondInnings = true;
+      
     });
 
     _showNewInningsSetupDialog(bowlingTeam, battingTeam);
@@ -262,6 +327,19 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnStrike = player;
     });
   }
+
+  void onBowlerSelected(Player player, Player? bowler) {
+    if(player == bowler) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This bowler just bowled. Select another.')),
+      );
+    }
+    print(player.name);
+    setState(() {
+      bowler = player;
+    });
+  }
+
 
 
 
@@ -361,7 +439,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "${widget.battingFirstTeam} Scorecard",
+          !isSecondInnings
+                ?"Team 1 Scorecard"
+                :"Team 2 Scorecard",
+          // "${widget.battingFirstTeam} Scorecard",
           style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
