@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/pages/new_unranked_game_page.dart';
 
 class NewInningsSetupDialog extends StatefulWidget {
-  final Function(Player, Player, Player) onBatsmenAndBowlerSelected;
+  final Function(Player, Player) onBatsmenAndBowlerSelected;
   final List<Player> availableBatsmen;
   final List<Player> availableBowlers;
 
@@ -20,7 +20,7 @@ class NewInningsSetupDialog extends StatefulWidget {
 class _NewInningsSetupDialogState extends State<NewInningsSetupDialog> {
   Player? newStrike;
   Player? newNonStrike;
-  Player? newBowler;
+  //Player? newBowler;
 
   @override
   Widget build(BuildContext context) {
@@ -59,28 +59,28 @@ class _NewInningsSetupDialogState extends State<NewInningsSetupDialog> {
               );
             }).toList(),
           ),
-          DropdownButton<Player>(
-            hint: const Text('Select Bowler'),
-            value: newBowler,
-            onChanged: (Player? player) {
-              setState(() {
-                newBowler = player;
-              });
-            },
-            items: widget.availableBowlers.map((Player bowler) {
-              return DropdownMenuItem<Player>(
-                value: bowler,
-                child: Text(bowler.name),
-              );
-            }).toList(),
-          ),
+          // DropdownButton<Player>(
+          //   hint: const Text('Select Bowler'),
+          //   value: newBowler,
+          //   onChanged: (Player? player) {
+          //     setState(() {
+          //       newBowler = player;
+          //     });
+          //   },
+          //   items: widget.availableBowlers.map((Player bowler) {
+          //     return DropdownMenuItem<Player>(
+          //       value: bowler,
+          //       child: Text(bowler.name),
+          //     );
+          //   }).toList(),
+          // ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () {
-            if (newStrike != null && newNonStrike != null && newBowler != null && newStrike != newNonStrike) {
-              widget.onBatsmenAndBowlerSelected(newStrike!, newNonStrike!, newBowler!);
+            if (newStrike != null && newNonStrike != null &&  newStrike != newNonStrike) {
+              widget.onBatsmenAndBowlerSelected(newStrike!, newNonStrike!);
               Navigator.of(context).pop();
             } 
             else if(newStrike == newNonStrike) {

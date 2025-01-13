@@ -41,6 +41,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int currentWickets = 0;
   bool isSecondInnings = false;
   int firstTeamScore = 0;
+  bool isFirstBallBowled = false;
 
   @override
   void initState() {
@@ -61,16 +62,24 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnStrike?.ballsFaced++;
       bowler?.runsOnBalls += runs;
       teamScore += runs;
+      bowler?.ballsBowled++;
 
       if (firstTeamScore < teamScore && isSecondInnings) {
         _endGame();
       }
 
       totalBalls++;
-      if (totalBalls % 6 == 0) {
+      if(totalBalls == 1) {
+        isFirstBallBowled = true;
+      }
+      print(bowler?.ballsBowled);
+      if (totalBalls % 6 == 0 && !(totalBalls/6 == totalOvers)) {
         totalOvers++;
-        _showNewBowlerDialog();
-        _changeStrike();
+        if(bowler?.ballsBowled != 0) {
+          //_showNewBowlerDialog();
+          _changeStrike();
+        }
+         
       }
 
       if (totalOvers >= widget.maxOvers) {
@@ -89,26 +98,34 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
-  void _showNewBowlerDialog() {
+  void _showNewBowlerDialog(List<Player> team) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Select a New Bowler"),
           content: DropdownButton<Player>(
             hint: const Text("Select New Bowler"),
-            items: bowlingTeam.map((Player player) {
+            items: team.map((Player player) {
               return DropdownMenuItem<Player>(
                 value: player,
                 child: Text(player.name),
               );
             }).toList(),
+            
             onChanged: (Player? selectedPlayer) {
-              if (selectedPlayer != null) {
-                 onBowlerSelected(selectedPlayer, bowler);
+              if (selectedPlayer != bowler) {
+                 onBowlerSelected(selectedPlayer!);
                 Navigator.pop(context);
+              } 
+               else if (selectedPlayer == bowler) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Select a different bowler - this bowler just bowled.')),
+              );
               }
             },
+            
           ),
         );
       },
@@ -165,6 +182,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                 Navigator.of(context).pop();
                 if (!isSecondInnings) {
                   _setupSecondInnings(battingTeam, bowlingTeam);
+                  setState(() {
+                    isSecondInnings = true;
+                  });
                 } else {
                   _endGame();
                 }
@@ -217,6 +237,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
 
   void _setupSecondInnings(List<Player> battingTeam, List<Player> bowlingTeam) {
+    List <Player> temp = [];
     setState(() {
       this.battingTeam = bowlingTeam; 
       this.bowlingTeam = battingTeam; 
@@ -229,10 +250,14 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       teamScore = 0;
       currentWickets = 0;
       isSecondInnings = true;
+      temp = battingTeam;
+      battingTeam = bowlingTeam;
+      bowlingTeam = temp;
+      isFirstBallBowled = false;
       
     });
 
-    _showNewInningsSetupDialog(bowlingTeam, battingTeam);
+    _showNewInningsSetupDialog(battingTeam, bowlingTeam);
   }
 
 
@@ -260,16 +285,16 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _showNewInningsSetupDialog(List<Player> battingTeam, List<Player> bowlingTeam) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return NewInningsSetupDialog(
           availableBatsmen: battingTeam, 
           availableBowlers: bowlingTeam, 
-          onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike, Player newBowler) {
+          onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike) {
             setState(() {
               batsmanOnStrike = newStrike;
               batsmanOnNonStrike = newNonStrike;
-              bowler = newBowler;
             });
             // Navigator.push(
             //   context,
@@ -289,6 +314,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         );
       },
     );
+    //_showNewBowlerDialog(bowlingTeam);
   }
 
    void _showNewBatsmanDialog(List<Player> availableBatsmen) {
@@ -297,6 +323,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
     // test to see why dialog box was returning as empty
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -328,16 +355,13 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
-  void onBowlerSelected(Player player, Player? bowler) {
-    if(player == bowler) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('This bowler just bowled. Select another.')),
-      );
-    }
+  void onBowlerSelected(Player player) {
+   
     print(player.name);
     setState(() {
       bowler = player;
     });
+    print("New Bowler Name" + bowler!.name);
   }
 
 
@@ -352,6 +376,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnStrike = batsmanOnNonStrike;
       batsmanOnNonStrike = temp;
     });
+    if(totalBalls%6 == 0 && (totalBalls/6 == widget.maxOvers)) {
+      _showNewBowlerDialog(battingTeam);
+    } else {
+      _showNewBowlerDialog(bowlingTeam);
+    }
   }
 
   Widget _batsmanCard(Player batsman, bool isOnStrike) {
@@ -497,4 +526,3 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 }
-
