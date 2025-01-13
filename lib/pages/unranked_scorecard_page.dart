@@ -75,7 +75,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       print(bowler?.ballsBowled);
       if (totalBalls % 6 == 0 && !(totalBalls/6 == totalOvers)) {
         totalOvers++;
-        if(bowler?.ballsBowled != 0) {
+        if(totalBalls % 6 == 0) {
           //_showNewBowlerDialog();
           _changeStrike();
         }
@@ -210,6 +210,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     }
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("End of Game"),
