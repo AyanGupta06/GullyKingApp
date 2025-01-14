@@ -19,6 +19,7 @@ class Player {
   int ballsBowled;
   int wicketsTaken;
   bool hasBatted;
+  String outMessage;
 
   Player({
     required this.name,
@@ -28,6 +29,7 @@ class Player {
     this.ballsBowled = 0,
     this.wicketsTaken = 0,
     this.hasBatted = false,
+    this.outMessage = "",
   });
 
   void setHasBatted(bool test) {

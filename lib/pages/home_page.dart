@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/previous_games_page.dart';
 import 'new_game_page.dart'; 
 import 'friends_teams_page.dart';
 
@@ -45,6 +46,10 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 1: //old games
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+        );
         break;
       case 2: //home
         break;
@@ -103,6 +108,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,8 +141,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
       ),
     );
   }

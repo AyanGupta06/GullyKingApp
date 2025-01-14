@@ -145,6 +145,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _recordWicket() {
     setState(() {
+      batsmanOnNonStrike?.outMessage = "This batter is out";
       batsmanOnStrike?.ballsFaced++;
       currentWickets++;
       bowler?.wicketsTaken++;
@@ -209,12 +210,22 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _endGame() {
     String temp = "";
+    int runsDifference = 0;
     if(firstTeamScore > teamScore) {
-      print("Team 1 Won!");
+      runsDifference = firstTeamScore - teamScore;
+      print("Team 1 Won by " + runsDifference.toString() + " runs!");
       temp = "Team 1 Won!";
     } else if (firstTeamScore < teamScore) {
-      print("Team 2 Won!");
-      temp = "Team 2 Won!";
+      
+      int secondTeamWickets = 0;
+      for(int j = 0; j < battingTeam.length; j++) {
+        if(battingTeam[j].outMessage != "") {
+          secondTeamWickets++;
+        }
+      }
+      
+      print("Team 2 Won by " + (battingTeam.length-secondTeamWickets).toString());
+      temp = "Team 2 won by " + (battingTeam.length-secondTeamWickets).toString() + " wickets!";
     } else {
       print("Tie Game!");
       temp = "Tie Game!";
@@ -400,6 +411,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
+  
+
   Widget _bowlerCard(Player bowler) {
 
   
@@ -461,6 +474,15 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
+  Widget _runsLeft() {
+    int runsLeft = firstTeamScore - teamScore;
+    return Text (
+      "Runs Needed to Win: "+ runsLeft.toString(), 
+      style: const TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.black)
+
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -488,6 +510,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+           // backgroundColor: i == 4 || i == 6 ? Colors.green : Colors.blue,
+            
+            
             Text(
               "Team Score: $teamScore",
               style: const TextStyle(
@@ -502,8 +527,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                 color: Colors.black54,
               ),
             ),
+            const SizedBox(height: 10),
+            if(isSecondInnings) _runsLeft(),
             const SizedBox(height: 20),
-            
             if (batsmanOnStrike != null) _batsmanCard(batsmanOnStrike!, true),
             if (batsmanOnNonStrike != null) _batsmanCard(batsmanOnNonStrike!, false),
 
