@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 import 'package:gully_king/pages/new_ranked_game_page.dart';
 import 'package:gully_king/pages/new_unranked_game_page.dart';
+import 'package:gully_king/pages/previous_games_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
 
 import 'home_page.dart';
@@ -106,6 +107,10 @@ class _NewGamePageState extends State<NewGamePage> {
         );
         break;
       case 1: //old games
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+        );
         break;
       case 2: //home
         Navigator.push(
@@ -155,7 +160,7 @@ class _NewGamePageState extends State<NewGamePage> {
         elevation: 0,
         ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/bg4.png'),
             fit: BoxFit.cover,
@@ -182,6 +187,8 @@ class _NewGamePageState extends State<NewGamePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,8 +220,6 @@ class _NewGamePageState extends State<NewGamePage> {
             ),
           ],
         ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
       ),
     );
   }
