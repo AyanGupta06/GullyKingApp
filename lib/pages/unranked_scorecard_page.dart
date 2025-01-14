@@ -6,6 +6,9 @@ import 'package:gully_king/pages/new_bowler_dialog.dart';
 
 import 'package:gully_king/pages/new_innings_setup_dialog.dart';
 import 'package:gully_king/pages/new_unranked_game_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class UnrankedScorecardPage extends StatefulWidget {
   final String? battingFirstTeam;
@@ -216,6 +219,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       print("Tie Game!");
       temp = "Tie Game!";
     }
+
+    _storeMatchData(temp);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -239,6 +244,33 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       },
     );
   }
+
+  void _storeMatchData(String result) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw Exception("User is not logged in.");
+    }
+
+    String userEmail = user.email ?? "unknown";
+
+    await FirebaseFirestore.instance.collection('matches').add({
+      'email': userEmail,
+      'team1Score': "Team 1 Score - $firstTeamScore",
+      'team2Score': "Team 2 Score - $teamScore",
+      'result': result,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    print("Match data stored successfully.");
+  } catch (e) {
+    print("Failed to store match data: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error saving match data: $e')),
+    );
+  }
+}
 
 
 
@@ -267,27 +299,6 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
 
 
-
-
-  // void _showNewInningsSetupDialog(List<Player> battingTeam, List<Player> bowlingTeam) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return NewInningsSetupDialog(
-  //         availableBatsmen: battingTeam, 
-  //         availableBowlers: bowlingTeam, 
-  //         onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike, Player newBowler) {
-  //           setState(() {
-  //             batsmanOnStrike = newStrike;
-  //             batsmanOnNonStrike = newNonStrike;
-  //             bowler = newBowler;
-  //           });
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
   void _showNewInningsSetupDialog(List<Player> battingTeam, List<Player> bowlingTeam) {
     showDialog(
       barrierDismissible: false,
@@ -307,14 +318,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         );
       },
     );
-    //_showNewBowlerDialog();
   }
 
    void _showNewBatsmanDialog(List<Player> availableBatsmen) {
-    // print(availableBatsmen.toString());
-    // availableBatsmen.add(new Player(name: "James"));
 
-    // test to see why dialog box was returning as empty
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -394,6 +401,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   }
 
   Widget _bowlerCard(Player bowler) {
+
+  
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -405,7 +414,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Text(
-              "${bowler.wicketsTaken}/${bowler.runsOnBalls}",
+              "${bowler.wicketsTaken}/${bowler.runsOnBalls}     (${(bowler.ballsBowled~/6).round()}.${bowler.ballsBowled % 6})",
               style: const TextStyle(fontSize: 16),
             ),
           ],
@@ -413,6 +422,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       ),
     );
   }
+
 
   Widget _scoreInputRow() {
     return Wrap(
@@ -493,8 +503,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // _batsmanCard(batsmanOnStrike!, true),
-            // _batsmanCard(batsmanOnNonStrike!, false),
+            
             if (batsmanOnStrike != null) _batsmanCard(batsmanOnStrike!, true),
             if (batsmanOnNonStrike != null) _batsmanCard(batsmanOnNonStrike!, false),
 
@@ -503,7 +512,6 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               "Bowler:",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            // _bowlerCard(bowler!),
             if (bowler != null) _bowlerCard(bowler!),
 
             const Spacer(),
