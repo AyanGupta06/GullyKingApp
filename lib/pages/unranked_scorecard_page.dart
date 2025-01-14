@@ -41,7 +41,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int currentWickets = 0;
   bool isSecondInnings = false;
   int firstTeamScore = 0;
-  bool isFirstBallBowled = false;
+  bool isLastBallBowled = false;
 
   @override
   void initState() {
@@ -68,18 +68,25 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         _endGame();
       }
 
+      
+
       totalBalls++;
-      if(totalBalls == 1) {
-        isFirstBallBowled = true;
+      if(totalBalls ==  ((6*widget.maxOvers))) {
+        isLastBallBowled = true;
+        print(isLastBallBowled);
+      } else {
+        isLastBallBowled = false;
       }
       print(bowler?.ballsBowled);
-      if (totalBalls % 6 == 0 && !(totalBalls/6 == totalOvers)) {
+      if (totalBalls % 6 == 0 && totalOvers != widget.maxOvers) {
         totalOvers++;
-        if(totalBalls % 6 == 0) {
-          //_showNewBowlerDialog();
-          _changeStrike();
+        if(isLastBallBowled) {
+          _showNewBowlerDialog(battingTeam);
+        } else {
+          _showNewBowlerDialog(bowlingTeam);
         }
          
+        _changeStrike();
       }
 
       if (totalOvers >= widget.maxOvers) {
@@ -185,6 +192,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                   setState(() {
                     isSecondInnings = true;
                   });
+                  // _showNewBowlerDialog();
                 } else {
                   _endGame();
                 }
@@ -210,7 +218,6 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     }
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("End of Game"),
@@ -238,7 +245,6 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
 
   void _setupSecondInnings(List<Player> battingTeam, List<Player> bowlingTeam) {
-    List <Player> temp = [];
     setState(() {
       this.battingTeam = bowlingTeam; 
       this.bowlingTeam = battingTeam; 
@@ -251,14 +257,12 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       teamScore = 0;
       currentWickets = 0;
       isSecondInnings = true;
-      temp = battingTeam;
-      battingTeam = bowlingTeam;
-      bowlingTeam = temp;
-      isFirstBallBowled = false;
+      // battingTeam = bowlingTeam;
+      // bowlingTeam = battingTeam;
       
     });
 
-    _showNewInningsSetupDialog(battingTeam, bowlingTeam);
+    _showNewInningsSetupDialog(bowlingTeam, battingTeam);
   }
 
 
@@ -297,25 +301,13 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               batsmanOnStrike = newStrike;
               batsmanOnNonStrike = newNonStrike;
             });
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => UnrankedScorecardPage2(
-            //       bowler: bowler,
-            //       batsmanOnStrike: batsmanOnStrike,
-            //       batsmanOnNonStrike: batsmanOnNonStrike,
-            //       maxOvers: totalOvers,
-            //       battingTeam: battingTeam,
-            //       bowlingTeam: bowlingTeam, 
+            
 
-            //     ),
-            //   ),
-            // );
           },
         );
       },
     );
-    //_showNewBowlerDialog(bowlingTeam);
+    //_showNewBowlerDialog();
   }
 
    void _showNewBatsmanDialog(List<Player> availableBatsmen) {
@@ -377,11 +369,6 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnStrike = batsmanOnNonStrike;
       batsmanOnNonStrike = temp;
     });
-    if(totalBalls%6 == 0 && (totalBalls/6 == widget.maxOvers)) {
-      _showNewBowlerDialog(battingTeam);
-    } else {
-      _showNewBowlerDialog(bowlingTeam);
-    }
   }
 
   Widget _batsmanCard(Player batsman, bool isOnStrike) {
