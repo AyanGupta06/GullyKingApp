@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:gully_king/auth.dart';
 import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PreviousGamesPage extends StatefulWidget {
   const PreviousGamesPage({super.key});
@@ -12,9 +15,40 @@ class PreviousGamesPage extends StatefulWidget {
 }
 
 class _PreviousGamesPageState extends State<PreviousGamesPage> {
-  int _selectedIndex = 1; // Default home index
-  
+  int _selectedIndex = 1; 
+  final User? user = Auth().currentUser;
 
+  String username = "";
+  String position = "";
+
+  Future<void> _fetchUserData() async {
+    if (user == null) return;
+
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('matches')
+          .doc(user!.uid)
+          .get();
+
+      setState(() {
+        // username = userDoc['username'] ?? "N/A";
+        position = userDoc['result'] ?? "N/A";
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error fetching user data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
   Widget _infoRow({required String label, required String value}) {
     return Padding(
@@ -43,9 +77,20 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
     );
   }
 
- 
 
-  
+  Widget _title() {
+    return const Text(
+      "GullyKing",
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 42,
+        fontWeight: FontWeight.bold,
+        color: Colors.blueAccent,
+      ),
+    );
+  }
+
+
 
   void _navigateToPage(int index) {
     setState(() {
@@ -93,14 +138,7 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Your Team', 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
-        ),
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-        elevation: 0,
-      ),
+    
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -112,10 +150,14 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
-          ]
-          
+            const SizedBox(height: 30), 
+            _title(),
+            const SizedBox(height: 20), 
+            // _infoRow(label: "Username:", value: username),
+            _infoRow(label: "Position:", value: position),
+          ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(

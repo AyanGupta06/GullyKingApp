@@ -3,6 +3,7 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/previous_games_page.dart';
 import 'package:gully_king/pages/started_new_unranked_game_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
 
@@ -101,6 +102,10 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
         );
         break;
       case 1:
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+        );
         break;
       case 2:
         Navigator.push(

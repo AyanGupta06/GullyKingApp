@@ -138,7 +138,7 @@ class _NewProfilePageState extends State<YourTeamsPage> {
         elevation: 0,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/bg4.png'),
             fit: BoxFit.cover,
@@ -155,6 +155,8 @@ class _NewProfilePageState extends State<YourTeamsPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,8 +188,6 @@ class _NewProfilePageState extends State<YourTeamsPage> {
             ),
           ],
         ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
       ),
     );
   }

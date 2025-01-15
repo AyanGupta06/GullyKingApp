@@ -119,9 +119,9 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
         );
       },
-      child: Text(
+      child: const Text(
         "Add Friends",
-        style: const TextStyle(color: Colors.black, fontSize: 18),
+        style: TextStyle(color: Colors.black, fontSize: 18),
       )
     );
   }
