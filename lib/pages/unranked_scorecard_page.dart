@@ -91,12 +91,13 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
          
         _changeStrike();
       }
+      
 
       if (totalOvers >= widget.maxOvers) {
         print("Total Overs" + totalOvers.toString());
         print("Max Overs" + widget.maxOvers.toString());
         if(!isSecondInnings){
-          _endInnings();
+          _endInnings(false);
         } else {
           _endGame();
         }
@@ -145,12 +146,13 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _recordWicket() {
     setState(() {
-      _showOutMessageDialog(bowlingTeam);
+      //_showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is out";
       batsmanOnStrike?.ballsFaced++;
       currentWickets++;
       bowler?.wicketsTaken++;
       totalBalls++;
+      bowler?.ballsBowled++;
       batsmanOnStrike?.setHasBatted(true);
       batsmanOnNonStrike?.setHasBatted(true);
       print(batsmanOnStrike?.hasBatted);
@@ -159,7 +161,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       print("Length " + battingTeam.length.toString());
 
       if (currentWickets == battingTeam.length - 1) {
-        _endInnings();
+        _endInnings(true);
+        
       } else {
         List<Player> availableBatsmen = battingTeam
             .where((player) => !player.hasBatted) 
@@ -176,84 +179,84 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
-  void _showOutMessageDialog(List<Player> bowlingTeam) {
-    List<String> outMessagesList = ["caught out", "bowled out", "run-out", "stumped", "LBW"];
-    List<String> outByWho = [];
-    String outMessage1 = "";
-    String outMessage2 = "";
-    for(Player playerTemp in bowlingTeam) {
-      outByWho.add(playerTemp.name);
-    }
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("How Did This Player Get Out"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButton<String>(
-                hint: const Text('Select How The Player Got Out'),
-                value: outMessage1,
-                onChanged: (String? out) {
-                  setState(() {
-                    outMessage1 = out!;
-                  });
-                },
-                items: outMessagesList.map((String temp) {
-                  return DropdownMenuItem<String>(
-                    value: temp,
-                    child: Text(temp),
-                  );
-                }).toList(),
-              ),
-              DropdownButton<String>(
-                hint: const Text('Select Bowler or Fielder'),
-                value:  outMessage2,
-                onChanged: (String? temp2) {
-                  setState(() {
-                    outMessage2 = temp2!;
-                  });
-                },
-                items: outByWho.map((String tempPlayerWhoMadeOut) {
-                  return DropdownMenuItem<String>(
-                    value: tempPlayerWhoMadeOut,
-                    child: Text(tempPlayerWhoMadeOut),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: [
-        TextButton(
-          onPressed: () {
-            if (batsmanOnStrike?.outMessage != null) {
-              _outMessageSelected(outMessage1, outMessage2);
-              Navigator.of(context).pop();
-            } 
-            else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select the appropriate error message.')),
-              );
-            }
+  // void _showOutMessageDialog(List<Player> bowlingTeam) {
+  //   List<String> outMessagesList = ["caught out", "bowled out", "run-out", "stumped", "LBW"];
+  //   List<String> outByWho = [];
+  //   String outMessage1 = "";
+  //   String outMessage2 = "";
+  //   for(Player playerTemp in bowlingTeam) {
+  //     outByWho.add(playerTemp.name);
+  //   }
+  //   showDialog(
+  //     barrierDismissible: false,
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text("How Did This Player Get Out"),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             DropdownButton<String>(
+  //               hint: const Text('Select How The Player Got Out'),
+  //               value: outMessage1,
+  //               onChanged: (String? out) {
+  //                 setState(() {
+  //                   outMessage1 = out!;
+  //                 });
+  //               },
+  //               items: outMessagesList.map((String temp) {
+  //                 return DropdownMenuItem<String>(
+  //                   value: temp,
+  //                   child: Text(temp),
+  //                 );
+  //               }).toList(),
+  //             ),
+  //             DropdownButton<String>(
+  //               hint: const Text('Select Bowler or Fielder'),
+  //               value:  outMessage2,
+  //               onChanged: (String? temp2) {
+  //                 setState(() {
+  //                   outMessage2 = temp2!;
+  //                 });
+  //               },
+  //               items: outByWho.map((String tempPlayerWhoMadeOut) {
+  //                 return DropdownMenuItem<String>(
+  //                   value: tempPlayerWhoMadeOut,
+  //                   child: Text(tempPlayerWhoMadeOut),
+  //                 );
+  //               }).toList(),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //       TextButton(
+  //         onPressed: () {
+  //           if (batsmanOnStrike?.outMessage != null) {
+  //             _outMessageSelected(outMessage1, outMessage2);
+  //             Navigator.of(context).pop();
+  //           } 
+  //           else {
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               const SnackBar(content: Text('Please select the appropriate error message.')),
+  //             );
+  //           }
              
-          },
-          child: const Text('Start'),
-        ),
-      ],
-        );
-      },
-    );
-  }
+  //         },
+  //         child: const Text('Start'),
+  //       ),
+  //     ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  void _outMessageSelected(String outMessage1, String outMessage2) {
-    batsmanOnStrike?.outMessage = outMessage1 + outMessage2;
-  }
+  // void _outMessageSelected(String outMessage1, String outMessage2) {
+  //   batsmanOnStrike?.outMessage = outMessage1 + outMessage2;
+  // }
 
 
 
-  void _endInnings() {
+  void _endInnings(bool temp) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -269,9 +272,14 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                 Navigator.of(context).pop();
                 if (!isSecondInnings) {
                   _setupSecondInnings(battingTeam, bowlingTeam);
+                  if(temp) {
+                    _showNewBowlerDialog(bowlingTeam);
+
+                  }
                   setState(() {
                     isSecondInnings = true;
                   });
+                  
                   // _showNewBowlerDialog();
                 } else {
                   _endGame();
@@ -309,6 +317,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
     _storeMatchData(temp);
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -551,7 +560,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   }
 
   Widget _runsLeft() {
-    int runsLeft = firstTeamScore - teamScore;
+    int runsLeft = firstTeamScore - teamScore + 1;
     return Text (
       "Runs Needed to Win: "+ runsLeft.toString(), 
       style: const TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.black)
