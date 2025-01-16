@@ -83,7 +83,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       print(bowler?.ballsBowled);
       if (totalBalls % 6 == 0 && totalOvers != widget.maxOvers) {
         totalOvers++;
-        if(isLastBallBowled) {
+        if(isLastBallBowled && !isSecondInnings) {
           _showNewBowlerDialog(battingTeam);
         } else {
           _showNewBowlerDialog(bowlingTeam);
@@ -298,7 +298,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     if(firstTeamScore > teamScore) {
       runsDifference = firstTeamScore - teamScore;
       print("Team 1 Won by " + runsDifference.toString() + " runs!");
-      temp = "Team 1 Won!";
+      temp = "Team 1 Won by " + runsDifference.toString() + " runs!";
     } else if (firstTeamScore < teamScore) {
       
       int secondTeamWickets = 0;

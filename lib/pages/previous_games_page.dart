@@ -118,21 +118,26 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
               "Team 2: ${matchData['team2Score']}",
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 8),
-            Text(
-              matchData['result'],
-              style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            // const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                matchData['result'],
+                  style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      //navigate to full scorecard to be added
+                    },
+                  ),
+                ),
+              ]
+              
             ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  //navigate to full scorecard to be added
-                },
-              ),
-            ),
+            
           ],
         ),
       ),
