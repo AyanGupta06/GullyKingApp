@@ -1,38 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'new_game_page.dart'; 
+import 'package:gully_king/pages/your_teams_page.dart';
+
+import 'home_page.dart';
+import 'new_game_page.dart';
 import 'friends_teams_page.dart';
 
-class HomePage extends StatefulWidget {
+class PreviousRankedGamesPage extends StatefulWidget {
+  const PreviousRankedGamesPage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<PreviousRankedGamesPage> createState() => _PreviousRankedGamesPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
+  int _selectedIndex = 1; // Default home index
   final User? user = Auth().currentUser;
-  int _selectedIndex = 2; //default homeIndez
 
-  Future<void> signOut() async {
-    await Auth().signOut();
+  String username = "";
+  String position = "";
+
+  Future<void> _fetchUserData() async {
+    if (user == null) return;
+
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+
+      setState(() {
+        username = userDoc['username'] ?? "N/A";
+        position = userDoc['position'] ?? "N/A";
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error fetching user data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-
-  Widget _userId() {
-    return Text(
-      user?.email ?? "User Email",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
   }
-    Widget _signOutClick() {
-    return ElevatedButton(
-      onPressed: signOut,
-      child: const Text("Sign Out"),
-    );
-  }
+  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -47,12 +66,12 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 1: //old games
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
-        );
         break;
       case 2: //home
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
         break;
       case 3: //friends
       Navigator.push(
@@ -61,7 +80,7 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 4: //profile
-      Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
         );
@@ -73,38 +92,39 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 180 * 3.14159 / 180, 
-          child: Tooltip(
-            message: 'Logout',
-            child: IconButton(
-              icon: const Icon(Icons.logout_sharp),
-              onPressed: () {
-                signOut(); 
-              },
-            ),
-          ),
-        ),
+        
         title: const Text(
-          'Home', 
+          'Previous Ranked Matches', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-      ),
+        ),
       body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/bg4.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
         height: double.infinity,
         width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _userId(),
-            _signOutClick(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     _unrankedMatchButton(),
+            //     _unrankedMatchButton(),
+
+            // ],)
+            
           ],
         ),
       ),
@@ -145,7 +165,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-//fyi tooltip is what gives the user the hint on what the button is
+
   Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
     return Tooltip(
       message: label,

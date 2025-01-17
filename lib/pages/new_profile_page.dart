@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/previous_games_page.dart';
 
 import 'home_page.dart';
@@ -152,7 +153,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
         break;
       case 2: //home

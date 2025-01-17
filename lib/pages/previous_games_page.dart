@@ -148,8 +148,8 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Previous Matches"),
-        backgroundColor: Colors.blueAccent,
+        title: const Text("Previous Unranked Matches"),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
       ),
       body: matches.isEmpty
           ? const Center(

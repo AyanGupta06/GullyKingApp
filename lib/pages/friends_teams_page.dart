@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/previous_games_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
 
@@ -164,7 +165,7 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
         break;
       case 2: //home
@@ -215,7 +216,7 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
         elevation: 0,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/bg4.png'),
             fit: BoxFit.cover,
@@ -237,6 +238,8 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -268,8 +271,6 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
             ),
           ],
         ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
       ),
     );
   }

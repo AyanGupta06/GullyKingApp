@@ -146,7 +146,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _recordWicket() {
     setState(() {
-      //_showOutMessageDialog(bowlingTeam);
+      _showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is out";
       batsmanOnStrike?.ballsFaced++;
       currentWickets++;
@@ -187,6 +187,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   //   for(Player playerTemp in bowlingTeam) {
   //     outByWho.add(playerTemp.name);
   //   }
+  //   print(outByWho);
   //   showDialog(
   //     barrierDismissible: false,
   //     context: context,
@@ -250,9 +251,49 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   //   );
   // }
 
+
+  void _showOutMessageDialog(List<Player> team) {
+    List<String> outMessagesList = ["caught out", "bowled out", "run-out", "stumped", "LBW"];
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select an Out Message"),
+          content: DropdownButton<String>(
+            hint: const Text("How Did This Player Get Out"),
+            items: outMessagesList.map((String temp) {
+              return DropdownMenuItem<String>(
+                value: temp,
+                child: Text(temp),
+              );
+            }).toList(),
+            
+            onChanged: (String? temp2) {
+              if (temp2 != null) {
+                 _outMessageSelected(temp2);
+                Navigator.pop(context);
+              } 
+               else  {
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('You need to select a valid out message.')),
+              );
+              }
+            },
+            
+          ),
+        );
+      },
+    );
+  }
+
   // void _outMessageSelected(String outMessage1, String outMessage2) {
   //   batsmanOnStrike?.outMessage = outMessage1 + outMessage2;
   // }
+
+    void _outMessageSelected(String outMessage1) {
+      batsmanOnStrike?.outMessage = outMessage1;
+    }
 
 
 

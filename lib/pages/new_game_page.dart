@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 import 'package:gully_king/pages/new_ranked_game_page.dart';
 import 'package:gully_king/pages/new_unranked_game_page.dart';
@@ -109,7 +110,7 @@ class _NewGamePageState extends State<NewGamePage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
         break;
       case 2: //home
@@ -144,7 +145,7 @@ class _NewGamePageState extends State<NewGamePage> {
         leading: Transform.rotate(
           angle: 0, 
           child: Tooltip(
-            message: 'New Game Page',
+            message: 'New Match Page',
             child: IconButton(
               icon: const Icon(Icons.add_box_rounded),
               onPressed: () {
@@ -153,7 +154,7 @@ class _NewGamePageState extends State<NewGamePage> {
           ),
         ),
         title: const Text(
-          'New Game', 
+          'New Match', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
