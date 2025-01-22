@@ -373,12 +373,39 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
     String userEmail = user.email ?? "unknown";
 
+    List<Map<String, dynamic>> firstTeamPlayerData = bowlingTeam.map((player) {
+      return {
+        'name': player.name,
+        'runs': player.runs,
+        'ballsFaced': player.ballsFaced,
+        'wicketsTaken': player.wicketsTaken,
+        'oversBowled': player.ballsBowled,
+        'outMessage': player.outMessage,
+        'wicketsTaken': player.wicketsTaken,
+      };
+    }).toList();
+
+    List<Map<String, dynamic>> secondTeamPlayerData = battingTeam.map((player) {
+      return {
+        'name': player.name,
+        'runs': player.runs,
+        'ballsFaced': player.ballsFaced,
+        'wicketsTaken': player.wicketsTaken,
+        'oversBowled': player.ballsBowled,
+        'outMessage': player.outMessage,
+        'wicketsTaken': player.wicketsTaken,
+      };
+    }).toList();
+
     await FirebaseFirestore.instance.collection('matches').add({
       'email': userEmail,
       'team1Score': "Team 1 Score - $firstTeamScore",
       'team2Score': "Team 2 Score - $teamScore",
       'result': result,
       'timestamp': FieldValue.serverTimestamp(),
+      'team1Players': firstTeamPlayerData,
+      'team2Players': secondTeamPlayerData,
+      
     });
 
     print("Match data stored successfully.");
