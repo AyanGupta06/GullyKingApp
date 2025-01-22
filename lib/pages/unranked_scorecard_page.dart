@@ -146,7 +146,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _recordWicket() {
     setState(() {
-      _showOutMessageDialog(bowlingTeam);
+      // _showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is out";
       batsmanOnStrike?.ballsFaced++;
       currentWickets++;
@@ -179,121 +179,102 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
-  // void _showOutMessageDialog(List<Player> bowlingTeam) {
-  //   List<String> outMessagesList = ["caught out", "bowled out", "run-out", "stumped", "LBW"];
-  //   List<String> outByWho = [];
-  //   String outMessage1 = "";
-  //   String outMessage2 = "";
-  //   for(Player playerTemp in bowlingTeam) {
-  //     outByWho.add(playerTemp.name);
-  //   }
-  //   print(outByWho);
-  //   showDialog(
-  //     barrierDismissible: false,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: const Text("How Did This Player Get Out"),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             DropdownButton<String>(
-  //               hint: const Text('Select How The Player Got Out'),
-  //               value: outMessage1,
-  //               onChanged: (String? out) {
-  //                 setState(() {
-  //                   outMessage1 = out!;
-  //                 });
-  //               },
-  //               items: outMessagesList.map((String temp) {
-  //                 return DropdownMenuItem<String>(
-  //                   value: temp,
-  //                   child: Text(temp),
-  //                 );
-  //               }).toList(),
-  //             ),
-  //             DropdownButton<String>(
-  //               hint: const Text('Select Bowler or Fielder'),
-  //               value:  outMessage2,
-  //               onChanged: (String? temp2) {
-  //                 setState(() {
-  //                   outMessage2 = temp2!;
-  //                 });
-  //               },
-  //               items: outByWho.map((String tempPlayerWhoMadeOut) {
-  //                 return DropdownMenuItem<String>(
-  //                   value: tempPlayerWhoMadeOut,
-  //                   child: Text(tempPlayerWhoMadeOut),
-  //                 );
-  //               }).toList(),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //       TextButton(
-  //         onPressed: () {
-  //           if (batsmanOnStrike?.outMessage != null) {
-  //             _outMessageSelected(outMessage1, outMessage2);
-  //             Navigator.of(context).pop();
-  //           } 
-  //           else {
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               const SnackBar(content: Text('Please select the appropriate error message.')),
-  //             );
-  //           }
-             
-  //         },
-  //         child: const Text('Start'),
-  //       ),
-  //     ],
-  //       );
-  //     },
-  //   );
-  // }
+ 
 
 
-  void _showOutMessageDialog(List<Player> team) {
+ void _showOutMessageDialog() {
     List<String> outMessagesList = ["caught out", "bowled out", "run-out", "stumped", "LBW"];
+    Player? selectedBowler;
+    String? selectedOutMessage;
+
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Select an Out Message"),
-          content: DropdownButton<String>(
-            hint: const Text("How Did This Player Get Out"),
-            items: outMessagesList.map((String temp) {
-              return DropdownMenuItem<String>(
-                value: temp,
-                child: Text(temp),
-              );
-            }).toList(),
-            
-            onChanged: (String? temp2) {
-              if (temp2 != null) {
-                 _outMessageSelected(temp2);
-                Navigator.pop(context);
-              } 
-               else  {
-                ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('You need to select a valid out message.')),
-              );
-              }
-            },
-            
-          ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AlertDialog(
+              title: const Text("Select Out Details"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButton<String>(
+                    value: selectedOutMessage,
+                    hint: const Text("How Did This Player Get Out"),
+                    items: outMessagesList.map((String temp) {
+                      return DropdownMenuItem<String>(
+                        value: temp,
+                        child: Text(temp),
+                      );
+                    }).toList(),
+                    onChanged: (String? temp2) {
+                      setDialogState(() {
+                        selectedOutMessage = temp2;
+                      });
+                      // if (temp2 != null && selectedBowler != null) {
+                      //   _outMessageSelected(temp2, selectedBowler!);
+                      // }
+                    },
+                  ),
+                  DropdownButton<Player>(
+                    value: selectedBowler,
+                    hint: const Text("Who Got the Player Out"),
+                    items: bowlingTeam.map((Player player) {
+                      return DropdownMenuItem<Player>(
+                        value: player,
+                        child: Text(player.name),
+                      );
+                    }).toList(),
+                    onChanged: (Player? selectedPlayer) {
+                      setDialogState(() {
+                        selectedBowler = selectedPlayer;
+                      });
+                      // if (selectedOutMessage != null && selectedPlayer != null) {
+                      //   _outMessageSelected(selectedOutMessage!, selectedPlayer);
+                      // }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    if (selectedOutMessage != null && selectedBowler != null) {
+                      Navigator.pop(context);
+                      _outMessageSelected(selectedOutMessage!, selectedBowler!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You need to select both an out message and the player who got them out.'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text("Confirm"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  // void _outMessageSelected(String outMessage1, String outMessage2) {
-  //   batsmanOnStrike?.outMessage = outMessage1 + outMessage2;
-  // }
+  void _outMessageSelected(String outMessage, Player playerWhoGotOut) {
+    String finalOutMessage;
 
-    void _outMessageSelected(String outMessage1) {
-      batsmanOnStrike?.outMessage = outMessage1;
+    if (outMessage == "bowled out") {
+      finalOutMessage = "bowled by ${bowler?.name}";
+    } else {
+      finalOutMessage = "$outMessage by ${playerWhoGotOut.name}, bowled by ${bowler?.name}";
     }
+
+    setState(() {
+      batsmanOnStrike?.outMessage = finalOutMessage;
+      _recordWicket();
+    });
+  }
+
 
 
 
@@ -581,7 +562,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
           ),
         ],
         ElevatedButton(
-          onPressed: _recordWicket,
+          onPressed: _showOutMessageDialog,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             minimumSize: const Size(50, 50),
