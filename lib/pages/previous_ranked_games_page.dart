@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/previous_games_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
 
 import 'home_page.dart';
@@ -66,6 +68,10 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
         );
         break;
       case 1: //old games
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+        );
         break;
       case 2: //home
         Navigator.push(
@@ -96,7 +102,22 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: 'Logout',
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+                );
+              },
+            ),
+          ),
+        ),
+      
         title: const Text(
           'Previous Ranked Matches', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)

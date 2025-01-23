@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_game_page.dart';
@@ -10,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/scorecard_previous_unranked_games_page.dart';
 import 'package:intl/intl.dart';
 
 class PreviousGamesPage extends StatefulWidget {
@@ -67,7 +69,7 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
         break;
       case 2: //home
@@ -131,6 +133,10 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
                     icon: const Icon(Icons.arrow_forward),
                     onPressed: () {
                       //navigate to full scorecard to be added
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ScorecardPreviousUnrankedGamesPage()),
+                      );
                     },
                   ),
                 ),
@@ -148,6 +154,21 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: 'Logout',
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+                );
+              },
+            ),
+          ),
+        ),
         title: const Text("Previous Unranked Matches"),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
       ),

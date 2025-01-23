@@ -1,25 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gully_king/auth.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/new_ranked_game_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/previous_ranked_games_page.dart';
 
-import '../auth.dart';
-
-class AllPreviousGamesPage extends StatefulWidget {
-  const AllPreviousGamesPage({super.key});
+class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
+  const ScorecardPreviousUnrankedGamesPage({super.key});
 
   @override
-  State<AllPreviousGamesPage> createState() => _AllPreviousGamesPageState();
+  State<ScorecardPreviousUnrankedGamesPage> createState() => _ScorecardPreviousUnrankedGamesPageState();
 }
 
-class _AllPreviousGamesPageState extends State<AllPreviousGamesPage> {
-  int _selectedIndex = 1; 
+class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUnrankedGamesPage> {
+  int _selectedIndex = 1; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -53,45 +50,6 @@ class _AllPreviousGamesPageState extends State<AllPreviousGamesPage> {
     super.initState();
     _fetchUserData();
   }
-
-  
-
-  Widget _unrankedMatchButton() {
-    return FloatingActionButton.extended(
-      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
-        );
-      },
-    
-      label: const Text(
-        "                                 View All Unranked Matches                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-  Widget _rankedMatchButton() {
-    return FloatingActionButton.extended(
-      
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PreviousRankedGamesPage()),
-        );
-      },
-      
-      label: const Text(
-        "                                 View All Ranked Matches                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-
-
-  
-  
-
-  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -140,24 +98,24 @@ class _AllPreviousGamesPageState extends State<AllPreviousGamesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 0, 
-          child: Tooltip(
-            message: 'All Previous Matches Page',
-            child: IconButton(
-              icon: const Icon(Icons.file_present_sharp),
-              onPressed: () {
-              },
-            ),
-          ),
-        ),
+        // leading: Transform.rotate(
+        //   angle: 0, 
+        //   child: Tooltip(
+        //     message: 'Previous Unranked Match',
+        //     child: IconButton(
+        //       icon: const Icon(Icons.file_present_sharp),
+        //       onPressed: () {
+        //       },
+        //     ),
+        //   ),
+        // ),
         title: const Text(
-          'All Previous Matches', 
+          'Previous Unranked Match', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -169,20 +127,10 @@ class _AllPreviousGamesPageState extends State<AllPreviousGamesPage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     _unrankedMatchButton(),
-            //     _unrankedMatchButton(),
-
-            // ],)
-            const SizedBox(height: 20), 
-            _unrankedMatchButton(),
-            const SizedBox(height: 20), 
-            _rankedMatchButton(),
-          ],
+            
+          ]
+          
         ),
       ),
       bottomNavigationBar: BottomAppBar(

@@ -147,7 +147,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   void _recordWicket() {
     setState(() {
       // _showOutMessageDialog(bowlingTeam);
-      batsmanOnNonStrike?.outMessage = "This batter is out";
+      batsmanOnNonStrike?.outMessage = "This batter is not-out";
       batsmanOnStrike?.ballsFaced++;
       currentWickets++;
       bowler?.wicketsTaken++;
