@@ -184,9 +184,28 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-    
+      appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: 'Profile Settings',
+            child: IconButton(
+              icon: const Icon(Icons.person),
+              onPressed: () {
+                
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          'Profile Settings', 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/bg4.png'),
             fit: BoxFit.cover,
@@ -198,7 +217,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 30), 
+            const SizedBox(height: 20), 
             _title(),
             const SizedBox(height: 20), 
             _infoRow(label: "Username:", value: username),
@@ -207,6 +226,8 @@ class _NewProfilePageState extends State<NewProfilePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,8 +259,6 @@ class _NewProfilePageState extends State<NewProfilePage> {
             ),
           ],
         ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
       ),
     );
   }
