@@ -136,7 +136,11 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
                       //navigate to full scorecard to be added
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ScorecardPreviousUnrankedGamesPage()),
+                        MaterialPageRoute(
+                          builder: (context) => ScorecardPreviousUnrankedGamesPage(
+                            timestamp: matchData['timestamp'].toDate().toIso8601String(),
+                          ),
+                        ),
                       );
                     },
                   ),

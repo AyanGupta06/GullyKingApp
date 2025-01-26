@@ -30,7 +30,7 @@ class Player {
     this.ballsBowled = 0,
     this.wicketsTaken = 0,
     this.hasBatted = false,
-    this.outMessage = "",
+    this.outMessage = "This batter is not-out",
   });
 
   void setHasBatted(bool test) {

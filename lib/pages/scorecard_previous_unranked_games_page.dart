@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gully_king/auth.dart';
 import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
@@ -9,47 +8,19 @@ import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 
 class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
-  const ScorecardPreviousUnrankedGamesPage({super.key});
+  final String timestamp;
+
+  const ScorecardPreviousUnrankedGamesPage({
+    Key? key,
+    required this.timestamp,
+  }) : super(key: key);
 
   @override
   State<ScorecardPreviousUnrankedGamesPage> createState() => _ScorecardPreviousUnrankedGamesPageState();
 }
 
 class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUnrankedGamesPage> {
-  int _selectedIndex = 1; // Default home index
-  final User? user = Auth().currentUser;
-
-  String username = "";
-  String position = "";
-
-  Future<void> _fetchUserData() async {
-    if (user == null) return;
-
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      setState(() {
-        username = userDoc['username'] ?? "N/A";
-        position = userDoc['position'] ?? "N/A";
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error fetching user data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
-  }
+  int _selectedIndex = 1; // Default to 'Records' index
 
   void _navigateToPage(int index) {
     setState(() {
@@ -57,82 +28,179 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     });
 
     switch (index) {
-      case 0: //new game
+      case 0: // New Game
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewGamePage()),
         );
         break;
-      case 1: //old games
-      Navigator.push(
+      case 1: // Records
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
         break;
-      case 2: //home
+      case 2: // Home
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
         break;
-      case 3: //friends
-      Navigator.push(
+      case 3: // Friends
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
         );
         break;
-      case 4: //profile
+      case 4: // Profile
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
         );
         break;
-
       default:
-      //idk
         break;
     }
   }
-  
 
+  Future<Map<String, dynamic>> _fetchMatchData() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('matches')
+        .where('timestamp', isEqualTo: Timestamp.fromDate(DateTime.parse(widget.timestamp)))
+        .get();
 
+    if (snapshot.docs.isEmpty) {
+      throw Exception("No match data found.");
+    }
+
+    return snapshot.docs.first.data();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // leading: Transform.rotate(
-        //   angle: 0, 
-        //   child: Tooltip(
-        //     message: 'Previous Unranked Match',
-        //     child: IconButton(
-        //       icon: const Icon(Icons.file_present_sharp),
-        //       onPressed: () {
-        //       },
-        //     ),
-        //   ),
-        // ),
-        title: const Text(
-          'Previous Unranked Match', 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
-        ),
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-        elevation: 0,
+        title: const Text("Match Scorecard"),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg4.png'),
-            fit: BoxFit.cover,
+      body: FutureBuilder<Map<String, dynamic>>(
+      future: _fetchMatchData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text("No match data available."));
+        }
+
+        final matchData = snapshot.data!;
+        final team1Players = matchData['team1Players'] ?? [];
+        final team2Players = matchData['team2Players'] ?? [];
+
+
+
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    matchData['team1Score'],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    matchData['team2Score'],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Team 1 Players"),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            children: team1Players.isNotEmpty
+                                ? team1Players.map<Widget>((player) {
+                                    final playerName = player['name'] ?? 'Unknown';
+                                    final runs = player['runs'] ?? 'N/A';
+                                    final balls = player['ballsFaced'] ?? 'N/A';
+                                    final dismissal = player['outMessage'] ?? 'Not Out';
+
+                                    return ListTile(
+                                      title: Text(playerName),
+                                      subtitle: Text(
+                                        "Runs: $runs\nBalls: $balls\nDismissal: $dismissal",
+                                      ),
+                                    );
+                                  }).toList()
+                                : [
+                                    const Text("No players found for Team 1."),
+                                  ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: const Text("View Team 1 Players", style: TextStyle(color: Colors.blue)),
+              ),
+
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Team 2 Players"),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            children: team2Players.isNotEmpty
+                                ? team2Players.map<Widget>((player) {
+                                    final playerName = player['name'] ?? 'Unknown';
+                                    final runs = player['runs'] ?? 'N/A';
+                                    final balls = player['ballsFaced'] ?? 'N/A';
+                                    final dismissal = player['outMessage'] ?? 'Not Out';
+
+                                    return ListTile(
+                                      title: Text(playerName),
+                                      subtitle: Text(
+                                        "Runs: $runs\nBalls: $balls\nDismissal: $dismissal",
+                                      ),
+                                    );
+                                  }).toList()
+                                : [
+                                    const Text("No players found for Team 2."),
+                                  ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: const Text("View Team 2 Players", style: TextStyle(color: Colors.blue)),
+              ),
+
+            ],
           ),
-        ),
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          children: [
-            //
-          ]
-        ),
-      ),
+        );
+      },
+    ),
+
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,
