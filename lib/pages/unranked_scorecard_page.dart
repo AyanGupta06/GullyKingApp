@@ -41,10 +41,13 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int teamScore = 0;
   int totalOvers = 0;
   int totalBalls = 0;
+  int firstTeamTotalBalls = 0;
   int currentWickets = 0;
   bool isSecondInnings = false;
   int firstTeamScore = 0;
   bool isLastBallBowled = false;
+  int firstTeamWickets = 0;
+  int secondTeamWickets = 0;
 
   @override
   void initState() {
@@ -156,6 +159,13 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnStrike?.setHasBatted(true);
       batsmanOnNonStrike?.setHasBatted(true);
       print(batsmanOnStrike?.hasBatted);
+
+      if(isSecondInnings) {
+        secondTeamWickets++;
+
+      } else {
+        firstTeamWickets++;
+      }
       
 
       print("Length " + battingTeam.length.toString());
@@ -325,7 +335,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       
       int secondTeamWickets = 0;
       for(int j = 0; j < battingTeam.length; j++) {
-        if(battingTeam[j].outMessage != "") {
+        if(battingTeam[j].outMessage != "This batter is not-out") {
           secondTeamWickets++;
         }
       }
@@ -399,8 +409,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
     await FirebaseFirestore.instance.collection('matches').add({
       'email': userEmail,
-      'team1Score': "Team 1 Score - $firstTeamScore",
-      'team2Score': "Team 2 Score - $teamScore",
+      'team1Score': "$firstTeamScore/$firstTeamWickets",
+      'team2Score': "$teamScore/$secondTeamWickets",
       'result': result,
       'timestamp': FieldValue.serverTimestamp(),
       'team1Players': firstTeamPlayerData,
@@ -429,6 +439,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnNonStrike = null;
       bowler = null;
       totalOvers = 0;
+      firstTeamTotalBalls = totalBalls;
       totalBalls = 0;
       firstTeamScore = teamScore;
       teamScore = 0;

@@ -81,6 +81,8 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     return Scaffold(
       appBar: AppBar(
         title: const Text("Match Scorecard"),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+
       ),
       body: FutureBuilder<Map<String, dynamic>>(
       future: _fetchMatchData(),
@@ -105,7 +107,28 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.people_alt_sharp),
+                    onPressed: () {
+                      
+                    },
+                  ),
+                  const Text(
+                    "v.s."
+                  ),
+             
+                  IconButton(
+                    icon: const Icon(Icons.people_outline_sharp),
+                    onPressed: () {
+                      
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     matchData['team1Score'],
@@ -115,12 +138,28 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                     ),
                   ),
                   Text(
+                    "                                           "
+                  ),
+                  Text(
                     matchData['team2Score'],
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    matchData['result'],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 ],
               ),
               const SizedBox(height: 16),
