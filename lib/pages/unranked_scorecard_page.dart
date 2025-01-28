@@ -48,6 +48,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   bool isLastBallBowled = false;
   int firstTeamWickets = 0;
   int secondTeamWickets = 0;
+  int firstTeamOvers = 0;
+  int secondTeamOvers = 0;
 
   @override
   void initState() {
@@ -193,7 +195,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
 
  void _showOutMessageDialog() {
-    List<String> outMessagesList = ["caught out", "bowled out", "run-out", "stumped", "LBW"];
+    List<String> outMessagesList = ["caught", "bowled", "run-out", "stumped", "LBW"];
     Player? selectedBowler;
     String? selectedOutMessage;
 
@@ -275,7 +277,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
     if (outMessage == "bowled out") {
       finalOutMessage = "bowled by ${bowler?.name}";
-    } else {
+    } else if (outMessage == "LBW") {
+      finalOutMessage = "LBW by ${bowler?.name}";
+    }else if (playerWhoGotOut.name == bowler?.name) {
+      finalOutMessage = "caught and bowled by ${bowler?.name}";
+    }else {
       finalOutMessage = "$outMessage by ${playerWhoGotOut.name}, bowled by ${bowler?.name}";
     }
 
@@ -415,6 +421,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       'timestamp': FieldValue.serverTimestamp(),
       'team1Players': firstTeamPlayerData,
       'team2Players': secondTeamPlayerData,
+      'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls%6})",
+      'team2Overs': "($totalOvers.${totalBalls%6})",
       
     });
 
@@ -438,6 +446,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       batsmanOnStrike = null;
       batsmanOnNonStrike = null;
       bowler = null;
+      firstTeamOvers = totalOvers;
       totalOvers = 0;
       firstTeamTotalBalls = totalBalls;
       totalBalls = 0;

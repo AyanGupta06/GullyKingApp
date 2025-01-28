@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -149,6 +151,29 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    matchData['team1Overs'],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Text(
+                    "                                                "
+                  ),
+                  Text(
+                    matchData['team2Overs'],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -177,12 +202,14 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                                     final playerName = player['name'] ?? 'Unknown';
                                     final runs = player['runs'] ?? 'N/A';
                                     final balls = player['ballsFaced'] ?? 'N/A';
+                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
+                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
                                     final dismissal = player['outMessage'] ?? 'Not Out';
 
                                     return ListTile(
                                       title: Text(playerName),
                                       subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nDismissal: $dismissal",
+                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
                                       ),
                                     );
                                   }).toList()
@@ -213,12 +240,15 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                                     final playerName = player['name'] ?? 'Unknown';
                                     final runs = player['runs'] ?? 'N/A';
                                     final balls = player['ballsFaced'] ?? 'N/A';
+                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
+                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
                                     final dismissal = player['outMessage'] ?? 'Not Out';
+                                    
 
                                     return ListTile(
                                       title: Text(playerName),
                                       subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nDismissal: $dismissal",
+                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
                                       ),
                                     );
                                   }).toList()
@@ -277,6 +307,9 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
       ),
     );
   }
+
+  double truncateToDecimalPlaces(num value, int fractionalDigits) => (value * pow(10, 
+   fractionalDigits)).truncate() / pow(10, fractionalDigits);
 
   Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
     return Tooltip(
