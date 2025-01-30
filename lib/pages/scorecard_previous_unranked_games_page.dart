@@ -23,6 +23,7 @@ class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
 
 class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUnrankedGamesPage> {
   int _selectedIndex = 1; // Default to 'Records' index
+  int _isSelected = 0;
 
   void _navigateToPage(int index) {
     setState(() {
@@ -78,8 +79,21 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     return snapshot.docs.first.data();
   }
 
+  void _openSummaryPage() {
+
+  }
+
+  void _openTeam1ScoreCard() {
+
+  }
+
+  void _openTeam2ScoreCard() {
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    const List<String> toggleButtonNames = ["Summary", "Team 1 Scorecard", "Team 2 Scorecard"];;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Match Scorecard"),
@@ -188,6 +202,31 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                 ],
               ),
               const SizedBox(height: 16),
+
+              ToggleButtons(
+                isSelected: [_isSelected == 0, _isSelected == 1, _isSelected == 2],
+                onPressed: (int index) {
+                  setState(() {
+                    _isSelected = index;
+                  });
+                  index ==0 ? _openSummaryPage(): index == 1? _openTeam1ScoreCard(): _openTeam2ScoreCard();
+                },
+                borderWidth: 0,
+                borderColor: Colors.transparent,
+                selectedBorderColor: Colors.transparent,
+                
+                fillColor: Color.fromRGBO(98, 149, 216, 0.494),
+                highlightColor: Color.fromRGBO(110, 127, 175, 0.8),
+                children: const<Widget> [
+                  
+                  Text("    Summary    ", style: TextStyle(color: Colors.black),),
+                  Text("   Team 1 Scorecard   "),
+                  Text("   Team 2 Scorecard   "),
+                  
+                ]
+              ),
+              _isSelected == 0? 
+                Text("Hello"): Text("Bye"),
               GestureDetector(
                 onTap: () {
                   showDialog(
