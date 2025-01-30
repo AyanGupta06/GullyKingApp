@@ -50,6 +50,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int secondTeamWickets = 0;
   int firstTeamOvers = 0;
   int secondTeamOvers = 0;
+  bool isNoBall = false;
 
   @override
   void initState() {
@@ -71,6 +72,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       bowler?.runsOnBalls += runs;
       teamScore += runs;
       bowler?.ballsBowled++;
+      isNoBall = false;
 
       if (firstTeamScore < teamScore && isSecondInnings) {
         _endGame();
@@ -151,6 +153,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
   void _recordWicket() {
     setState(() {
+      isNoBall = false;
       // _showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is not-out";
       batsmanOnStrike?.ballsFaced++;
@@ -251,10 +254,25 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    if (selectedOutMessage != null && selectedBowler != null) {
+
+                    if (selectedOutMessage != "run-out" && isNoBall == true) {
+                      Navigator.pop(context);
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You can not get out other than a run-out when previous ball is a no-ball.'),
+                        ),
+                      );
+                    }
+
+                  
+                    if (selectedOutMessage != null && selectedBowler != null && isNoBall == false) {
                       Navigator.pop(context);
                       _outMessageSelected(selectedOutMessage!, selectedBowler!);
-                    } else {
+                    } else if (selectedOutMessage == "run-out" && isNoBall == true) {
+                      Navigator.pop(context);
+                      _outMessageSelected(selectedOutMessage!, selectedBowler!);
+                    }else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('You need to select both an out message and the player who got them out.'),
@@ -590,6 +608,20 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
+  void _wideBowled() {
+    setState ((){
+      teamScore++;
+      bowler?.runsOnBalls++;
+    });
+  }
+
+  void _noBallBowled() {
+    setState ((){
+      teamScore++;
+      isNoBall = true;
+    });
+  }
+
 
   Widget _scoreInputRow() {
     return Wrap(
@@ -617,13 +649,29 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
           child: const Text("W"),
         ),
         ElevatedButton(
-          onPressed: _changeStrike,
+          onPressed: _wideBowled,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.yellow,
+            minimumSize: const Size(50, 50),
+          ),
+          child: const Text("WD"),
+        ),
+        ElevatedButton(
+          onPressed: _noBallBowled,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.orange,
             minimumSize: const Size(50, 50),
           ),
-          child: const Text("Change Strike"),
+          child: const Text("NB"),
         ),
+        // ElevatedButton(
+        //   onPressed: _changeStrike,
+        //   style: ElevatedButton.styleFrom(
+        //     backgroundColor: Colors.orange,
+        //     minimumSize: const Size(50, 50),
+        //   ),
+        //   child: const Text("Change Strike"),
+        // ),
       ],
     );
   }
