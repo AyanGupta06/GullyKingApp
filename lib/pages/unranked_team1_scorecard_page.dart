@@ -8,23 +8,25 @@ import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/unranked_team1_scorecard_page.dart';
+import 'package:gully_king/pages/scorecard_previous_unranked_games_page.dart';
+import 'package:gully_king/pages/started_new_unranked_game_page.dart';
+import 'package:gully_king/pages/unranked_team2_scorecard_page.dart';
 
-class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
+class UnrankedTeam1ScoreCardPage extends StatefulWidget {
   final String timestamp;
 
-  const ScorecardPreviousUnrankedGamesPage({
+  const UnrankedTeam1ScoreCardPage({
     Key? key,
     required this.timestamp,
   }) : super(key: key);
 
   @override
-  State<ScorecardPreviousUnrankedGamesPage> createState() => _ScorecardPreviousUnrankedGamesPageState();
+  State<UnrankedTeam1ScoreCardPage> createState() => _UnrankedTeam1ScoreCardPageState();
 }
 
-class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUnrankedGamesPage> {
+class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage> {
   int _selectedIndex = 1; // Default to 'Records' index
-  int _isSelected = 0;
+  int _isSelected = 1;
 
   void _navigateToPage(int index) {
     setState(() {
@@ -80,21 +82,27 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     return snapshot.docs.first.data();
   }
 
-
-
-  void _openTeam1ScoreCard(Map<String, dynamic> matchData) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UnrankedTeam1ScoreCardPage(
-          timestamp: matchData['timestamp'].toDate().toIso8601String(),
+    void _openSummaryPage(Map<String, dynamic> matchData) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ScorecardPreviousUnrankedGamesPage(
+            timestamp: matchData['timestamp'].toDate().toIso8601String(),
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  void _openTeam2ScoreCard() {
 
+  void _openTeam2ScoreCard(Map<String, dynamic> matchData) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UnrankedTeam2ScoreCardPage(
+            timestamp: matchData['timestamp'].toDate().toIso8601String(),
+          ),
+        ),
+      );
   }
 
   @override
@@ -215,7 +223,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                   setState(() {
                     _isSelected = index;
                   });
-                  index ==1 ? _openTeam1ScoreCard(matchData): _openTeam2ScoreCard();
+                  index == 0 ? _openSummaryPage(matchData): index == 1? Text("hiifigrjj"): _openTeam2ScoreCard(matchData);
                 },
                 borderWidth: 0,
                 borderColor: Colors.transparent,
@@ -231,7 +239,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                   
                 ]
               ),
-              
+            
               GestureDetector(
                 onTap: () {
                   showDialog(
@@ -269,44 +277,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                 child: const Text("View Team 1 Players", style: TextStyle(color: Colors.blue)),
               ),
 
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Team 2 Players"),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: team2Players.isNotEmpty
-                                ? team2Players.map<Widget>((player) {
-                                    final playerName = player['name'] ?? 'Unknown';
-                                    final runs = player['runs'] ?? 'N/A';
-                                    final balls = player['ballsFaced'] ?? 'N/A';
-                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
-                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
-                                    final dismissal = player['outMessage'] ?? 'Not Out';
-                                    
-
-                                    return ListTile(
-                                      title: Text(playerName),
-                                      subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    const Text("No players found for Team 2."),
-                                  ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Text("View Team 2 Players", style: TextStyle(color: Colors.blue)),
-              ),
+              
 
             ],
           ),
