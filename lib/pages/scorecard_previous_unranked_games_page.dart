@@ -9,6 +9,7 @@ import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 import 'package:gully_king/pages/unranked_team1_scorecard_page.dart';
+import 'package:gully_king/pages/unranked_team2_scorecard_page.dart';
 
 class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
   final String timestamp;
@@ -93,8 +94,15 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     );
   }
 
-  void _openTeam2ScoreCard() {
-
+  void _openTeam2ScoreCard(Map<String, dynamic> matchData) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UnrankedTeam2ScoreCardPage(
+          timestamp: matchData['timestamp'].toDate().toIso8601String(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -128,6 +136,8 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 16),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -215,7 +225,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                   setState(() {
                     _isSelected = index;
                   });
-                  index ==1 ? _openTeam1ScoreCard(matchData): _openTeam2ScoreCard();
+                  index ==1 ? _openTeam1ScoreCard(matchData): _openTeam2ScoreCard(matchData);
                 },
                 borderWidth: 0,
                 borderColor: Colors.transparent,
