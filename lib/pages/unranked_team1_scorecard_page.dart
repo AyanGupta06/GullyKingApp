@@ -302,11 +302,17 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                   var ballsBowled = player['ballsBowled'] ?? 0;
                   final runs = player['runsOnBalls'] ?? 0;
                   final wickets = player['wicketsTaken'] ?? 0;
-                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
+                  // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
                   final overs2 = (player['ballsBowled']~/6).round();
+                  double temp = overs2 + ((ballsBowled%6)/10);
+                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
                   if(ballsBowled == 6) {
                     ballsBowled = 0;
                   }
+                  // double temp = overs2 + (ballsBowled/10);
+                  // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
+
+
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
