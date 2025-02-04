@@ -284,16 +284,13 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
 
                   
                 }).toList(),
-                const SizedBox(height: 16),
-                const Text(
-                  "Bowling",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                const SizedBox(height: 40),
+              
                 const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Expanded(flex: 3, child: Text("Bowler", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(flex: 3, child: Text("Bowling", style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("O", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("W", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),

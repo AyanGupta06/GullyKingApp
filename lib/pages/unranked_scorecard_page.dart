@@ -77,9 +77,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       }
       isNoBall = false;
 
-      if (firstTeamScore < teamScore && isSecondInnings) {
-        _endGame();
-      }
+      
 
       
 
@@ -115,6 +113,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
       if (runs % 2 != 0) {
         _changeStrike();
+      }
+      if (firstTeamScore < teamScore && isSecondInnings) {
+        _endGame();
       }
     });
   }
