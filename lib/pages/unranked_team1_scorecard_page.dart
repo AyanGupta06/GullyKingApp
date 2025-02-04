@@ -12,6 +12,8 @@ import 'package:gully_king/pages/scorecard_previous_unranked_games_page.dart';
 import 'package:gully_king/pages/started_new_unranked_game_page.dart';
 import 'package:gully_king/pages/unranked_team2_scorecard_page.dart';
 
+
+
 class UnrankedTeam1ScoreCardPage extends StatefulWidget {
   final String timestamp;
 
@@ -25,7 +27,7 @@ class UnrankedTeam1ScoreCardPage extends StatefulWidget {
 }
 
 class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage> {
-  int _selectedIndex = 1; // Default to 'Records' index
+  int _selectedIndex = 1;
   int _isSelected = 1;
 
   void _navigateToPage(int index) {
@@ -82,209 +84,251 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
     return snapshot.docs.first.data();
   }
 
-    void _openSummaryPage(Map<String, dynamic> matchData) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ScorecardPreviousUnrankedGamesPage(
-            timestamp: matchData['timestamp'].toDate().toIso8601String(),
-          ),
+  void _openSummaryPage(Map<String, dynamic> matchData) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ScorecardPreviousUnrankedGamesPage(
+          timestamp: matchData['timestamp'].toDate().toIso8601String(),
         ),
-      );
-    }
-
+      ),
+    );
+  }
 
   void _openTeam2ScoreCard(Map<String, dynamic> matchData) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => UnrankedTeam2ScoreCardPage(
-            timestamp: matchData['timestamp'].toDate().toIso8601String(),
-          ),
+      context,
+      MaterialPageRoute(
+        builder: (context) => UnrankedTeam2ScoreCardPage(
+          timestamp: matchData['timestamp'].toDate().toIso8601String(),
         ),
-      );
+      ),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
-    const List<String> toggleButtonNames = ["Summary", "Team 1 Scorecard", "Team 2 Scorecard"];;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Match Scorecard"),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-
       ),
       body: FutureBuilder<Map<String, dynamic>>(
-      future: _fetchMatchData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text("No match data available."));
-        }
+        future: _fetchMatchData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No match data available."));
+          }
 
-        final matchData = snapshot.data!;
-        final team1Players = matchData['team1Players'] ?? [];
-        final team2Players = matchData['team2Players'] ?? [];
+          final matchData = snapshot.data!;
+          final team1Players = matchData['team1Players'] ?? [];
+          final team2Players = matchData['team2Players'] ?? [];
 
 
-
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.people_alt_sharp),
-                    onPressed: () {
-                      
-                    },
-                  ),
-                  const Text(
-                    "v.s."
-                  ),
-             
-                  IconButton(
-                    icon: const Icon(Icons.people_outline_sharp),
-                    onPressed: () {
-                      
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    matchData['team1Score'],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.people_alt_sharp),
+                      onPressed: () {
+                        
+                      },
                     ),
-                  ),
-                  Text(
-                    "                                           "
-                  ),
-                  Text(
-                    matchData['team2Score'],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    const Text(
+                      "v.s."
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    matchData['team1Overs'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  Text(
-                    "                                                "
-                  ),
-                  Text(
-                    matchData['team2Overs'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    matchData['result'],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              ToggleButtons(
-                isSelected: [_isSelected == 0, _isSelected == 1, _isSelected == 2],
-                onPressed: (int index) {
-                  setState(() {
-                    _isSelected = index;
-                  });
-                  index == 0 ? _openSummaryPage(matchData): index == 1? Text("hiifigrjj"): _openTeam2ScoreCard(matchData);
-                },
-                borderWidth: 0,
-                borderColor: Colors.transparent,
-                selectedBorderColor: Colors.transparent,
-                
-                fillColor: Color.fromRGBO(219, 227, 236, 0.49),
-                highlightColor: Color.fromRGBO(110, 127, 175, 0.8),
-                children: const<Widget> [
-                  
-                  Text("    Summary    ", style: TextStyle(color: Colors.black),),
-                  Text("   Team 1 Scorecard   "),
-                  Text("   Team 2 Scorecard   "),
-                  
-                ]
-              ),
-            
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Team 1 Players"),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: team1Players.isNotEmpty
-                                ? team1Players.map<Widget>((player) {
-                                    final playerName = player['name'] ?? 'Unknown';
-                                    final runs = player['runs'] ?? 'N/A';
-                                    final balls = player['ballsFaced'] ?? 'N/A';
-                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
-                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
-                                    final dismissal = player['outMessage'] ?? 'Not Out';
-
-                                    return ListTile(
-                                      title: Text(playerName),
-                                      subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    const Text("No players found for Team 1."),
-                                  ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Text("View Team 1 Players", style: TextStyle(color: Colors.blue)),
-              ),
-
               
+                    IconButton(
+                      icon: const Icon(Icons.people_outline_sharp),
+                      onPressed: () {
+                        
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      matchData['team1Score'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "                                           "
+                    ),
+                    Text(
+                      matchData['team2Score'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      matchData['team1Overs'],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    Text(
+                      "                                                "
+                    ),
+                    Text(
+                      matchData['team2Overs'],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      matchData['result'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 16),
 
-            ],
-          ),
-        );
-      },
-    ),
+                ToggleButtons(
+                  isSelected: [_isSelected == 0, _isSelected == 1, _isSelected == 2],
+                  onPressed: (int index) {
+                    setState(() {
+                      _isSelected = index;
+                    });
+                    index == 0 ? _openSummaryPage(matchData): index == 1? Text("hiifigrjj"): _openTeam2ScoreCard(matchData);
+                  },
+                  borderWidth: 0,
+                  borderColor: Colors.transparent,
+                  selectedBorderColor: Colors.transparent,
+                  
+                  fillColor: Color.fromRGBO(219, 227, 236, 0.49),
+                  highlightColor: Color.fromRGBO(110, 127, 175, 0.8),
+                  children: const<Widget> [
+                    
+                    Text("    Summary    ", style: TextStyle(color: Colors.black),),
+                    Text("   Team 1 Scorecard   "),
+                    Text("   Team 2 Scorecard   "),
+                    
+                  ]
+                ),
+                
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Expanded(flex: 3, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("S/R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const Divider(),
+                ...team1Players.map<Widget>((player) {
+                  final playerName = player['name'] ?? 'Unknown';
+                  final runs = player['runs'] ?? 0;
+                  final balls = player['ballsFaced'] ?? 0;
+                  final dismissal = player['outMessage'] ?? 'Not Out';
+                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 2) : 0.00;
 
+                
+
+                 
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(playerName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text("  $dismissal", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(flex: 3, child: SizedBox()),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$balls", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$strikeRate", textAlign: TextAlign.center)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
+                  );
+
+
+
+                  
+                }).toList(),
+                const SizedBox(height: 16),
+                const Text(
+                  "Bowling",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Expanded(flex: 3, child: Text("Bowler", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("O", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("W", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("Econ", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const Divider(),
+                ...team2Players.map<Widget>((player) {
+                  final bowlerName = player['name'] ?? 'Unknown';
+                  final overs = player['oversBowled'] ?? 0;
+                  final runs = player['runsConceded'] ?? 0;
+                  final wickets = player['wicketsTaken'] ?? 0;
+                  final econ = overs > 0 ? truncateToDecimalPlaces(runs / overs, 2) : 0.00;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(flex: 3, child: Text(bowlerName, style: const TextStyle(fontWeight: FontWeight.bold))),
+                          Expanded(child: Text("$overs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$wickets", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$econ", textAlign: TextAlign.center)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
+                  );
+                }).toList(),
+
+              ],
+            ),
+          );
+        },
+      ),
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,
@@ -323,9 +367,6 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
     );
   }
 
-  double truncateToDecimalPlaces(num value, int fractionalDigits) => (value * pow(10, 
-   fractionalDigits)).truncate() / pow(10, fractionalDigits);
-
   Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
     return Tooltip(
       message: label,
@@ -337,4 +378,7 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
       ),
     );
   }
+
+  double truncateToDecimalPlaces(num value, int fractionalDigits) =>
+      (value * pow(10, fractionalDigits)).truncate() / pow(10, fractionalDigits);
 }
