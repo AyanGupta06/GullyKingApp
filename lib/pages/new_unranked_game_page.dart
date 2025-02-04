@@ -21,6 +21,7 @@ class Player {
   int wicketsTaken;
   bool hasBatted;
   String outMessage;
+  int oversBowled;
 
   Player({
     required this.name,
@@ -31,6 +32,7 @@ class Player {
     this.wicketsTaken = 0,
     this.hasBatted = false,
     this.outMessage = "This batter is not-out",
+    this.oversBowled = 0,
   });
 
   void setHasBatted(bool test) {

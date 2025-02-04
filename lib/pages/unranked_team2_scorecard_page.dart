@@ -241,43 +241,95 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                 ]
               ),
             
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Team 2 Players"),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: team2Players.isNotEmpty
-                                ? team2Players.map<Widget>((player) {
-                                    final playerName = player['name'] ?? 'Unknown';
-                                    final runs = player['runs'] ?? 'N/A';
-                                    final balls = player['ballsFaced'] ?? 'N/A';
-                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
-                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
-                                    final dismissal = player['outMessage'] ?? 'Not Out';
-                                    
+              const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Expanded(flex: 3, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("S/R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const Divider(),
+                ...team2Players.map<Widget>((player) {
+                  final playerName = player['name'] ?? 'Unknown';
+                  final runs = player['runs'] ?? 0;
+                  final balls = player['ballsFaced'] ?? 0;
+                  final dismissal = player['outMessage'] ?? 'Not Out';
+                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 2) : 0.00;
 
-                                    return ListTile(
-                                      title: Text(playerName),
-                                      subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    const Text("No players found for Team 2."),
-                                  ],
-                          ),
-                        ),
-                      );
-                    },
+                
+
+                 
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(playerName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text("  $dismissal", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(flex: 3, child: SizedBox()),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$balls", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$strikeRate", textAlign: TextAlign.center)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
                   );
-                },
-                child: const Text("View Team 2 Players", style: TextStyle(color: Colors.blue)),
-              ),
+
+
+
+                  
+                }).toList(),
+                const SizedBox(height: 16),
+                const Text(
+                  "Bowling",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Expanded(flex: 3, child: Text("Bowler", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("O", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("W", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("Econ", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const Divider(),
+                ...team1Players.map<Widget>((player) {
+                  final bowlerName = player['name'] ?? 'Unknown';
+                  final overs = player['oversBowled'] ?? 0;
+                  var ballsBowled = player['ballsBowled'] ?? 0;
+                  final runs = player['runsOnBalls'] ?? 0;
+                  final wickets = player['wicketsTaken'] ?? 0;
+                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
+                  final overs2 = (player['ballsBowled']~/6).round();
+                  if(ballsBowled == 6) {
+                    ballsBowled = 0;
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(flex: 3, child: Text(bowlerName, style: const TextStyle(fontWeight: FontWeight.bold))),
+                          Expanded(child: Text("$overs2.$ballsBowled", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$wickets", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$econ", textAlign: TextAlign.center)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
+                  );
+                }).toList(),
 
               
 

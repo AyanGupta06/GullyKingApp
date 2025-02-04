@@ -302,9 +302,14 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                 ...team2Players.map<Widget>((player) {
                   final bowlerName = player['name'] ?? 'Unknown';
                   final overs = player['oversBowled'] ?? 0;
-                  final runs = player['runsConceded'] ?? 0;
+                  var ballsBowled = player['ballsBowled'] ?? 0;
+                  final runs = player['runsOnBalls'] ?? 0;
                   final wickets = player['wicketsTaken'] ?? 0;
-                  final econ = overs > 0 ? truncateToDecimalPlaces(runs / overs, 2) : 0.00;
+                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
+                  final overs2 = (player['ballsBowled']~/6).round();
+                  if(ballsBowled == 6) {
+                    ballsBowled = 0;
+                  }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,7 +318,7 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(flex: 3, child: Text(bowlerName, style: const TextStyle(fontWeight: FontWeight.bold))),
-                          Expanded(child: Text("$overs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$overs2.$ballsBowled", textAlign: TextAlign.center)),
                           Expanded(child: Text("$runs", textAlign: TextAlign.center)),
                           Expanded(child: Text("$wickets", textAlign: TextAlign.center)),
                           Expanded(child: Text("$econ", textAlign: TextAlign.center)),

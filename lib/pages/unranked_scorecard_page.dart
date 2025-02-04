@@ -72,6 +72,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       bowler?.runsOnBalls += runs;
       teamScore += runs;
       bowler?.ballsBowled++;
+      if(bowler!.ballsBowled%6 == 0 && bowler!.ballsBowled != 0) {
+        bowler?.oversBowled++;
+      }
       isNoBall = false;
 
       if (firstTeamScore < teamScore && isSecondInnings) {
@@ -161,6 +164,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       bowler?.wicketsTaken++;
       totalBalls++;
       bowler?.ballsBowled++;
+      if(bowler!.ballsBowled%6 == 0 && bowler!.ballsBowled != 0) {
+        bowler?.oversBowled++;
+      }
       batsmanOnStrike?.setHasBatted(true);
       batsmanOnNonStrike?.setHasBatted(true);
       print(batsmanOnStrike?.hasBatted);
@@ -413,9 +419,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         'runs': player.runs,
         'ballsFaced': player.ballsFaced,
         'wicketsTaken': player.wicketsTaken,
-        'oversBowled': player.ballsBowled,
+        'ballsBowled': player.ballsBowled,
+        'oversBowled': player.oversBowled,
         'outMessage': player.outMessage,
         'wicketsTaken': player.wicketsTaken,
+        'runsOnBalls': player.runsOnBalls,
       };
     }).toList();
 
@@ -425,9 +433,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         'runs': player.runs,
         'ballsFaced': player.ballsFaced,
         'wicketsTaken': player.wicketsTaken,
-        'oversBowled': player.ballsBowled,
+        'ballsBowled': player.ballsBowled,
+        'oversBowled': player.oversBowled,
         'outMessage': player.outMessage,
         'wicketsTaken': player.wicketsTaken,
+        'runsOnBalls': player.runsOnBalls,
       };
     }).toList();
 
