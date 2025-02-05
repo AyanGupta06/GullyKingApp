@@ -24,7 +24,7 @@ class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
 }
 
 class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUnrankedGamesPage> {
-  int _selectedIndex = 1; // Default to 'Records' index
+  int _selectedIndex = 1; 
   int _isSelected = 0;
 
   void _navigateToPage(int index) {
@@ -81,6 +81,15 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     return snapshot.docs.first.data();
   }
 
+  Map<String, dynamic> _getBestBatsman(List<dynamic> players) {
+    return players.reduce((curr, next) => (curr['runs'] ?? 0) > (next['runs'] ?? 0) ? curr : next);
+  }
+
+  Map<String, dynamic> _getBestBowler(List<dynamic> players) {
+    return players.reduce((curr, next) => (curr['wicketsTaken'] ?? 0) > (next['wicketsTaken'] ?? 0) ? curr : next);
+  }
+
+
 
 
   void _openTeam1ScoreCard(Map<String, dynamic> matchData) {
@@ -128,6 +137,11 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
         final matchData = snapshot.data!;
         final team1Players = matchData['team1Players'] ?? [];
         final team2Players = matchData['team2Players'] ?? [];
+
+        final bestBatsman1 = _getBestBatsman(team1Players);
+        final bestBatsman2 = _getBestBatsman(team2Players);
+        final bestBowler1 = _getBestBowler(team1Players);
+        final bestBowler2 = _getBestBowler(team2Players);
 
 
 
@@ -242,81 +256,50 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                 ]
               ),
               
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Team 1 Players"),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: team1Players.isNotEmpty
-                                ? team1Players.map<Widget>((player) {
-                                    final playerName = player['name'] ?? 'Unknown';
-                                    final runs = player['runs'] ?? 'N/A';
-                                    final balls = player['ballsFaced'] ?? 'N/A';
-                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
-                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
-                                    final dismissal = player['outMessage'] ?? 'Not Out';
-
-                                    return ListTile(
-                                      title: Text(playerName),
-                                      subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    const Text("No players found for Team 1."),
-                                  ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Text("View Team 1 Players", style: TextStyle(color: Colors.blue)),
-              ),
-
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Team 2 Players"),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: team2Players.isNotEmpty
-                                ? team2Players.map<Widget>((player) {
-                                    final playerName = player['name'] ?? 'Unknown';
-                                    final runs = player['runs'] ?? 'N/A';
-                                    final balls = player['ballsFaced'] ?? 'N/A';
-                                    final strikeRate1 = ((player['runs']/player['ballsFaced']) * 100);
-                                    final strikeRate = truncateToDecimalPlaces(strikeRate1, 2);
-                                    final dismissal = player['outMessage'] ?? 'Not Out';
-                                    
-
-                                    return ListTile(
-                                      title: Text(playerName),
-                                      subtitle: Text(
-                                        "Runs: $runs\nBalls: $balls\nStrike Rate: $strikeRate\nDismissal: $dismissal",
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    const Text("No players found for Team 2."),
-                                  ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Text("View Team 2 Players", style: TextStyle(color: Colors.blue)),
-              ),
+               const SizedBox(height: 16),
+                const Text("First Innings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(bestBatsman1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text("${bestBatsman1['runs']} (${bestBatsman1['ballsFaced']})"),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(bestBowler2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text("${bestBowler2['wicketsTaken']}/${bestBowler2['runsOnBalls']} (${(bestBowler2['ballsBowled']~/6).round()}.${bestBowler2['ballsBowled']})")
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Text("Second Innings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(bestBatsman2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text("${bestBatsman2['runs']} (${bestBatsman2['ballsFaced']})"),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(bestBowler1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text("${bestBowler1['wicketsTaken']}/${bestBowler1['runsOnBalls']} (${(bestBowler1['ballsBowled']~/6).round()}.${bestBowler1['ballsBowled']})")
+                      ],
+                    ),
+                  ],
+                ),
 
             ],
           ),
