@@ -51,6 +51,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   int firstTeamOvers = 0;
   int secondTeamOvers = 0;
   bool isNoBall = false;
+  int firstTeamWide = 0;
+  int firstTeamNB = 0;
+  int secondTeamWide = 0;
+  int secondTeamNB = 0;
 
   @override
   void initState() {
@@ -452,6 +456,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       'team2Players': secondTeamPlayerData,
       'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls%6})",
       'team2Overs': "($totalOvers.${totalBalls%6})",
+      'team1Wide': "$firstTeamWide",
+      'team2Wide': "$secondTeamWide",
+      'team1NB': "$firstTeamNB",
+      'team2NB': "$firstTeamNB",
       
     });
 
@@ -623,6 +631,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     setState ((){
       teamScore++;
       bowler?.runsOnBalls++;
+      if(!isSecondInnings) {
+        firstTeamWide++;
+      } else {
+        secondTeamWide++;
+      }
     });
   }
 
@@ -630,6 +643,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     setState ((){
       teamScore++;
       isNoBall = true;
+      if(!isSecondInnings) {
+        firstTeamNB++;
+      } else {
+        secondTeamNB++;
+      }
     });
   }
 

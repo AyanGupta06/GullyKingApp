@@ -168,7 +168,7 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "                                           "
                   ),
                   Text(
@@ -191,7 +191,7 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "                                                "
                   ),
                   Text(
@@ -242,9 +242,9 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
               ),
             
               const Divider(),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Expanded(flex: 3, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
@@ -284,12 +284,23 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
 
                   
                 }).toList(),
-                const SizedBox(height: 40),
+                const SizedBox(height: 10),
+                
               
-                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
+                    const Expanded(flex: 1, child: Text("Extras", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text( "                          W " + matchData['team2Wide'] + "  NB " + matchData['team2NB'], textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                 
+                  ],
+                ),
+                const SizedBox(height: 10),
+              
+                const Divider(),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Expanded(flex: 3, child: Text("Bowling", style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("O", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),

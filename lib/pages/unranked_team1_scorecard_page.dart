@@ -128,6 +128,10 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
           final matchData = snapshot.data!;
           final team1Players = matchData['team1Players'] ?? [];
           final team2Players = matchData['team2Players'] ?? [];
+          // final team1Wide = matchData['team1Wide'] ?? 0;
+          // final team2Wide = matchData['team2Wide'] ?? 0;
+          // final team1NB = matchData['team1NB'] ?? 0;
+          // final team2NB = matchData['team2NB'] ?? 0;
 
 
           return Padding(
@@ -166,7 +170,7 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
+                    const Text(
                       "                                           "
                     ),
                     Text(
@@ -189,7 +193,7 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                    Text(
+                    const Text(
                       "                                                "
                     ),
                     Text(
@@ -240,9 +244,9 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                 ),
                 
                 const Divider(),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Expanded(flex: 3, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
@@ -282,12 +286,25 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
 
                   
                 }).toList(),
-                const SizedBox(height: 40),
+                const SizedBox(height: 10),
+                
               
-                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
+                    const Expanded(flex: 1, child: Text("Extras", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text( "                          W " + matchData['team1Wide'] + "  NB " + matchData['team1NB'], textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    // Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    // Expanded(child: Text("W", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    // Expanded(child: Text("Econ", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const SizedBox(height: 10),
+              
+                const Divider(),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Expanded(flex: 3, child: Text("Bowling", style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("O", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
@@ -305,10 +322,15 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                   // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
                   final overs2 = (player['ballsBowled']~/6).round();
                   double temp = overs2 + ((ballsBowled%6)/10);
+                  double temp2 = 0;
+                  if(((ballsBowled%6)/10) == 0.1) {
+                    temp2 = 1/6;
+                  } 
                   final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
                   if(ballsBowled == 6) {
                     ballsBowled = 0;
                   }
+                  
                   // double temp = overs2 + (ballsBowled/10);
                   // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
 
