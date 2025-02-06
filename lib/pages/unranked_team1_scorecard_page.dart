@@ -111,9 +111,29 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Match Scorecard"),
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: "Match Scorecard",
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+                );
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          "Match Scorecard", 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
       ),
+      
       body: FutureBuilder<Map<String, dynamic>>(
         future: _fetchMatchData(),
         builder: (context, snapshot) {
@@ -247,10 +267,13 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(flex: 3, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(child: Text("S/R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(flex: 5, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("B", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("4s", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("6s", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+
+                    Expanded(child: Text("S/R", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
                   ],
                 ),
                 const Divider(),
@@ -258,8 +281,11 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                   final playerName = player['name'] ?? 'Unknown';
                   final runs = player['runs'] ?? 0;
                   final balls = player['ballsFaced'] ?? 0;
+                  final fours = player['fours'] ?? 0;
+                  final sixes = player['sixes'] ?? 0;
+
                   final dismissal = player['outMessage'] ?? 'Not Out';
-                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 2) : 0.00;
+                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 1) : 0.00;
 
                 
 
@@ -272,10 +298,13 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Expanded(flex: 3, child: SizedBox()),
-                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
-                          Expanded(child: Text("$balls", textAlign: TextAlign.center)),
-                          Expanded(child: Text("$strikeRate", textAlign: TextAlign.center)),
+                          const Expanded(flex: 5, child: SizedBox()),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.left)),
+                          Expanded(child: Text("$balls", textAlign: TextAlign.left)),
+                          Expanded(child: Text("$fours", textAlign: TextAlign.left)),
+                          Expanded(child: Text("$sixes", textAlign: TextAlign.left)),
+
+                          Expanded(child: Text("$strikeRate", textAlign: TextAlign.left)),
                         ],
                       ),
                       const Divider(),
@@ -325,8 +354,19 @@ class _UnrankedTeam1ScoreCardPageState extends State<UnrankedTeam1ScoreCardPage>
                   double temp2 = 0;
                   if(((ballsBowled%6)/10) == 0.1) {
                     temp2 = 1/6;
+                  } else if(((ballsBowled%6)/10) == 0.2) {
+                    temp2 = 2/6;
+                  } else if(((ballsBowled%6)/10) == 0.3) {
+                    temp2 = 3/6;
+                  } else if(((ballsBowled%6)/10) == 0.4) {
+                    temp2 = 4/6;
+                  } else if(((ballsBowled%6)/10) == 0.5) {
+                    temp2 = 5/6;
+                  } else if(((ballsBowled%6)/10) == 0.0) {
+                    temp2 = 0;
                   } 
-                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
+                  double temp3 = overs2 + temp2;
+                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp3, 2) : 0.00;
                   if(ballsBowled == 6) {
                     ballsBowled = 0;
                   }

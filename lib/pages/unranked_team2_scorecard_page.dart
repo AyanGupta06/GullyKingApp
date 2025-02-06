@@ -111,9 +111,27 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
     const List<String> toggleButtonNames = ["Summary", "Team 1 Scorecard", "Team 2 Scorecard"];;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Match Scorecard"),
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: "Match Scorecard",
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+                );
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          "Match Scorecard", 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-
+        elevation: 0,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
       future: _fetchMatchData(),
@@ -245,9 +263,11 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(flex: 3, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(flex: 5, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("4s", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("6s", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
                     Expanded(child: Text("S/R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                   ],
                 ),
@@ -257,7 +277,9 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                   final runs = player['runs'] ?? 0;
                   final balls = player['ballsFaced'] ?? 0;
                   final dismissal = player['outMessage'] ?? 'Not Out';
-                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 2) : 0.00;
+                  final fours = player['fours'] ?? 0;
+                  final sixes = player['sixes'] ?? 0;
+                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 1) : 0.00;
 
                 
 
@@ -270,9 +292,11 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Expanded(flex: 3, child: SizedBox()),
+                          const Expanded(flex: 5, child: SizedBox()),
                           Expanded(child: Text("$runs", textAlign: TextAlign.center)),
                           Expanded(child: Text("$balls", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$fours", textAlign: TextAlign.left)),
+                          Expanded(child: Text("$sixes", textAlign: TextAlign.left)),
                           Expanded(child: Text("$strikeRate", textAlign: TextAlign.center)),
                         ],
                       ),
@@ -318,7 +342,22 @@ class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage>
                   // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
                   final overs2 = (player['ballsBowled']~/6).round();
                   double temp = overs2 + ((ballsBowled%6)/10);
-                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
+                  double temp2 = 0;
+                  if(((ballsBowled%6)/10) == 0.1) {
+                    temp2 = 1/6;
+                  } else if(((ballsBowled%6)/10) == 0.2) {
+                    temp2 = 2/6;
+                  } else if(((ballsBowled%6)/10) == 0.3) {
+                    temp2 = 3/6;
+                  } else if(((ballsBowled%6)/10) == 0.4) {
+                    temp2 = 4/6;
+                  } else if(((ballsBowled%6)/10) == 0.5) {
+                    temp2 = 5/6;
+                  } else if(((ballsBowled%6)/10) == 0.0) {
+                    temp2 = 0;
+                  } 
+                  double temp3 = overs2 + temp2;
+                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp3, 2) : 0.00;
                   if(ballsBowled == 6) {
                     ballsBowled = 0;
                   }

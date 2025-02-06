@@ -72,6 +72,12 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   void _updateScore(int runs) {
     setState(() {
       batsmanOnStrike?.runs += runs;
+      if(runs == 4) {
+        batsmanOnStrike?.fours++;
+      }
+      if(runs == 6) {
+        batsmanOnStrike?.sixes++;
+      }
       batsmanOnStrike?.ballsFaced++;
       bowler?.runsOnBalls += runs;
       teamScore += runs;
@@ -429,6 +435,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         'outMessage': player.outMessage,
         'wicketsTaken': player.wicketsTaken,
         'runsOnBalls': player.runsOnBalls,
+        'fours': player.fours,
+        'sixes': player.sixes,
       };
     }).toList();
 
@@ -443,6 +451,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         'outMessage': player.outMessage,
         'wicketsTaken': player.wicketsTaken,
         'runsOnBalls': player.runsOnBalls,
+        'fours': player.fours,
+        'sixes': player.sixes,
       };
     }).toList();
 

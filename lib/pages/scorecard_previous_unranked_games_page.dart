@@ -119,9 +119,27 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     const List<String> toggleButtonNames = ["Summary", "Team 1 Scorecard", "Team 2 Scorecard"];;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Match Scorecard"),
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: "Match Scorecard",
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+                );
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          "Match Scorecard", 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-
+        elevation: 0,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
       future: _fetchMatchData(),
