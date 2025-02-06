@@ -130,6 +130,65 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
+  void _updateScoreWicket(int runs) {
+    setState(() {
+      batsmanOnStrike?.runs += runs;
+      if(runs == 4) {
+        batsmanOnStrike?.fours++;
+      }
+      if(runs == 6) {
+        batsmanOnStrike?.sixes++;
+      }
+      batsmanOnStrike?.ballsFaced++;
+      bowler?.runsOnBalls += runs;
+      teamScore += runs;
+      bowler?.ballsBowled++;
+      if(bowler!.ballsBowled%6 == 0 && bowler!.ballsBowled != 0) {
+        bowler?.oversBowled++;
+      }
+      isNoBall = false;
+
+      
+
+      
+
+      totalBalls++;
+      if(totalBalls ==  ((6*widget.maxOvers))) {
+        isLastBallBowled = true;
+        print(isLastBallBowled);
+      } else {
+        isLastBallBowled = false;
+      }
+      print(bowler?.ballsBowled);
+      if (totalBalls % 6 == 0 && totalOvers != widget.maxOvers) {
+        totalOvers++;
+        if(isLastBallBowled && !isSecondInnings) {
+          _showNewBowlerDialog(battingTeam);
+        } else {
+          _showNewBowlerDialog(bowlingTeam);
+        }
+         
+        // _changeStrike();
+      }
+      
+
+      if (totalOvers >= widget.maxOvers) {
+        print("Total Overs" + totalOvers.toString());
+        print("Max Overs" + widget.maxOvers.toString());
+        if(!isSecondInnings){
+          _endInnings(false);
+        } else {
+          _endGame();
+        }
+      }
+
+      
+      if (firstTeamScore < teamScore && isSecondInnings) {
+        _endGame();
+      }
+    });
+  }
+
   void _showNewBowlerDialog(List<Player> team) {
     showDialog(
       barrierDismissible: false,
@@ -150,18 +209,23 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
               if (selectedPlayer != bowler) {
                  onBowlerSelected(selectedPlayer!);
                 Navigator.pop(context);
+                if(totalBalls%6 == 0 && totalBalls != 0) {
+                  _changeStrike();
+                }
               } 
                else if (selectedPlayer == bowler) {
                 ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Select a different bowler - this bowler just bowled.')),
               );
               }
+              
             },
             
           ),
         );
       },
     );
+    
   }
 
 
@@ -170,11 +234,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       isNoBall = false;
       // _showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is not-out";
-      batsmanOnStrike?.ballsFaced++;
-      currentWickets++;
-      bowler?.wicketsTaken++;
-      totalBalls++;
-      bowler?.ballsBowled++;
+      
+      
       if(bowler!.ballsBowled%6 == 0 && bowler!.ballsBowled != 0) {
         bowler?.oversBowled++;
       }
@@ -205,8 +266,12 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         //   print(battingTeam[i].hasBatted);
         // }
         print("Length" + battingTeam.length.toString());
+        _updateScoreWicket(0);
 
         _showNewBatsmanDialog(availableBatsmen);
+        // if(bowler!.ballsBowled%6 == 0) {
+        //   _changeStrike();
+        // }
       }
     });
   }
