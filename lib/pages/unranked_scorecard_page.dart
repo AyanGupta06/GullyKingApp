@@ -268,7 +268,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         print("Length" + battingTeam.length.toString());
         _updateScoreWicket(0);
 
-        _showNewBatsmanDialog(availableBatsmen);
+        if(totalOvers != widget.maxOvers) {
+           _showNewBatsmanDialog(availableBatsmen);
+
+        }
         // if(bowler!.ballsBowled%6 == 0) {
         //   _changeStrike();
         // }
