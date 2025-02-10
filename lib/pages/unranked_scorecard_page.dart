@@ -107,7 +107,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
           _showNewBowlerDialog(bowlingTeam);
         }
          
-        _changeStrike();
+        // _changeStrike();
       }
       
 
@@ -268,9 +268,11 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         print("Length" + battingTeam.length.toString());
         _updateScoreWicket(0);
 
-        if(totalOvers != widget.maxOvers) {
+        if(totalOvers != widget.maxOvers && (isSecondInnings? secondTeamWickets: firstTeamWickets) != battingTeam.length - 1) {
            _showNewBatsmanDialog(availableBatsmen);
 
+        } else if ((isSecondInnings? secondTeamWickets: firstTeamWickets) == battingTeam.length - 1) {
+          _endInnings(true);
         }
         // if(bowler!.ballsBowled%6 == 0) {
         //   _changeStrike();
