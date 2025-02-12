@@ -86,7 +86,13 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
   }
 
   Map<String, dynamic> _getBestBowler(List<dynamic> players) {
-    return players.reduce((curr, next) => (curr['wicketsTaken'] ?? 0) > (next['wicketsTaken'] ?? 0) ? curr : next);
+    List<dynamic> players1 = [];
+    for(int i = 0; i < players.length; i++) {
+      if(players[i]['ballsBowled'] != 0) {
+        players1.add(players[i]);
+      }
+    }
+    return players1.reduce((curr, next) => (curr['wicketsTaken'] ?? 0) > (next['wicketsTaken'] ?? 0) || ((curr['runsOnBalls'] ?? 0)/(curr['ballsBowled'] ?? 0)) < ((curr['runsOnBalls'] ?? 0)/(curr['ballsBowled'] ?? 0)) ? curr : next);
   }
 
 
@@ -291,7 +297,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(bestBowler2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${bestBowler2['wicketsTaken']}/${bestBowler2['runsOnBalls']} (${(bestBowler2['ballsBowled']~/6).round()}.${bestBowler2['ballsBowled']})")
+                        Text("${bestBowler2['wicketsTaken']}/${bestBowler2['runsOnBalls']} (${(bestBowler2['ballsBowled']~/6).round()}.${bestBowler2['ballsBowled'] == 6? 0: bestBowler2['ballsBowled']})")
                       ],
                     ),
                   ],
@@ -313,7 +319,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(bestBowler1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${bestBowler1['wicketsTaken']}/${bestBowler1['runsOnBalls']} (${(bestBowler1['ballsBowled']~/6).round()}.${bestBowler1['ballsBowled']})")
+                        Text("${bestBowler1['wicketsTaken']}/${bestBowler1['runsOnBalls']} (${(bestBowler1['ballsBowled']~/6).round()}.${bestBowler1['ballsBowled'] == 6 ? 0: bestBowler1['ballsBowled']})")
                       ],
                     ),
                   ],

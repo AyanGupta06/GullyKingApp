@@ -234,6 +234,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       isNoBall = false;
       // _showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is not-out";
+      bowler?.wicketsTaken++;
       
       
       if(bowler!.ballsBowled%6 == 0 && bowler!.ballsBowled != 0) {
