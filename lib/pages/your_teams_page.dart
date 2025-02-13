@@ -110,7 +110,7 @@ class _NewProfilePageState extends State<YourTeamsPage> {
           child: Tooltip(
             message: "Friends/Teams",
             child: IconButton(
-              icon: const Icon(Icons.file_present_sharp),
+              icon: const Icon(Icons.people_alt_sharp),
               onPressed: () {
                 Navigator.push(
                   context,

@@ -120,6 +120,49 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     );
   }
 
+  void _algorithim() {
+    future: _fetchMatchData();
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text("Error: ${snapshot.error}"));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text("No match data available."));
+      }
+
+      final matchData = snapshot.data!;
+      final team1Players = matchData['team1Players'] ?? [];
+      final team2Players = matchData['team2Players'] ?? [];
+      int bestEcon = 0;
+      int tempEcon = 0;
+      int tempWickets = 0;
+      int mostWickets = 0;
+      for(int i = 0; i < team1Players.length(); i++) {
+        if(team1Players.get(i).wicketsTaken >= tempWickets) {
+          mostWickets = i;
+        }
+        if(team1Players.get(i).runsOnBalls/team1Players.get(i).ballsBowled <= tempEcon) {
+          bestEcon = i;
+        }
+      }
+
+
+      int bestEcon2 = 0;
+      int tempEcon2 = 0;
+      int tempWickets2 = 0;
+      int mostWickets2 = 0;
+      for(int j = 0; j < team2Players.length(); j++) {
+        if(team2Players.get(j).wicketsTaken >= tempWickets2) {
+          mostWickets2 = j;
+        }
+        if(team2Players.get(j).runsOnBalls/team2Players.get(j).ballsBowled <= tempEcon2) {
+          bestEcon2 = j;
+        }
+      }
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     const List<String> toggleButtonNames = ["Summary", "Team 1 Scorecard", "Team 2 Scorecard"];;
@@ -166,6 +209,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
         final bestBatsman2 = _getBestBatsman(team2Players);
         final bestBowler1 = _getBestBowler(team1Players);
         final bestBowler2 = _getBestBowler(team2Players);
+        // _algorithim();
 
 
 

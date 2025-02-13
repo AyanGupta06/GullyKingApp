@@ -289,47 +289,47 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
           ],
         ),
         const SizedBox(height: 10),
-        // StreamBuilder<QuerySnapshot>(
-        //   stream: FirebaseFirestore.instance
-        //       .collection('friend_requests')
-        //       .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
-        //       .snapshots(),
-        //   builder: (context, snapshot) {
-        //     if (!snapshot.hasData) return const CircularProgressIndicator();
-        //     var requests = snapshot.data!.docs;
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('friend_requests')
+              .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const CircularProgressIndicator();
+            var requests = snapshot.data!.docs;
 
-        //     return Column(
-        //       children: requests.map((doc) {
-        //         String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
-        //         return FutureBuilder<DocumentSnapshot>(
-        //           future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
-        //           builder: (context, userSnapshot) {
-        //             if (!userSnapshot.hasData) return const SizedBox();
-        //             String friendName = userSnapshot.data!['username'] ?? "Unknown";
+            return Column(
+              children: requests.map((doc) {
+                String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
+                return FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
+                  builder: (context, userSnapshot) {
+                    if (!userSnapshot.hasData) return const SizedBox();
+                    String friendName = userSnapshot.data!['username'] ?? "Unknown";
 
-        //             return ListTile(
-        //               title: Text(friendName),
-        //               subtitle: Text(doc['status']),
-        //               trailing: _showOutgoingRequests
-        //                   ? IconButton(
-        //                       icon: const Icon(Icons.cancel, color: Colors.red),
-        //                       onPressed: () async {
-        //                         await doc.reference.delete();
-        //                       },
-        //                     )
-        //                   : IconButton(
-        //                       icon: const Icon(Icons.check, color: Colors.green),
-        //                       onPressed: () async {
-        //                         await doc.reference.update({'status': 'accepted'});
-        //                       },
-        //                     ),
-        //             );
-        //           },
-        //         );
-        //       }).toList(),
-        //     );
-        //   },
-        // ),
+                    return ListTile(
+                      title: Text(friendName),
+                      subtitle: Text(doc['status']),
+                      trailing: _showOutgoingRequests
+                          ? IconButton(
+                              icon: const Icon(Icons.cancel, color: Colors.red),
+                              onPressed: () async {
+                                await doc.reference.delete();
+                              },
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.check, color: Colors.green),
+                              onPressed: () async {
+                                await doc.reference.update({'status': 'accepted'});
+                              },
+                            ),
+                    );
+                  },
+                );
+              }).toList(),
+            );
+          },
+        ),
       ],
     );
   }
@@ -344,7 +344,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
           child: Tooltip(
             message: "Friends/Teams",
             child: IconButton(
-              icon: const Icon(Icons.file_present_sharp),
+              icon: const Icon(Icons.people_alt_sharp),
               onPressed: () {
                 Navigator.push(
                   context,
