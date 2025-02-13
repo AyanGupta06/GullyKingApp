@@ -138,7 +138,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
 
   Widget _title() {
     return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.symmetric(vertical: 10),
       child: Text(
         "Add New Friends",
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
@@ -150,13 +150,15 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
     return Row(
       children: [
         Expanded(
-          child: TextField(
-            controller: _friendEmailController,
-            decoration: const InputDecoration(
-              labelText: "Enter friend's email",
-              border: OutlineInputBorder(),
-            ),
-          ),
+          child: 
+          // TextField(
+          //   controller: _friendEmailController,
+          //   decoration: const InputDecoration(
+          //     labelText: "Enter friend's email",
+          //     border: OutlineInputBorder(),
+          //   ),
+          // ),
+          _entryFieldFriend("Enter Friend's Email", _friendEmailController),
         ),
         const SizedBox(width: 10),
         ElevatedButton(
@@ -167,62 +169,171 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
     );
   }
 
+  Widget _addFriendSubmitButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      onPressed: _sendFriendRequest,
+      child: const Text("Send Friend Request"),
+    );
+  }
+
+  Widget _entryFieldFriend(String hintText, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Colors.blueAccent),
+        filled: true,
+        fillColor: Colors.grey[100],
+        prefixIcon: const Icon(
+          Icons.people_alt_sharp,
+          color: Colors.blueAccent,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20.0),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  // Widget _friendRequestsSection() {
+  //   return Column(
+  //     children: [
+  //       ElevatedButton(
+  //         onPressed: () {
+  //           setState(() {
+  //             _showOutgoingRequests = !_showOutgoingRequests;
+  //           });
+  //         },
+  //         child: Text(_showOutgoingRequests ? "View Incoming Requests" : "View Outgoing Requests"),
+  //       ),
+  //       const SizedBox(height: 10),
+  //       StreamBuilder<QuerySnapshot>(
+  //         stream: FirebaseFirestore.instance
+  //             .collection('friend_requests')
+  //             .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
+  //             .snapshots(),
+  //         builder: (context, snapshot) {
+  //           if (!snapshot.hasData) return const CircularProgressIndicator();
+  //           var requests = snapshot.data!.docs;
+
+  //           return Column(
+  //             children: requests.map((doc) {
+  //               String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
+  //               return FutureBuilder<DocumentSnapshot>(
+  //                 future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
+  //                 builder: (context, userSnapshot) {
+  //                   if (!userSnapshot.hasData) return const SizedBox();
+  //                   String friendName = userSnapshot.data!['username'] ?? "Unknown";
+
+  //                   return ListTile(
+  //                     title: Text(friendName),
+  //                     subtitle: Text(doc['status']),
+  //                     trailing: _showOutgoingRequests
+  //                         ? IconButton(
+  //                             icon: const Icon(Icons.cancel, color: Colors.red),
+  //                             onPressed: () async {
+  //                               await doc.reference.delete();
+  //                             },
+  //                           )
+  //                         : IconButton(
+  //                             icon: const Icon(Icons.check, color: Colors.green),
+  //                             onPressed: () async {
+  //                               await doc.reference.update({'status': 'accepted'});
+  //                             },
+  //                           ),
+  //                   );
+  //                 },
+  //               );
+  //             }).toList(),
+  //           );
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
+
   Widget _friendRequestsSection() {
     return Column(
       children: [
-        ElevatedButton(
-          onPressed: () {
+        ToggleButtons(
+          isSelected: [_showOutgoingRequests, !_showOutgoingRequests],
+          onPressed: (index) {
             setState(() {
-              _showOutgoingRequests = !_showOutgoingRequests;
+              _showOutgoingRequests = index == 0;
             });
           },
-          child: Text(_showOutgoingRequests ? "View Incoming Requests" : "View Outgoing Requests"),
+          borderRadius: BorderRadius.circular(10),
+          // selectedColor: Colors.white,
+          color: Colors.black,
+          fillColor: Colors.blue,
+          // borderWidth: 2,
+          borderColor: Colors.blue,
+          selectedBorderColor: Colors.blue,
+          children: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text("Outgoing Requests", style: TextStyle(fontSize: 16)),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text("Incoming Requests", style: TextStyle(fontSize: 16)),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
-        StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('friend_requests')
-              .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const CircularProgressIndicator();
-            var requests = snapshot.data!.docs;
+        // StreamBuilder<QuerySnapshot>(
+        //   stream: FirebaseFirestore.instance
+        //       .collection('friend_requests')
+        //       .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
+        //       .snapshots(),
+        //   builder: (context, snapshot) {
+        //     if (!snapshot.hasData) return const CircularProgressIndicator();
+        //     var requests = snapshot.data!.docs;
 
-            return Column(
-              children: requests.map((doc) {
-                String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
-                return FutureBuilder<DocumentSnapshot>(
-                  future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
-                  builder: (context, userSnapshot) {
-                    if (!userSnapshot.hasData) return const SizedBox();
-                    String friendName = userSnapshot.data!['username'] ?? "Unknown";
+        //     return Column(
+        //       children: requests.map((doc) {
+        //         String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
+        //         return FutureBuilder<DocumentSnapshot>(
+        //           future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
+        //           builder: (context, userSnapshot) {
+        //             if (!userSnapshot.hasData) return const SizedBox();
+        //             String friendName = userSnapshot.data!['username'] ?? "Unknown";
 
-                    return ListTile(
-                      title: Text(friendName),
-                      subtitle: Text(doc['status']),
-                      trailing: _showOutgoingRequests
-                          ? IconButton(
-                              icon: const Icon(Icons.cancel, color: Colors.red),
-                              onPressed: () async {
-                                await doc.reference.delete();
-                              },
-                            )
-                          : IconButton(
-                              icon: const Icon(Icons.check, color: Colors.green),
-                              onPressed: () async {
-                                await doc.reference.update({'status': 'accepted'});
-                              },
-                            ),
-                    );
-                  },
-                );
-              }).toList(),
-            );
-          },
-        ),
+        //             return ListTile(
+        //               title: Text(friendName),
+        //               subtitle: Text(doc['status']),
+        //               trailing: _showOutgoingRequests
+        //                   ? IconButton(
+        //                       icon: const Icon(Icons.cancel, color: Colors.red),
+        //                       onPressed: () async {
+        //                         await doc.reference.delete();
+        //                       },
+        //                     )
+        //                   : IconButton(
+        //                       icon: const Icon(Icons.check, color: Colors.green),
+        //                       onPressed: () async {
+        //                         await doc.reference.update({'status': 'accepted'});
+        //                       },
+        //                     ),
+        //             );
+        //           },
+        //         );
+        //       }).toList(),
+        //     );
+        //   },
+        // ),
       ],
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +372,10 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
         child: Column(
           children: [
             _title(),
-            _friendInput(),
+            const SizedBox(height: 80),
+            _entryFieldFriend("Enter Friend's Email", _friendEmailController),
+            const SizedBox(height: 20),
+            _addFriendSubmitButton(),
             const SizedBox(height: 20),
             _friendRequestsSection(),
           ],
