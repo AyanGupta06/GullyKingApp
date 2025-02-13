@@ -52,32 +52,7 @@ class _NewProfilePageState extends State<YourTeamsPage> {
     _fetchUserData();
   }
 
-  Widget _infoRow({required String label, required String value}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 25,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
  
 
@@ -130,8 +105,23 @@ class _NewProfilePageState extends State<YourTeamsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: "Friends/Teams",
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                );
+              },
+            ),
+          ),
+        ),
         title: const Text(
-          'Your Team', 
+          "Your Teams", 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),

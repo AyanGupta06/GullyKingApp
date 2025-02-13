@@ -1,0 +1,319 @@
+import 'package:flutter/material.dart';
+import 'package:gully_king/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/add_new_friends_page.dart';
+import 'package:gully_king/pages/all_previous_games_page.dart';
+import 'package:gully_king/pages/friends_teams_page.dart';
+import 'package:gully_king/pages/previous_games_page.dart';
+import 'package:gully_king/pages/your_friends_page.dart';
+import 'package:gully_king/pages/your_teams_page.dart';
+
+import 'home_page.dart';
+import 'new_game_page.dart';
+import 'new_profile_page.dart';
+import 'your_teams_page.dart';
+
+class AddNewFriendsPage extends StatefulWidget {
+  const AddNewFriendsPage({super.key});
+
+  @override
+  State<AddNewFriendsPage> createState() => _AddNewFriendsPageState();
+}
+
+class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
+  final User? user = Auth().currentUser;
+  final TextEditingController _friendEmailController = TextEditingController();
+  bool _showOutgoingRequests = true;
+  int _selectedIndex = 3;
+
+  String username = "";
+  String position = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    if (user == null) return;
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+
+      setState(() {
+        username = userDoc['username'] ?? "N/A";
+        position = userDoc['position'] ?? "N/A";
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error fetching user data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _sendFriendRequest() async {
+    String friendEmail = _friendEmailController.text.trim();
+    if (friendEmail.isEmpty) return;
+
+    try {
+      QuerySnapshot query = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: friendEmail)
+          .get();
+
+      if (query.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User not found"), backgroundColor: Colors.red),
+        );
+        return;
+      }
+
+      String friendId = query.docs.first.id;
+
+      await FirebaseFirestore.instance
+          .collection('friend_requests')
+          .add({'from': user!.uid, 'to': friendId, 'status': 'pending'});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Friend request sent!"), backgroundColor: Colors.green),
+      );
+
+      _friendEmailController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error sending request: $e"), backgroundColor: Colors.red),
+      );
+    }
+  }
+  
+  void _navigateToPage(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0: //new game
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewGamePage()),
+        );
+        break;
+      case 1: //old games
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+        );
+        break;
+      case 2: //home
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+        break;
+      case 3: //friends
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+        );
+        break;
+      case 4: //profile
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewProfilePage()),
+        );
+        break;
+
+      default:
+      //idk
+        break;
+    }
+  }
+
+  Widget _title() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      child: Text(
+        "Add New Friends",
+        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+    );
+  }
+
+  Widget _friendInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _friendEmailController,
+            decoration: const InputDecoration(
+              labelText: "Enter friend's email",
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        ElevatedButton(
+          onPressed: _sendFriendRequest,
+          child: const Text("Send"),
+        ),
+      ],
+    );
+  }
+
+  Widget _friendRequestsSection() {
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _showOutgoingRequests = !_showOutgoingRequests;
+            });
+          },
+          child: Text(_showOutgoingRequests ? "View Incoming Requests" : "View Outgoing Requests"),
+        ),
+        const SizedBox(height: 10),
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('friend_requests')
+              .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const CircularProgressIndicator();
+            var requests = snapshot.data!.docs;
+
+            return Column(
+              children: requests.map((doc) {
+                String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
+                return FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
+                  builder: (context, userSnapshot) {
+                    if (!userSnapshot.hasData) return const SizedBox();
+                    String friendName = userSnapshot.data!['username'] ?? "Unknown";
+
+                    return ListTile(
+                      title: Text(friendName),
+                      subtitle: Text(doc['status']),
+                      trailing: _showOutgoingRequests
+                          ? IconButton(
+                              icon: const Icon(Icons.cancel, color: Colors.red),
+                              onPressed: () async {
+                                await doc.reference.delete();
+                              },
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.check, color: Colors.green),
+                              onPressed: () async {
+                                await doc.reference.update({'status': 'accepted'});
+                              },
+                            ),
+                    );
+                  },
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: "Friends/Teams",
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                );
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          "Add New Friends", 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/bg4.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          children: [
+            _title(),
+            _friendInput(),
+            const SizedBox(height: 20),
+            _friendRequestsSection(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildBottomBarIcon(
+              icon: Icons.add_box_rounded,
+              index: 0,
+              label: 'New Game',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.file_present_sharp,
+              index: 1,
+              label: 'Records',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.home_sharp,
+              index: 2,
+              label: 'Home',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.people_alt_sharp,
+              index: 3,
+              label: 'Friends',
+            ),
+            _buildBottomBarIcon(
+              icon: Icons.person,
+              index: 4,
+              label: 'Account',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
+    return Tooltip(
+      message: label,
+      child: IconButton(
+        icon: Icon(icon),
+        color: _selectedIndex == index ? Colors.white : Colors.black,
+        onPressed: () => _navigateToPage(index),
+        iconSize: 30,
+      ),
+    );
+  }
+}

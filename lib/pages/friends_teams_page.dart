@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/add_new_friends_page.dart';
 import 'package:gully_king/pages/all_previous_games_page.dart';
 import 'package:gully_king/pages/previous_games_page.dart';
+import 'package:gully_king/pages/your_friends_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
 
 import 'home_page.dart';
@@ -19,7 +21,7 @@ class FriendsTeamsPage extends StatefulWidget {
 }
 
 class _NewProfilePageState extends State<FriendsTeamsPage> {
-  int _selectedIndex = 3; // Default home index
+  int _selectedIndex = 3; 
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -81,72 +83,52 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
     );
   }
 
+  Widget _addFriends() {
+    return FloatingActionButton.extended(
+      onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AddNewFriendsPage()),
+        );
+      },
+    
+      label: const Text(
+        "                                 Add Friends                                 ",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      )
+    );
+  } 
  
   Widget _yourTeams() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1), 
-        side: BorderSide(width: 1.0, color: const Color.fromARGB(255, 187, 191, 194)),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 120),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-      ),
-       onPressed:() {Navigator.push(
+    return FloatingActionButton.extended(
+      onPressed:() {Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const YourTeamsPage()),
         );
       },
-      child: Text(
-        "Your Teams",
-        style: const TextStyle(color: Colors.black, fontSize: 18),
-      )
-      
-    );
-  }
-
-  Widget _addFriends() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1), 
-        side: BorderSide(width: 1.0, color: const Color.fromARGB(255, 187, 191, 194)),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 120),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-      ),
-       onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewProfilePage()),
-        );
-      },
-      child: const Text(
-        "Add Friends",
+    
+      label: const Text(
+        "                                 Your Teams                                 ",
         style: TextStyle(color: Colors.black, fontSize: 18),
       )
     );
-  }
+  } 
+
+ 
   Widget _yourFriends() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1), 
-        side: BorderSide(width: 1.0, color: const Color.fromARGB(255, 187, 191, 194)),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 120),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-      ),
-       onPressed:() {Navigator.push(
+    return FloatingActionButton.extended(
+      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+      onPressed:() {Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const NewProfilePage()),
+          MaterialPageRoute(builder: (context) => const YourFriendsPage()),
         );
       },
-      child: Text(
-        "Your Friends",
-        style: const TextStyle(color: Colors.black, fontSize: 18),
+    
+      label: const Text(
+        "                                 Your Friends                                 ",
+        style: TextStyle(color: Colors.black, fontSize: 18),
       )
     );
-  }
+  } 
 
   
 
@@ -227,10 +209,11 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            const SizedBox(height: 20), 
-            _yourTeams(),
+            
             const SizedBox(height: 20), 
             _addFriends(),
+            const SizedBox(height: 20), 
+            _yourTeams(),
             const SizedBox(height: 20), 
             _yourFriends(),
           ]
