@@ -79,7 +79,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
 
       await FirebaseFirestore.instance
           .collection('friend_requests')
-          .add({'from': user!.uid, 'to': friendId, 'status': 'pending'});
+          .add({'from': user!.uid, 'fromEmail': user!.email, 'to': friendId, 'toEmail:': friendEmail, 'status': 'pending'});
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Friend request sent!"), backgroundColor: Colors.green),
@@ -89,6 +89,40 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error sending request: $e"), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> _addFriend(String friendEmail) async {
+    // String friendEmail = _friendEmailController.text.trim();
+    // if (friendEmail.isEmpty) return;
+
+    try {
+      QuerySnapshot query = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: friendEmail)
+          .get();
+
+      if (query.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User not found"), backgroundColor: Colors.red),
+        );
+        return;
+      }
+
+      String friendId = query.docs.first.id;
+
+      await FirebaseFirestore.instance
+          .collection('friends')
+          .add({'friend1': user!.email, 'friend2': friendEmail});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Friend request accepted!"), backgroundColor: Colors.green),
+      );
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error accepting request: $e"), backgroundColor: Colors.red),
       );
     }
   }
@@ -203,62 +237,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
     );
   }
 
-  // Widget _friendRequestsSection() {
-  //   return Column(
-  //     children: [
-  //       ElevatedButton(
-  //         onPressed: () {
-  //           setState(() {
-  //             _showOutgoingRequests = !_showOutgoingRequests;
-  //           });
-  //         },
-  //         child: Text(_showOutgoingRequests ? "View Incoming Requests" : "View Outgoing Requests"),
-  //       ),
-  //       const SizedBox(height: 10),
-  //       StreamBuilder<QuerySnapshot>(
-  //         stream: FirebaseFirestore.instance
-  //             .collection('friend_requests')
-  //             .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
-  //             .snapshots(),
-  //         builder: (context, snapshot) {
-  //           if (!snapshot.hasData) return const CircularProgressIndicator();
-  //           var requests = snapshot.data!.docs;
-
-  //           return Column(
-  //             children: requests.map((doc) {
-  //               String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
-  //               return FutureBuilder<DocumentSnapshot>(
-  //                 future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
-  //                 builder: (context, userSnapshot) {
-  //                   if (!userSnapshot.hasData) return const SizedBox();
-  //                   String friendName = userSnapshot.data!['username'] ?? "Unknown";
-
-  //                   return ListTile(
-  //                     title: Text(friendName),
-  //                     subtitle: Text(doc['status']),
-  //                     trailing: _showOutgoingRequests
-  //                         ? IconButton(
-  //                             icon: const Icon(Icons.cancel, color: Colors.red),
-  //                             onPressed: () async {
-  //                               await doc.reference.delete();
-  //                             },
-  //                           )
-  //                         : IconButton(
-  //                             icon: const Icon(Icons.check, color: Colors.green),
-  //                             onPressed: () async {
-  //                               await doc.reference.update({'status': 'accepted'});
-  //                             },
-  //                           ),
-  //                   );
-  //                 },
-  //               );
-  //             }).toList(),
-  //           );
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
+ 
 
   Widget _friendRequestsSection() {
     return Column(
@@ -306,6 +285,8 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
                   builder: (context, userSnapshot) {
                     if (!userSnapshot.hasData) return const SizedBox();
                     String friendName = userSnapshot.data!['username'] ?? "Unknown";
+                    String friendEmail = userSnapshot.data!['email'] ?? "Unknown";
+
 
                     return ListTile(
                       title: Text(friendName),
@@ -317,12 +298,16 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
                                 await doc.reference.delete();
                               },
                             )
+                            
                           : IconButton(
                               icon: const Icon(Icons.check, color: Colors.green),
                               onPressed: () async {
                                 await doc.reference.update({'status': 'accepted'});
+                                _addFriend(friendEmail);
                               },
                             ),
+         
+                          
                     );
                   },
                 );
@@ -333,6 +318,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
       ],
     );
   }
+
 
 
   @override
@@ -371,8 +357,9 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
         ),
         child: Column(
           children: [
+            const SizedBox(height: 40),
             _title(),
-            const SizedBox(height: 80),
+            const SizedBox(height: 40),
             _entryFieldFriend("Enter Friend's Email", _friendEmailController),
             const SizedBox(height: 20),
             _addFriendSubmitButton(),
