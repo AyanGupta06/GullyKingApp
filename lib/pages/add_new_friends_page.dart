@@ -79,7 +79,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
 
       await FirebaseFirestore.instance
           .collection('friend_requests')
-          .add({'from': user!.uid, 'fromEmail': user!.email, 'to': friendId, 'toEmail:': friendEmail, 'status': 'pending'});
+          .add({'from': user!.uid, 'fromEmail': user!.email, 'to': friendId, 'toEmail': friendEmail, 'status': 'pending'});
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Friend request sent!"), backgroundColor: Colors.green),
