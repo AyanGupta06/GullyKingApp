@@ -177,7 +177,9 @@ class _PreviousGamesPageState extends State<PreviousGamesPage> {
         title: const Text("Previous Unranked Matches"),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
       ),
-      body: matches.isEmpty
+      body: 
+      
+      matches.isEmpty
           ? const Center(
               child: Text(
                 "No Matches Found",

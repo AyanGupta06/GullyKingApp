@@ -111,6 +111,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
       }
 
       String friendId = query.docs.first.id;
+      // List<String> friendsEmails = [friend2];
 
       await FirebaseFirestore.instance
           .collection('friends')
@@ -118,6 +119,7 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Friend request accepted!"), backgroundColor: Colors.green),
+        //add integration to go to the other user
       );
 
     } catch (e) {
@@ -250,10 +252,10 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
             });
           },
           borderRadius: BorderRadius.circular(10),
-          selectedColor: Colors.white,
+          // selectedColor: Colors.white,
           color: Colors.black,
           fillColor: Colors.blue,
-          borderWidth: 2,
+          // borderWidth: 2,
           borderColor: Colors.blue,
           selectedBorderColor: Colors.blue,
           children: const [
@@ -285,38 +287,29 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
                   builder: (context, userSnapshot) {
                     if (!userSnapshot.hasData) return const SizedBox();
                     String friendName = userSnapshot.data!['username'] ?? "Unknown";
-                    String friendEmail = userSnapshot.data!['email'] ?? "Unknown Email";
+                    String friendEmail = userSnapshot.data!['email'] ?? "Unknown";
+
 
                     return ListTile(
                       title: Text(friendName),
-                      subtitle: const Text("Pending"),
+                      subtitle: Text(doc['status']),
                       trailing: _showOutgoingRequests
                           ? IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon: const Icon(Icons.cancel, color: Colors.red),
                               onPressed: () async {
                                 await doc.reference.delete();
                               },
                             )
-                          : Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.check, color: Colors.green),
-                                  onPressed: () async {
-                                    await _acceptFriendRequest(doc, friendEmail);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Friended successfully!"), backgroundColor: Colors.green),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
-                                  onPressed: () async {
-                                    await doc.reference.delete();
-                                  },
-                                ),
-                              ],
+                            
+                          : IconButton(
+                              icon: const Icon(Icons.check, color: Colors.green),
+                              onPressed: () async {
+                                await doc.reference.update({'status': 'accepted'});
+                                _addFriend(friendEmail);
+                              },
                             ),
+         
+                          
                     );
                   },
                 );
@@ -327,37 +320,6 @@ class _AddNewFriendsPageState extends State<AddNewFriendsPage> {
       ],
     );
   }
-
-  Future<void> _acceptFriendRequest(DocumentSnapshot doc, String friendEmail) async {
-    String userEmail = user!.email!;
-
-    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
-    DocumentReference friendRef = FirebaseFirestore.instance.collection('users').doc(doc['from']);
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      DocumentSnapshot userSnapshot = await transaction.get(userRef);
-      DocumentSnapshot friendSnapshot = await transaction.get(friendRef);
-
-      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>? ?? {};
-      Map<String, dynamic> friendData = friendSnapshot.data() as Map<String, dynamic>? ?? {};
-
-      List<dynamic> userFriends = userData.containsKey('friends') ? List.from(userData['friends']) : [];
-      List<dynamic> friendFriends = friendData.containsKey('friends') ? List.from(friendData['friends']) : [];
-
-      if (!userFriends.contains(friendEmail)) {
-        userFriends.add(friendEmail);
-      }
-      if (!friendFriends.contains(userEmail)) {
-        friendFriends.add(userEmail);
-      }
-
-      transaction.update(userRef, {'friends': userFriends});
-      transaction.update(friendRef, {'friends': friendFriends});
-
-      await doc.reference.delete();
-    });
-  }
-
 
 
 

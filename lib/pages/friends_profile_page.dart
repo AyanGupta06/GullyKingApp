@@ -1,38 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/add_new_friends_page.dart';
 import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/previous_games_page.dart';
-import 'new_game_page.dart'; 
-import 'friends_teams_page.dart';
+import 'package:gully_king/pages/your_teams_page.dart';
 
-class HomePage extends StatefulWidget {
+import 'home_page.dart';
+import 'new_game_page.dart';
+import 'new_profile_page.dart';
+import 'your_teams_page.dart';
+
+class FriendsProfilePage extends StatefulWidget {
+  final String friendEmail;
+
+  const FriendsProfilePage({
+    Key? key,
+    required this.friendEmail,
+  }) : super(key: key);
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<FriendsProfilePage> createState() => _FriendsProfilePageState();
 }
-
-class _HomePageState extends State<HomePage> {
+class _FriendsProfilePageState extends State<FriendsProfilePage> {
+  int _selectedIndex = 3; 
   final User? user = Auth().currentUser;
-  int _selectedIndex = 2; //default homeIndez
 
-  Future<void> signOut() async {
-    await Auth().signOut();
+  String username = "";
+  String position = "";
+
+  Future<void> _fetchUserData() async {
+    if (user == null) return;
+
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+
+      setState(() {
+        username = userDoc['username'] ?? "N/A";
+        position = userDoc['position'] ?? "N/A";
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error fetching user data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-
-  Widget _userId() {
-    return Text(
-      user?.email ?? "User Email",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
   }
-    Widget _signOutClick() {
-    return ElevatedButton(
-      onPressed: signOut,
-      child: const Text("Sign Out"),
-    );
-  }
+ 
 
   void _navigateToPage(int index) {
     setState(() {
@@ -53,6 +80,10 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 2: //home
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
         break;
       case 3: //friends
       Navigator.push(
@@ -61,7 +92,7 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 4: //profile
-      Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
         );
@@ -73,23 +104,45 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
+
+  Future<Map<String, dynamic>> _fetchFriendData () async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('friends', arrayContains: (widget.friendEmail))
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      throw Exception("No friend data found.");
+    }
+
+    return snapshot.docs.first.data();
+  }
+
+ 
+
+
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Transform.rotate(
           angle: 0, 
           child: Tooltip(
-            message: 'Home',
+            message: 'Friends/Teams',
             child: IconButton(
-              icon: const Icon(Icons.home_sharp),
+              icon: const Icon(Icons.people_alt_sharp),
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                );
               },
             ),
           ),
         ),
         title: const Text(
-          'Home', 
+          'Friends Profile', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
@@ -104,15 +157,18 @@ class _HomePageState extends State<HomePage> {
         ),
         height: double.infinity,
         width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _userId(),
-            _signOutClick(),
+          children: [
+            Text(
+              widget.friendEmail,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
+
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,
@@ -150,7 +206,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-//fyi tooltip is what gives the user the hint on what the button is
+
   Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
     return Tooltip(
       message: label,

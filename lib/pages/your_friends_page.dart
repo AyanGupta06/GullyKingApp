@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/add_new_friends_page.dart';
 import 'package:gully_king/pages/all_previous_games_page.dart';
+import 'package:gully_king/pages/friends_profile_page.dart';
 import 'package:gully_king/pages/friends_teams_page.dart';
 import 'package:gully_king/pages/previous_games_page.dart';
 import 'package:gully_king/pages/your_teams_page.dart';
@@ -171,6 +172,10 @@ class _YourFriendsPageState extends State<YourFriendsPage> {
                       trailing: const Icon(Icons.arrow_forward_ios, color: Colors.black),
                       onTap: () {
                         //add functionality here
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FriendsProfilePage(friendEmail: friendEmail)),
+                        );
                       },
                     ),
                   );
