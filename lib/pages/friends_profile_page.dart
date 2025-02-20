@@ -108,7 +108,7 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
   Future<Map<String, dynamic>> _fetchFriendData () async {
     final snapshot = await FirebaseFirestore.instance
         .collection('users')
-        .where('friends', arrayContains: (widget.friendEmail))
+        .where('email', isEqualTo: (widget.friendEmail))
         .get();
 
     if (snapshot.docs.isEmpty) {
