@@ -2,30 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/add_new_friends_page.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/friends_teams_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/New%20Game/Ranked%20Games/new_ranked_game_page.dart';
+import 'package:gully_king/pages/New%20Game/Unranked%20Games/new_unranked_game_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import 'home_page.dart';
+import '../home_page.dart';
 import 'new_game_page.dart';
-import 'new_profile_page.dart';
-import 'your_teams_page.dart';
+import '../Friends/friends_teams_page.dart';
 
-class FriendsProfilePage extends StatefulWidget {
-  final String friendEmail;
-
-  const FriendsProfilePage({
-    Key? key,
-    required this.friendEmail,
-  }) : super(key: key);
+class NewGamePage extends StatefulWidget {
+  const NewGamePage({super.key});
 
   @override
-  State<FriendsProfilePage> createState() => _FriendsProfilePageState();
+  State<NewGamePage> createState() => _NewGamePageState();
 }
-class _FriendsProfilePageState extends State<FriendsProfilePage> {
-  int _selectedIndex = 3; 
+
+class _NewGamePageState extends State<NewGamePage> {
+  int _selectedIndex = 0; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -59,7 +55,45 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
     super.initState();
     _fetchUserData();
   }
- 
+
+  
+
+  Widget _unrankedMatchButton() {
+    return FloatingActionButton.extended(
+      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+      onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewUnrankedGamePage()),
+        );
+      },
+    
+      label: const Text(
+        "                                 Create New Unranked Game                                 ",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      )
+    );
+  } 
+  Widget _rankedMatchButton() {
+    return FloatingActionButton.extended(
+      
+      onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NewRankedGamePage()),
+        );
+      },
+      
+      label: const Text(
+        "                                 Create New Ranked Game                                 ",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      )
+    );
+  } 
+
+
+  
+  
+
+  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -105,49 +139,27 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
   }
 
 
-  Future<Map<String, dynamic>> _fetchFriendData () async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: (widget.friendEmail))
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      throw Exception("No friend data found.");
-    }
-
-    return snapshot.docs.first.data();
-  }
-
- 
-
-
-
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Transform.rotate(
           angle: 0, 
           child: Tooltip(
-            message: 'Friends/Teams',
+            message: 'New Match Page',
             child: IconButton(
-              icon: const Icon(Icons.people_alt_sharp),
+              icon: const Icon(Icons.add_box_rounded),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
-                );
               },
             ),
           ),
         ),
         title: const Text(
-          'Friends Profile', 
+          'New Match', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-      ),
+        ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -159,16 +171,22 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.friendEmail,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            const SizedBox(height: 10),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     _unrankedMatchButton(),
+            //     _unrankedMatchButton(),
+
+            // ],)
+            const SizedBox(height: 20), 
+            _unrankedMatchButton(),
+            const SizedBox(height: 20), 
+            _rankedMatchButton(),
           ],
         ),
       ),
-
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,

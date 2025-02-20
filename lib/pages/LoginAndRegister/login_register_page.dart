@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
-import 'package:gully_king/pages/additional_details_page.dart';
+import 'package:gully_king/pages/LoginAndRegister/additional_details_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

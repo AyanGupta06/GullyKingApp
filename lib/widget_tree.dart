@@ -1,6 +1,6 @@
 import "package:gully_king/auth.dart";
 import "package:gully_king/pages/home_page.dart";
-import 'package:gully_king/pages/login_register_page.dart';
+import 'package:gully_king/pages/LoginAndRegister/login_register_page.dart';
 import "package:flutter/material.dart";
 
 class WidgetTree extends StatefulWidget {

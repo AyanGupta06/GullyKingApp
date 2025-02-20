@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/add_new_friends_page.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/friends_teams_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/your_friends_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/Friends/add_new_friends_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/Friends/your_friends_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'new_profile_page.dart';
+import '../home_page.dart';
+import '../New Game/new_game_page.dart';
+import '../new_profile_page.dart';
 import 'your_teams_page.dart';
 
 class AddNewFriendsPage extends StatefulWidget {

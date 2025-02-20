@@ -1,11 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:gully_king/pages/home_page.dart';
-import 'package:gully_king/pages/new_batsman_dialog.dart';
-import 'package:gully_king/pages/new_bowler_dialog.dart';
+import 'package:gully_king/pages/Dialogs/new_batsman_dialog.dart';
+import 'package:gully_king/pages/Dialogs/new_bowler_dialog.dart';
 
-import 'package:gully_king/pages/new_innings_setup_dialog.dart';
-import 'package:gully_king/pages/new_unranked_game_page.dart';
+import 'package:gully_king/pages/Dialogs/new_innings_setup_dialog.dart';
+import 'package:gully_king/pages/New%20Game/Unranked%20Games/new_unranked_game_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

@@ -1,23 +1,25 @@
-import 'package:flutter/material.dart';
-import 'package:gully_king/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/home_page.dart';
+import 'package:gully_king/pages/New%20Game/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/New%20Game/Ranked%20Games/new_ranked_game_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Ranked%20Games/previous_ranked_games_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import '../../auth.dart';
 
-class NewRankedGamePage extends StatefulWidget {
-  const NewRankedGamePage({super.key});
+class AllPreviousGamesPage extends StatefulWidget {
+  const AllPreviousGamesPage({super.key});
 
   @override
-  State<NewRankedGamePage> createState() => _NewRankedGamePageState();
+  State<AllPreviousGamesPage> createState() => _AllPreviousGamesPageState();
 }
 
-class _NewRankedGamePageState extends State<NewRankedGamePage> {
-  int _selectedIndex = 0; // Default home index
+class _AllPreviousGamesPageState extends State<AllPreviousGamesPage> {
+  int _selectedIndex = 1; 
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -51,6 +53,44 @@ class _NewRankedGamePageState extends State<NewRankedGamePage> {
     super.initState();
     _fetchUserData();
   }
+
+  
+
+  Widget _unrankedMatchButton() {
+    return FloatingActionButton.extended(
+      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+      onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+        );
+      },
+    
+      label: const Text(
+        "                                 View All Unranked Matches                                 ",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      )
+    );
+  } 
+  Widget _rankedMatchButton() {
+    return FloatingActionButton.extended(
+      
+      onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PreviousRankedGamesPage()),
+        );
+      },
+      
+      label: const Text(
+        "                                 View All Ranked Matches                                 ",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      )
+    );
+  } 
+
+
+  
+  
+
   
 
   void _navigateToPage(int index) {
@@ -66,6 +106,10 @@ class _NewRankedGamePageState extends State<NewRankedGamePage> {
         );
         break;
       case 1: //old games
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+        );
         break;
       case 2: //home
         Navigator.push(
@@ -96,16 +140,26 @@ class _NewRankedGamePageState extends State<NewRankedGamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: 'All Previous Matches Page',
+            child: IconButton(
+              icon: const Icon(Icons.file_present_sharp),
+              onPressed: () {
+              },
+            ),
+          ),
+        ),
         title: const Text(
-          'New Ranked Game', 
+          'All Previous Matches', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
         ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/bg4.png'),
             fit: BoxFit.cover,
@@ -124,11 +178,16 @@ class _NewRankedGamePageState extends State<NewRankedGamePage> {
             //     _unrankedMatchButton(),
 
             // ],)
-            
+            const SizedBox(height: 20), 
+            _unrankedMatchButton(),
+            const SizedBox(height: 20), 
+            _rankedMatchButton(),
           ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: const Color.fromRGBO(53, 150, 207, 1),
+        height: 70,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,8 +219,6 @@ class _NewRankedGamePageState extends State<NewRankedGamePage> {
             ),
           ],
         ),
-        color: const Color.fromRGBO(53, 150, 207, 1),
-        height: 70,
       ),
     );
   }

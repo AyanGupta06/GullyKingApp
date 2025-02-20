@@ -3,13 +3,13 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/started_new_unranked_game_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/New%20Game/Unranked%20Games/started_new_unranked_game_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import '../../home_page.dart';
+import '../new_game_page.dart';
+import '../../Friends/friends_teams_page.dart';
 
 // Player class
 class Player {

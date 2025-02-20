@@ -2,24 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/Friends/add_new_friends_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import '../home_page.dart';
+import '../New Game/new_game_page.dart';
+import '../new_profile_page.dart';
+import 'your_teams_page.dart';
 
-class PreviousRankedGamesPage extends StatefulWidget {
-  const PreviousRankedGamesPage({super.key});
+class FriendsProfilePage extends StatefulWidget {
+  final String friendEmail;
+
+  const FriendsProfilePage({
+    Key? key,
+    required this.friendEmail,
+  }) : super(key: key);
 
   @override
-  State<PreviousRankedGamesPage> createState() => _PreviousRankedGamesPageState();
+  State<FriendsProfilePage> createState() => _FriendsProfilePageState();
 }
-
-class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
-  int _selectedIndex = 1; // Default home index
+class _FriendsProfilePageState extends State<FriendsProfilePage> {
+  int _selectedIndex = 3; 
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -53,7 +59,7 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
     super.initState();
     _fetchUserData();
   }
-  
+ 
 
   void _navigateToPage(int index) {
     setState(() {
@@ -99,32 +105,49 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
   }
 
 
+  Future<Map<String, dynamic>> _fetchFriendData () async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: (widget.friendEmail))
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      throw Exception("No friend data found.");
+    }
+
+    return snapshot.docs.first.data();
+  }
+
+ 
+
+
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Transform.rotate(
           angle: 0, 
           child: Tooltip(
-            message: 'Logout',
+            message: 'Friends/Teams',
             child: IconButton(
-              icon: const Icon(Icons.file_present_sharp),
+              icon: const Icon(Icons.people_alt_sharp),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
                 );
               },
             ),
           ),
         ),
-      
         title: const Text(
-          'Previous Ranked Matches', 
+          'Friends Profile', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -135,20 +158,17 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
           children: [
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     _unrankedMatchButton(),
-            //     _unrankedMatchButton(),
-
-            // ],)
-            
+            Text(
+              widget.friendEmail,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
+
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,

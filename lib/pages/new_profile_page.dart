@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
 
 import 'home_page.dart';
-import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import 'New Game/new_game_page.dart';
+import 'Friends/friends_teams_page.dart';
 
 class NewProfilePage extends StatefulWidget {
   const NewProfilePage({super.key});

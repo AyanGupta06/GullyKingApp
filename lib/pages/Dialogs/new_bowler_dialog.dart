@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gully_king/pages/new_unranked_game_page.dart';
+import 'package:gully_king/pages/New%20Game/Unranked%20Games/new_unranked_game_page.dart';
 
 class NewBowlerDialog extends StatelessWidget {
   final List<Player> availableowlers;

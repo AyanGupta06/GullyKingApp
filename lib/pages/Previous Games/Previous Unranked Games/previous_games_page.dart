@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/friends_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
-import 'package:gully_king/pages/new_game_page.dart';
+import 'package:gully_king/pages/New%20Game/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/scorecard_previous_unranked_games_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/scorecard_previous_unranked_games_page.dart';
 import 'package:intl/intl.dart';
 
 class PreviousGamesPage extends StatefulWidget {

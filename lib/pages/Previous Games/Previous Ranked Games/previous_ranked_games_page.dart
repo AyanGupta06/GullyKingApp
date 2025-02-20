@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/friends_teams_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/new_profile_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'new_profile_page.dart';
+import '../../home_page.dart';
+import '../../New Game/new_game_page.dart';
+import '../../Friends/friends_teams_page.dart';
 
-class YourTeamsPage extends StatefulWidget {
-  const YourTeamsPage({super.key});
+class PreviousRankedGamesPage extends StatefulWidget {
+  const PreviousRankedGamesPage({super.key});
 
   @override
-  State<YourTeamsPage> createState() => _NewProfilePageState();
+  State<PreviousRankedGamesPage> createState() => _PreviousRankedGamesPageState();
 }
 
-class _NewProfilePageState extends State<YourTeamsPage> {
-  int _selectedIndex = 3; // Default home index
+class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
+  int _selectedIndex = 1; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -51,11 +53,6 @@ class _NewProfilePageState extends State<YourTeamsPage> {
     super.initState();
     _fetchUserData();
   }
-
-
-
- 
-
   
 
   void _navigateToPage(int index) {
@@ -73,7 +70,7 @@ class _NewProfilePageState extends State<YourTeamsPage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
         break;
       case 2: //home
@@ -108,25 +105,26 @@ class _NewProfilePageState extends State<YourTeamsPage> {
         leading: Transform.rotate(
           angle: 0, 
           child: Tooltip(
-            message: "Friends/Teams",
+            message: 'Logout',
             child: IconButton(
-              icon: const Icon(Icons.people_alt_sharp),
+              icon: const Icon(Icons.file_present_sharp),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                  MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
                 );
               },
             ),
           ),
         ),
+      
         title: const Text(
-          "Your Teams", 
+          'Previous Ranked Matches', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-      ),
+        ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -137,11 +135,18 @@ class _NewProfilePageState extends State<YourTeamsPage> {
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     _unrankedMatchButton(),
+            //     _unrankedMatchButton(),
+
+            // ],)
             
-          ]
-          
+          ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(

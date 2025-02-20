@@ -3,29 +3,30 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/friends_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
-import 'package:gully_king/pages/new_game_page.dart';
+import 'package:gully_king/pages/New%20Game/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/unranked_team1_scorecard_page.dart';
-import 'package:gully_king/pages/unranked_team2_scorecard_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/scorecard_previous_unranked_games_page.dart';
+import 'package:gully_king/pages/New%20Game/Unranked%20Games/started_new_unranked_game_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/unranked_team1_scorecard_page.dart';
 
-class ScorecardPreviousUnrankedGamesPage extends StatefulWidget {
+class UnrankedTeam2ScoreCardPage extends StatefulWidget {
   final String timestamp;
 
-  const ScorecardPreviousUnrankedGamesPage({
+  const UnrankedTeam2ScoreCardPage({
     Key? key,
     required this.timestamp,
   }) : super(key: key);
 
   @override
-  State<ScorecardPreviousUnrankedGamesPage> createState() => _ScorecardPreviousUnrankedGamesPageState();
+  State<UnrankedTeam2ScoreCardPage> createState() => _UnrankedTeam2ScoreCardPageState();
 }
 
-class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUnrankedGamesPage> {
-  int _selectedIndex = 1; 
-  int _isSelected = 0;
+class _UnrankedTeam2ScoreCardPageState extends State<UnrankedTeam2ScoreCardPage> {
+  int _selectedIndex = 1; // Default to 'Records' index
+  int _isSelected = 2;
 
   void _navigateToPage(int index) {
     setState(() {
@@ -81,22 +82,16 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     return snapshot.docs.first.data();
   }
 
-  Map<String, dynamic> _getBestBatsman(List<dynamic> players) {
-    return players.reduce((curr, next) => (curr['runs'] ?? 0) > (next['runs'] ?? 0) ? curr : next);
+    void _openSummaryPage(Map<String, dynamic> matchData) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ScorecardPreviousUnrankedGamesPage(
+          timestamp: matchData['timestamp'].toDate().toIso8601String(),
+        ),
+      ),
+    );
   }
-
-  Map<String, dynamic> _getBestBowler(List<dynamic> players) {
-    List<dynamic> players1 = [];
-    for(int i = 0; i < players.length; i++) {
-      if(players[i]['ballsBowled'] != 0) {
-        players1.add(players[i]);
-      }
-    }
-    return players1.reduce((curr, next) => (curr['wicketsTaken'] ?? 0) > (next['wicketsTaken'] ?? 0) || ((curr['runsOnBalls'] ?? 0)/(curr['ballsBowled'] ?? 0)) < ((curr['runsOnBalls'] ?? 0)/(curr['ballsBowled'] ?? 0)) ? curr : next);
-  }
-
-
-
 
   void _openTeam1ScoreCard(Map<String, dynamic> matchData) {
     Navigator.push(
@@ -109,59 +104,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
     );
   }
 
-  void _openTeam2ScoreCard(Map<String, dynamic> matchData) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UnrankedTeam2ScoreCardPage(
-          timestamp: matchData['timestamp'].toDate().toIso8601String(),
-        ),
-      ),
-    );
-  }
-
-  void _algorithim() {
-    future: _fetchMatchData();
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Center(child: Text("Error: ${snapshot.error}"));
-      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return const Center(child: Text("No match data available."));
-      }
-
-      final matchData = snapshot.data!;
-      final team1Players = matchData['team1Players'] ?? [];
-      final team2Players = matchData['team2Players'] ?? [];
-      int bestEcon = 0;
-      int tempEcon = 0;
-      int tempWickets = 0;
-      int mostWickets = 0;
-      for(int i = 0; i < team1Players.length(); i++) {
-        if(team1Players.get(i).wicketsTaken >= tempWickets) {
-          mostWickets = i;
-        }
-        if(team1Players.get(i).runsOnBalls/team1Players.get(i).ballsBowled <= tempEcon) {
-          bestEcon = i;
-        }
-      }
-
-
-      int bestEcon2 = 0;
-      int tempEcon2 = 0;
-      int tempWickets2 = 0;
-      int mostWickets2 = 0;
-      for(int j = 0; j < team2Players.length(); j++) {
-        if(team2Players.get(j).wicketsTaken >= tempWickets2) {
-          mostWickets2 = j;
-        }
-        if(team2Players.get(j).runsOnBalls/team2Players.get(j).ballsBowled <= tempEcon2) {
-          bestEcon2 = j;
-        }
-      }
-    };
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -205,12 +148,6 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
         final team1Players = matchData['team1Players'] ?? [];
         final team2Players = matchData['team2Players'] ?? [];
 
-        final bestBatsman1 = _getBestBatsman(team1Players);
-        final bestBatsman2 = _getBestBatsman(team2Players);
-        final bestBowler1 = _getBestBowler(team1Players);
-        final bestBowler2 = _getBestBowler(team2Players);
-        // _algorithim();
-
 
 
         return Padding(
@@ -218,8 +155,6 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -251,7 +186,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "                                           "
                   ),
                   Text(
@@ -274,7 +209,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "                                                "
                   ),
                   Text(
@@ -307,7 +242,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                   setState(() {
                     _isSelected = index;
                   });
-                  index ==1 ? _openTeam1ScoreCard(matchData): _openTeam2ScoreCard(matchData);
+                  index == 0 ? _openSummaryPage(matchData): index == 1? _openTeam1ScoreCard(matchData): Text("ewhgj");
                 },
                 borderWidth: 0,
                 borderColor: Colors.transparent,
@@ -323,51 +258,131 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousUn
                   
                 ]
               ),
+            
+              const Divider(),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(flex: 5, child: Text("Batting", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("B", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("4s", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("6s", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("S/R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const Divider(),
+                ...team2Players.map<Widget>((player) {
+                  final playerName = player['name'] ?? 'Unknown';
+                  final runs = player['runs'] ?? 0;
+                  final balls = player['ballsFaced'] ?? 0;
+                  final dismissal = player['outMessage'] ?? 'Not Out';
+                  final fours = player['fours'] ?? 0;
+                  final sixes = player['sixes'] ?? 0;
+                  final strikeRate = balls > 0 ? truncateToDecimalPlaces((runs / balls) * 100, 1) : 0.00;
+
+                
+
+                 
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(playerName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text("  $dismissal", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(flex: 5, child: SizedBox()),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$balls", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$fours", textAlign: TextAlign.left)),
+                          Expanded(child: Text("$sixes", textAlign: TextAlign.left)),
+                          Expanded(child: Text("$strikeRate", textAlign: TextAlign.center)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
+                  );
+
+
+
+                  
+                }).toList(),
+                const SizedBox(height: 10),
+                
               
-               const SizedBox(height: 16),
-                const Text("First Innings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(bestBatsman1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${bestBatsman1['runs']} (${bestBatsman1['ballsFaced']})"),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(bestBowler2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${bestBowler2['wicketsTaken']}/${bestBowler2['runsOnBalls']} (${(bestBowler2['ballsBowled']~/6).round()}.${bestBowler2['ballsBowled'] == 6? 0: bestBowler2['ballsBowled']})")
-                      ],
-                    ),
+                    const Expanded(flex: 1, child: Text("Extras", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text( "                          W " + matchData['team2Wide'] + "  NB " + matchData['team2NB'], textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                 
                   ],
                 ),
-                const SizedBox(height: 16),
-                const Text("Second Innings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+              
                 const Divider(),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(bestBatsman2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${bestBatsman2['runs']} (${bestBatsman2['ballsFaced']})"),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(bestBowler1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${bestBowler1['wicketsTaken']}/${bestBowler1['runsOnBalls']} (${(bestBowler1['ballsBowled']~/6).round()}.${bestBowler1['ballsBowled'] == 6 ? 0: bestBowler1['ballsBowled']})")
-                      ],
-                    ),
+                    Expanded(flex: 3, child: Text("Bowling", style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("O", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("R", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("W", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(child: Text("Econ", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
                   ],
                 ),
+                const Divider(),
+                ...team1Players.map<Widget>((player) {
+                  final bowlerName = player['name'] ?? 'Unknown';
+                  final overs = player['oversBowled'] ?? 0;
+                  var ballsBowled = player['ballsBowled'] ?? 0;
+                  final runs = player['runsOnBalls'] ?? 0;
+                  final wickets = player['wicketsTaken'] ?? 0;
+                  // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / ballsBowled, 2)*6 : 0.00;
+                  final overs2 = (player['ballsBowled']~/6).round();
+                  double temp = overs2 + ((ballsBowled%6)/10);
+                  double temp2 = 0;
+                  if(((ballsBowled%6)/10) == 0.1) {
+                    temp2 = 1/6;
+                  } else if(((ballsBowled%6)/10) == 0.2) {
+                    temp2 = 2/6;
+                  } else if(((ballsBowled%6)/10) == 0.3) {
+                    temp2 = 3/6;
+                  } else if(((ballsBowled%6)/10) == 0.4) {
+                    temp2 = 4/6;
+                  } else if(((ballsBowled%6)/10) == 0.5) {
+                    temp2 = 5/6;
+                  } else if(((ballsBowled%6)/10) == 0.0) {
+                    temp2 = 0;
+                  } 
+                  double temp3 = overs2 + temp2;
+                  final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp3, 2) : 0.00;
+                  if(ballsBowled == 6) {
+                    ballsBowled = 0;
+                  }
+                  // double temp = overs2 + (ballsBowled/10);
+                  // final econ = ballsBowled > 0 ? truncateToDecimalPlaces(runs / temp, 2) : 0.00;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(flex: 3, child: Text(bowlerName, style: const TextStyle(fontWeight: FontWeight.bold))),
+                          Expanded(child: Text("$overs2.$ballsBowled", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$runs", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$wickets", textAlign: TextAlign.center)),
+                          Expanded(child: Text("$econ", textAlign: TextAlign.center)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
+                  );
+                }).toList(),
+
+              
 
             ],
           ),

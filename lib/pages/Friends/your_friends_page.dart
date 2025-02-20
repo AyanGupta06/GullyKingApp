@@ -2,26 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/add_new_friends_page.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/your_friends_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/Friends/add_new_friends_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Friends/friends_profile_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'new_profile_page.dart';
+import '../home_page.dart';
+import '../New Game/new_game_page.dart';
+import '../new_profile_page.dart';
 import 'your_teams_page.dart';
 
-class FriendsTeamsPage extends StatefulWidget {
-  const FriendsTeamsPage({super.key});
+class YourFriendsPage extends StatefulWidget {
+  const YourFriendsPage({super.key});
 
   @override
-  State<FriendsTeamsPage> createState() => _NewProfilePageState();
+  State<YourFriendsPage> createState() => _YourFriendsPageState();
 }
 
-class _NewProfilePageState extends State<FriendsTeamsPage> {
-  int _selectedIndex = 3; 
+class _YourFriendsPageState extends State<YourFriendsPage> {
+  int _selectedIndex = 3; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -83,54 +84,7 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
     );
   }
 
-  Widget _addFriends() {
-    return FloatingActionButton.extended(
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AddNewFriendsPage()),
-        );
-      },
-    
-      label: const Text(
-        "                                 Add Friends                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
  
-  Widget _yourTeams() {
-    return FloatingActionButton.extended(
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const YourTeamsPage()),
-        );
-      },
-    
-      label: const Text(
-        "                                 Your Teams                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-
- 
-  Widget _yourFriends() {
-    return FloatingActionButton.extended(
-      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const YourFriendsPage()),
-        );
-      },
-    
-      label: const Text(
-        "                                 Your Friends                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-
-  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -175,6 +129,66 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
     }
   }
 
+  Widget _friendsList() {
+    return Expanded(
+      child: FutureBuilder<DocumentSnapshot>(
+        future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+          List<dynamic> friends = userData.containsKey('friends') ? List.from(userData['friends']) : [];
+
+          if (friends.isEmpty) {
+            return const Center(
+              child: Text(
+                "You have no friends yet.",
+                style: TextStyle(fontSize: 18, color: Colors.black),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: friends.length,
+            itemBuilder: (context, index) {
+              String friendEmail = friends[index];
+
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance.collection('users').where('email', isEqualTo: friendEmail).limit(1).get().then((query) => query.docs.first),
+                builder: (context, friendSnapshot) {
+                  if (!friendSnapshot.hasData) return const SizedBox();
+
+                  String friendName = friendSnapshot.data!['username'] ?? "Unknown";
+
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    child: ListTile(
+                      leading: const Icon(Icons.person, color: Colors.blue),
+                      title: Text(friendName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      subtitle: Text(friendEmail, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.black),
+                      onTap: () {
+                        //add functionality here
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FriendsProfilePage(friendEmail: friendEmail)),
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,12 +200,16 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
             child: IconButton(
               icon: const Icon(Icons.people_alt_sharp),
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                );
               },
             ),
           ),
         ),
         title: const Text(
-          'Friends/Team', 
+          'Your Friends', 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
@@ -209,17 +227,16 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            
-            const SizedBox(height: 20), 
-            _addFriends(),
-            const SizedBox(height: 20), 
-            _yourTeams(),
-            const SizedBox(height: 20), 
-            _yourFriends(),
-          ]
-          
+            const Text(
+              "Your Friends",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            const SizedBox(height: 10),
+            _friendsList(),
+          ],
         ),
       ),
+
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,

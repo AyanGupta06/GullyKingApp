@@ -2,26 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/all_previous_games_page.dart';
-import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/new_ranked_game_page.dart';
-import 'package:gully_king/pages/new_unranked_game_page.dart';
-import 'package:gully_king/pages/previous_games_page.dart';
-import 'package:gully_king/pages/your_teams_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
 
-import 'home_page.dart';
-import 'new_game_page.dart';
-import 'friends_teams_page.dart';
+import '../home_page.dart';
+import '../New Game/new_game_page.dart';
+import '../new_profile_page.dart';
 
-class NewGamePage extends StatefulWidget {
-  const NewGamePage({super.key});
+class YourTeamsPage extends StatefulWidget {
+  const YourTeamsPage({super.key});
 
   @override
-  State<NewGamePage> createState() => _NewGamePageState();
+  State<YourTeamsPage> createState() => _NewProfilePageState();
 }
 
-class _NewGamePageState extends State<NewGamePage> {
-  int _selectedIndex = 0; // Default home index
+class _NewProfilePageState extends State<YourTeamsPage> {
+  int _selectedIndex = 3; // Default home index
   final User? user = Auth().currentUser;
 
   String username = "";
@@ -56,42 +52,9 @@ class _NewGamePageState extends State<NewGamePage> {
     _fetchUserData();
   }
 
-  
-
-  Widget _unrankedMatchButton() {
-    return FloatingActionButton.extended(
-      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewUnrankedGamePage()),
-        );
-      },
-    
-      label: const Text(
-        "                                 Create New Unranked Game                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
-  Widget _rankedMatchButton() {
-    return FloatingActionButton.extended(
-      
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewRankedGamePage()),
-        );
-      },
-      
-      label: const Text(
-        "                                 Create New Ranked Game                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
 
 
-  
-  
+ 
 
   
 
@@ -110,7 +73,7 @@ class _NewGamePageState extends State<NewGamePage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
         );
         break;
       case 2: //home
@@ -145,21 +108,25 @@ class _NewGamePageState extends State<NewGamePage> {
         leading: Transform.rotate(
           angle: 0, 
           child: Tooltip(
-            message: 'New Match Page',
+            message: "Friends/Teams",
             child: IconButton(
-              icon: const Icon(Icons.add_box_rounded),
+              icon: const Icon(Icons.people_alt_sharp),
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                );
               },
             ),
           ),
         ),
         title: const Text(
-          'New Match', 
+          "Your Teams", 
           style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
-        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -171,20 +138,10 @@ class _NewGamePageState extends State<NewGamePage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     _unrankedMatchButton(),
-            //     _unrankedMatchButton(),
-
-            // ],)
-            const SizedBox(height: 20), 
-            _unrankedMatchButton(),
-            const SizedBox(height: 20), 
-            _rankedMatchButton(),
-          ],
+            
+          ]
+          
         ),
       ),
       bottomNavigationBar: BottomAppBar(
