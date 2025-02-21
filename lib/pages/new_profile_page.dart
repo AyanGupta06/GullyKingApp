@@ -3,7 +3,6 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
-import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
 
 import 'home_page.dart';
 import 'New Game/new_game_page.dart';
@@ -17,11 +16,18 @@ class NewProfilePage extends StatefulWidget {
 }
 
 class _NewProfilePageState extends State<NewProfilePage> {
-  int _selectedIndex = 4; // Default home index
+  int _selectedIndex = 4;
   final User? user = Auth().currentUser;
-
   String username = "";
   String position = "";
+  bool isEditingUsername = false;
+  TextEditingController usernameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
   Future<void> _fetchUserData() async {
     if (user == null) return;
@@ -35,6 +41,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
       setState(() {
         username = userDoc['username'] ?? "N/A";
         position = userDoc['position'] ?? "N/A";
+        usernameController.text = username;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,97 +53,68 @@ class _NewProfilePageState extends State<NewProfilePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
+  Future<void> _updateUsername() async {
+    await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+      'username': usernameController.text.trim(),
+    });
+
+    setState(() {
+      username = usernameController.text.trim();
+      isEditingUsername = false;
+    });
   }
 
-  Widget _infoRow({required String label, required String value}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              
+  Widget _infoCard() {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            isEditingUsername
+                ? TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      hintText: "Enter new username",
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.check, color: Colors.green),
+                        onPressed: _updateUsername,
+                      ),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Username: $username",
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          setState(() {
+                            isEditingUsername = true;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Position:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(position, style: const TextStyle(fontSize: 18)),
+              ],
             ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 25,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _title() {
-    return const Text(
-      "GullyKing",
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 42,
-        fontWeight: FontWeight.bold,
-        color: Colors.blueAccent,
-      ),
-    );
-  }
-  Widget _userId() {
-    return Text(
-      user?.email ?? "User Email",
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
-  }
-
-  Widget _usernameEntry (String hintText, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.blueAccent),
-          filled: true,
-          fillColor: const Color.fromRGBO(245, 245, 245, 0.6),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide.none,
-          ),
+          ],
         ),
+      ),
     );
   }
-
-
-  Widget _settingsText() {
-    return const Text (
-      "Settings", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-
-    );
-  }
-
-  Widget _profileView() {
-    return const Text (
-      "Profile View: ", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-    );
-  }
-  Widget _colorScheme() {
-    return const Text (
-      "App Theme: ", 
-      style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.blueAccent)
-    );
-  }
-
-  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -157,7 +135,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
         );
         break;
       case 2: //home
-        Navigator.push(
+      Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
@@ -169,7 +147,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
         );
         break;
       case 4: //profile
-        Navigator.push(
+      Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const NewProfilePage()),
         );
@@ -181,25 +159,12 @@ class _NewProfilePageState extends State<NewProfilePage> {
     }
   }
 
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 0, 
-          child: Tooltip(
-            message: 'Profile Settings',
-            child: IconButton(
-              icon: const Icon(Icons.person),
-              onPressed: () {
-                
-              },
-            ),
-          ),
-        ),
         title: const Text(
-          'Profile Settings', 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+          "Profile Settings",
+          style: TextStyle(fontSize: 22, color: Colors.black),
         ),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         elevation: 0,
@@ -211,17 +176,23 @@ class _NewProfilePageState extends State<NewProfilePage> {
             fit: BoxFit.cover,
           ),
         ),
-        height: double.infinity,
-        width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20), 
-            _title(),
-            const SizedBox(height: 20), 
-            _infoRow(label: "Username:", value: username),
-            _infoRow(label: "Position:", value: position),
+            const SizedBox(height: 20),
+            const Text(
+              "GullyKing",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _infoCard(),
+            const Spacer(),
           ],
         ),
       ),
@@ -229,41 +200,20 @@ class _NewProfilePageState extends State<NewProfilePage> {
         color: const Color.fromRGBO(53, 150, 207, 1),
         height: 70,
         child: Row(
-          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildBottomBarIcon(
-              icon: Icons.add_box_rounded,
-              index: 0,
-              label: 'New Game',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.file_present_sharp,
-              index: 1,
-              label: 'Records',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.home_sharp,
-              index: 2,
-              label: 'Home',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.people_alt_sharp,
-              index: 3,
-              label: 'Friends',
-            ),
-            _buildBottomBarIcon(
-              icon: Icons.person,
-              index: 4,
-              label: 'Account',
-            ),
+            _buildBottomBarIcon(Icons.add_box_rounded, 0, 'New Game'),
+            _buildBottomBarIcon(Icons.file_present_sharp, 1, 'Records'),
+            _buildBottomBarIcon(Icons.home_sharp, 2, 'Home'),
+            _buildBottomBarIcon(Icons.people_alt_sharp, 3, 'Friends'),
+            _buildBottomBarIcon(Icons.person, 4, 'Account'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
+  Widget _buildBottomBarIcon(IconData icon, int index, String label) {
     return Tooltip(
       message: label,
       child: IconButton(
