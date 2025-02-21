@@ -7,6 +7,8 @@ import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'home_page.dart';
 import 'New Game/new_game_page.dart';
 import 'Friends/friends_teams_page.dart';
+import 'dart:math' as math;
+
 
 class NewProfilePage extends StatefulWidget {
   const NewProfilePage({super.key});
@@ -20,6 +22,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
   final User? user = Auth().currentUser;
   String username = "";
   String position = "";
+  String email = "";
   bool isEditingUsername = false;
   TextEditingController usernameController = TextEditingController();
 
@@ -41,6 +44,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
       setState(() {
         username = userDoc['username'] ?? "N/A";
         position = userDoc['position'] ?? "N/A";
+        email = userDoc['email'] ?? "N/A";
         usernameController.text = username;
       });
     } catch (e) {
@@ -86,12 +90,17 @@ class _NewProfilePageState extends State<NewProfilePage> {
                     ),
                   )
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        "Username: $username",
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      IconButton(
+                        icon: const Icon(Icons.person, color: Colors.blue),
+                        onPressed: () {
+                        
+                        },
                       ),
+                      const Text("Name:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Spacer(flex: 1),
+                      Text(username, style: const TextStyle(fontSize: 18)),
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
@@ -106,7 +115,33 @@ class _NewProfilePageState extends State<NewProfilePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                IconButton(
+                        icon: const Icon(Icons.person, color: Colors.blue),
+                        onPressed: () {
+                        
+                        },
+                      ),
+                const Text("Email:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Spacer(flex: 1),
+                Text(email, style: const TextStyle(fontSize: 18)),
+              ],
+            ),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Transform.rotate(
+                      angle: 180 * math.pi / 180,
+                      child: const IconButton(
+                        icon: Icon(
+                          Icons.sports_cricket,
+                          color: Colors.blue,
+                        ),
+                        onPressed: null,
+                      ),
+                    ),
                 const Text("Position:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Spacer(flex: 1),
                 Text(position, style: const TextStyle(fontSize: 18)),
               ],
             ),
@@ -185,9 +220,9 @@ class _NewProfilePageState extends State<NewProfilePage> {
               "GullyKing",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 46,
                 fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 20),

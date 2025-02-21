@@ -12,6 +12,8 @@ import '../home_page.dart';
 import '../New Game/new_game_page.dart';
 import '../new_profile_page.dart';
 import 'your_teams_page.dart';
+import 'dart:math' as math;
+
 
 class FriendsProfilePage extends StatefulWidget {
   final String friendEmail;
@@ -118,9 +120,95 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
     return snapshot.docs.first.data();
   }
 
- 
+  Widget _infoCard() {
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('users').where('email', isEqualTo: widget.friendEmail).limit(1).get().then((query) => query.docs.first),
+      builder: (context, friendSnapshot) {
+      if (!friendSnapshot.hasData) return const SizedBox();
+      String friendName = friendSnapshot.data!['username'] ?? "Unknown";
+      String friendPosition = friendSnapshot.data!['position'] ?? "Unknown";
+        return Card(
+          elevation: 5,
+          margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+          
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.person, color: Colors.blue),
+                        onPressed: () {
+                        
+                        },
+                      ),
+                      const Text("Name:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Spacer(flex: 1),
+                      Text(friendName, style: const TextStyle(fontSize: 18)),
+                      
+                    ],
+                ),
+                const Divider(),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.mail, color: Colors.blue),
+                        onPressed: () {
+                        
+                        },
+                      ),
+                      const Text("Email:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Spacer(flex: 1),
+                      Text(widget.friendEmail, style: const TextStyle(fontSize: 18)),
+                      
+                    ],
+                ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Transform.rotate(
+                      angle: 180 * math.pi / 180,
+                      child: const IconButton(
+                        icon: Icon(
+                          Icons.sports_cricket,
+                          color: Colors.blue,
+                        ),
+                        onPressed: null,
+                      ),
+                    ),
+                    const Text("Position:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Spacer(flex: 1),
+                    Text(friendPosition, style: const TextStyle(fontSize: 18)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
-
+  Widget _friendsName() {
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('users').where('email', isEqualTo: widget.friendEmail).limit(1).get().then((query) => query.docs.first),
+      builder: (context, friendSnapshot) {
+      if (!friendSnapshot.hasData) return const SizedBox();
+      String friendName = friendSnapshot.data!['username'] ?? "Unknown";
+      String friendNameTitle = friendName + "'s Profile";
+        return  Text (
+          friendNameTitle,
+          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
+        );
+      }
+    );
+  }
 
 
   Widget build(BuildContext context) {
@@ -159,12 +247,15 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          children: [
-            Text(
-              widget.friendEmail,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
+          children: [            
             const SizedBox(height: 10),
+            // const Text(
+            //   "Friends Profile",
+            //   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
+            // ),
+            _friendsName(),
+            const SizedBox(height: 10),
+            _infoCard()
           ],
         ),
       ),

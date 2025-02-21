@@ -10,6 +10,8 @@ import 'package:gully_king/pages/Friends/your_teams_page.dart';
 import '../../home_page.dart';
 import '../new_game_page.dart';
 import '../../Friends/friends_teams_page.dart';
+import 'dart:math' as math;
+
 
 // Player class
 class Player {
@@ -144,9 +146,19 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
         hintStyle: const TextStyle(color: Colors.blueAccent),
         filled: true,
         fillColor: Colors.grey[100],
-        prefixIcon: const Icon(
-          Icons.sports_cricket_sharp,
-          color: Colors.blueAccent,
+        // prefixIcon: const Icon(
+        //   Icons.sports_cricket_sharp,
+        //   color: Colors.blueAccent,
+        // ),
+        prefixIcon: Transform.rotate(
+          angle: 180 * math.pi / 180,
+          child: const IconButton(
+            icon: Icon(
+              Icons.sports_cricket,
+              color: Colors.blue,
+            ),
+            onPressed: null,
+          ),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20.0),
