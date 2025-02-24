@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/auth.dart';
@@ -15,9 +16,39 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final User? user = Auth().currentUser;
   int _selectedIndex = 2; //default homeIndez
+  String username = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
   Future<void> signOut() async {
     await Auth().signOut();
+  }
+
+  Future<void> _fetchUserData() async {
+    // if (user == null) return;
+
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+
+      setState(() {
+        username = userDoc['username'] ?? "N/A";
+        
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error fetching user data: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
 
@@ -33,6 +64,8 @@ class _HomePageState extends State<HomePage> {
       child: const Text("Sign Out"),
     );
   }
+
+  
 
   void _navigateToPage(int index) {
     setState(() {
@@ -73,6 +106,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  
+
+  Widget _welcome() {
+    return Text (
+      "Welcome, $username",
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,6 +150,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             _userId(),
+            _welcome(),
             _signOutClick(),
           ],
         ),
