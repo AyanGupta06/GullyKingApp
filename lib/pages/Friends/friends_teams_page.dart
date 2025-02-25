@@ -136,12 +136,12 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
       // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
       onPressed:() {Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const InviteTeamPage()),
+          MaterialPageRoute(builder: (context) => const TeamManagementPage()),
         );
       },
     
       label: const Text(
-        "                         Invite/Join Team                         ",
+        "                         Create/Invite/Join Team                         ",
         style: TextStyle(color: Colors.black, fontSize: 18),
       )
     );

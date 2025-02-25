@@ -1,132 +1,62 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/Friends/add_new_friends_page.dart';
-import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'package:gully_king/pages/Friends/friends_teams_page.dart';
 import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
-import 'package:gully_king/pages/Friends/your_friends_page.dart';
-import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
 import '../home_page.dart';
 import '../New Game/new_game_page.dart';
 import '../new_profile_page.dart';
-import 'your_teams_page.dart';
 
-class InviteTeamPage extends StatefulWidget {
-  const InviteTeamPage({super.key});
+class TeamManagementPage extends StatefulWidget {
+  const TeamManagementPage({super.key});
 
   @override
-  State<InviteTeamPage> createState() => _InviteTeamPageState();
+  State<TeamManagementPage> createState() => _TeamManagementPageState();
 }
 
-class _InviteTeamPageState extends State<InviteTeamPage> {
-  final User? user = Auth().currentUser;
-  final TextEditingController _friendEmailController = TextEditingController();
-  bool _showOutgoingRequests = true;
+class _TeamManagementPageState extends State<TeamManagementPage> {
+  final User? user = FirebaseAuth.instance.currentUser;
+  final TextEditingController _teamNameController = TextEditingController();
+  final TextEditingController _inviteEmailController = TextEditingController();
+  String? _selectedTeamId;
+  bool _showCreateTeam = true;
+  bool _showOutgoingInvites = true;
   int _selectedIndex = 3;
 
-  String username = "";
-  String position = "";
+  Future<void> _createTeam() async {
+    if (user == null || _teamNameController.text.trim().isEmpty) return;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
+    String teamId = _generateUniqueCode();
+    String teamName = _teamNameController.text.trim();
+    DocumentReference teamRef = FirebaseFirestore.instance.collection('teams').doc(teamId);
+
+    await teamRef.set({
+      'teamId': teamId,
+      'teamName': _teamNameController.text.trim(),
+      'players': [
+        {'email': user!.email}
+      ],
+    });
+
+    setState(() {
+      _selectedTeamId = teamId;
+      _teamNameController.clear();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Team '$teamName' created successfully!"),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
-  Future<void> _fetchUserData() async {
-    if (user == null) return;
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      setState(() {
-        username = userDoc['username'] ?? "N/A";
-        position = userDoc['position'] ?? "N/A";
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error fetching user data: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  String _generateUniqueCode() {
+    Random random = Random();
+    return (100000 + random.nextInt(900000)).toString();
   }
-
-  Future<void> _sendFriendRequest() async {
-    String friendEmail = _friendEmailController.text.trim();
-    if (friendEmail.isEmpty) return;
-
-    try {
-      QuerySnapshot query = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: friendEmail)
-          .get();
-
-      if (query.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not found"), backgroundColor: Colors.red),
-        );
-        return;
-      }
-
-      String friendId = query.docs.first.id;
-
-      await FirebaseFirestore.instance
-          .collection('friend_requests')
-          .add({'from': user!.uid, 'fromEmail': user!.email, 'to': friendId, 'toEmail': friendEmail, 'status': 'pending'});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Friend request sent!"), backgroundColor: Colors.green),
-      );
-
-      _friendEmailController.clear();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error sending request: $e"), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-  Future<void> _addFriend(String friendEmail) async {
-    // String friendEmail = _friendEmailController.text.trim();
-    // if (friendEmail.isEmpty) return;
-
-    try {
-      QuerySnapshot query = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: friendEmail)
-          .get();
-
-      if (query.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not found"), backgroundColor: Colors.red),
-        );
-        return;
-      }
-
-      String friendId = query.docs.first.id;
-
-      await FirebaseFirestore.instance
-          .collection('friends')
-          .add({'friend1': user!.email, 'friend2': friendEmail});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Friend request accepted!"), backgroundColor: Colors.green),
-      );
-
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error accepting request: $e"), backgroundColor: Colors.red),
-      );
-    }
-  }
-  
   void _navigateToPage(int index) {
     setState(() {
       _selectedIndex = index;
@@ -142,7 +72,7 @@ class _InviteTeamPageState extends State<InviteTeamPage> {
       case 1: //old games
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
+          MaterialPageRoute(builder: (context) => const PreviousGamesPage()),
         );
         break;
       case 2: //home
@@ -170,40 +100,154 @@ class _InviteTeamPageState extends State<InviteTeamPage> {
     }
   }
 
-  Widget _title() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Text(
-        "Join Team",
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
+
+  Future<void> _invitePlayer() async {
+    if (_selectedTeamId == null || _inviteEmailController.text.trim().isEmpty) return;
+
+    String inviteEmail = _inviteEmailController.text.trim();
+
+    var userQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: inviteEmail)
+        .limit(1)
+        .get();
+
+    if (userQuery.docs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("User does not exist!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; 
+    }
+
+    DocumentSnapshot teamSnapshot =
+        await FirebaseFirestore.instance.collection('teams').doc(_selectedTeamId).get();
+    String teamName = teamSnapshot['teamName'];
+
+    await FirebaseFirestore.instance.collection('team_invites').add({
+      'from': user!.email,
+      'to': _inviteEmailController.text.trim(),
+      'teamId': _selectedTeamId,
+      'teamName': teamName,
+      'status': 'pending',
+    });
+
+    _inviteEmailController.clear();
+  }
+
+  Widget _toggleView() {
+    return Center(
+      child: ToggleButtons(
+        isSelected: [_showCreateTeam, !_showCreateTeam],
+        onPressed: (index) {
+          setState(() {
+            _showCreateTeam = index == 0;
+          });
+        },
+        borderRadius: BorderRadius.circular(10),
+        selectedColor: Colors.white,
+        color: Colors.black,
+        fillColor: Colors.blue,
+        borderWidth: 2,
+        borderColor: Colors.blue,
+        selectedBorderColor: Colors.blue,
+        children: const [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text("Create Team", style: TextStyle(fontSize: 16)),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text("Invite Players", style: TextStyle(fontSize: 16)),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _friendInput() {
-    return Row(
+  Widget _teamCreationSection() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: 
-          // TextField(
-          //   controller: _friendEmailController,
-          //   decoration: const InputDecoration(
-          //     labelText: "Enter friend's email",
-          //     border: OutlineInputBorder(),
-          //   ),
-          // ),
-          _entryFieldFriend("Enter Friend's Email", _friendEmailController),
-        ),
-        const SizedBox(width: 10),
+        const SizedBox(height: 20),
+        _styledTextField(_teamNameController, "Enter Team Name"),
+        const SizedBox(height: 10),
         ElevatedButton(
-          onPressed: _sendFriendRequest,
-          child: const Text("Send"),
+          onPressed: _createTeam,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
+          ),
+          child: const Text("Create Team", style: TextStyle(fontSize: 18, color: Colors.white)),
         ),
       ],
     );
   }
 
-  Widget _addFriendSubmitButton() {
+  Widget _teamSelection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('teams').where('players', arrayContains: {'email': user!.email}).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const CircularProgressIndicator();
+        var teams = snapshot.data!.docs;
+
+        return DropdownButton<String>(
+          value: _selectedTeamId,
+          hint: const Text("Select a Team"),
+          isExpanded: true,
+          items: teams.map((doc) {
+            return DropdownMenuItem<String>(
+              value: doc.id,
+              child: Text(doc['teamName']),
+            );
+          }).toList(),
+          onChanged: (String? teamId) {
+            setState(() {
+              _selectedTeamId = teamId;
+            });
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _acceptInvite(DocumentSnapshot inviteDoc) async {
+    String teamId = inviteDoc['teamId'];
+    String teamName = inviteDoc['teamName'];
+
+    DocumentReference teamRef = FirebaseFirestore.instance.collection('teams').doc(teamId);
+    DocumentSnapshot teamSnapshot = await teamRef.get();
+    List<dynamic> players = teamSnapshot['players'] ?? [];
+
+    players.add({'email': user!.email});
+
+    await teamRef.update({'players': players});
+    await inviteDoc.reference.delete();
+  }
+
+
+
+
+  Widget _teamInviteSection() {
+  return Column(
+    children: [
+      const SizedBox(height: 20),
+      _teamSelection(),
+      const SizedBox(height: 10),
+      _styledTextField(_inviteEmailController, "Enter Player Email"),
+      const SizedBox(height: 10),
+      _submitButton(),
+      const SizedBox(height: 10),
+      _toggleInviteView(),
+      const SizedBox(height: 10),
+      _inviteListSection(),
+    ],
+  );
+}
+
+Widget _submitButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
@@ -212,199 +256,131 @@ class _InviteTeamPageState extends State<InviteTeamPage> {
           borderRadius: BorderRadius.circular(30.0),
         ),
       ),
-      onPressed: _sendFriendRequest,
-      child: const Text("Send Invite to Team"),
+      onPressed: _invitePlayer,
+      child: const Text("Send Invite"),
     );
   }
 
-  Widget _entryFieldFriend(String hintText, TextEditingController controller) {
+Widget _toggleInviteView() {
+  return ToggleButtons(
+    isSelected: [_showOutgoingInvites, !_showOutgoingInvites],
+    onPressed: (index) {
+      setState(() {
+        _showOutgoingInvites = index == 0;
+      });
+    },
+    borderRadius: BorderRadius.circular(10),
+    selectedColor: Colors.white,
+    color: Colors.black,
+    fillColor: Colors.blue,
+    borderWidth: 2,
+    borderColor: Colors.blue,
+    selectedBorderColor: Colors.blue,
+    children: const [
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Text("Outgoing Invites", style: TextStyle(fontSize: 16)),
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Text("Incoming Invites", style: TextStyle(fontSize: 16)),
+      ),
+    ],
+  );
+}
+
+  Widget _inviteListSection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('team_invites')
+          .where(_showOutgoingInvites ? 'from' : 'to', isEqualTo: user!.email)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Text(
+            "No invites found",
+            style: TextStyle(fontSize: 16, color: Colors.red),
+            textAlign: TextAlign.center,
+          );
+        }
+
+        var invites = snapshot.data!.docs;
+
+        return Column(
+          children: invites.map((doc) {
+            String teamName = doc['teamName'];
+            String invitee = doc['to']; 
+            String inviter = doc['from']; 
+
+            return Card(
+              elevation: 3,
+              margin: const EdgeInsets.symmetric(vertical: 5),
+              child: ListTile(
+                title: Text(teamName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                subtitle: Text(
+                  _showOutgoingInvites ? "Invite for $invitee" : "Invited by $inviter",
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                trailing: _showOutgoingInvites
+                    ? IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await doc.reference.delete();
+                        },
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.check, color: Colors.green),
+                            onPressed: () async {
+                              await _acceptInvite(doc);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red),
+                            onPressed: () async {
+                              await doc.reference.delete();
+                            },
+                          ),
+                        ],
+                      ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+
+
+  Widget _styledTextField(TextEditingController controller, String hintText) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: Colors.blueAccent),
         filled: true,
-        fillColor: Colors.grey[100],
-        prefixIcon: const Icon(
-          Icons.people_alt_sharp,
-          color: Colors.blueAccent,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0),
-          borderSide: BorderSide.none,
-        ),
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
       ),
     );
   }
 
- 
-
-  Widget _friendRequestsSection() {
-    return Column(
-      children: [
-        ToggleButtons(
-          isSelected: [_showOutgoingRequests, !_showOutgoingRequests],
-          onPressed: (index) {
-            setState(() {
-              _showOutgoingRequests = index == 0;
-            });
-          },
-          borderRadius: BorderRadius.circular(10),
-          selectedColor: Colors.white,
-          color: Colors.black,
-          fillColor: Colors.blue,
-          borderWidth: 2,
-          borderColor: Colors.blue,
-          selectedBorderColor: Colors.blue,
-          children: const [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text("Outgoing Requests", style: TextStyle(fontSize: 16)),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text("Incoming Requests", style: TextStyle(fontSize: 16)),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('friend_requests')
-              .where(_showOutgoingRequests ? 'from' : 'to', isEqualTo: user!.uid)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const CircularProgressIndicator();
-            var requests = snapshot.data!.docs;
-
-            return Column(
-              children: requests.map((doc) {
-                String friendId = _showOutgoingRequests ? doc['to'] : doc['from'];
-                return FutureBuilder<DocumentSnapshot>(
-                  future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
-                  builder: (context, userSnapshot) {
-                    if (!userSnapshot.hasData) return const SizedBox();
-                    String friendName = userSnapshot.data!['username'] ?? "Unknown";
-                    String friendEmail = userSnapshot.data!['email'] ?? "Unknown Email";
-
-                    return ListTile(
-                      title: Text(friendName),
-                      subtitle: const Text("Pending"),
-                      trailing: _showOutgoingRequests
-                          ? IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async {
-                                await doc.reference.delete();
-                              },
-                            )
-                          : Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.check, color: Colors.green),
-                                  onPressed: () async {
-                                    await _acceptFriendRequest(doc, friendEmail);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Friended successfully!"), backgroundColor: Colors.green),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
-                                  onPressed: () async {
-                                    await doc.reference.delete();
-                                  },
-                                ),
-                              ],
-                            ),
-                    );
-                  },
-                );
-              }).toList(),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Future<void> _acceptFriendRequest(DocumentSnapshot doc, String friendEmail) async {
-    String userEmail = user!.email!;
-
-    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
-    DocumentReference friendRef = FirebaseFirestore.instance.collection('users').doc(doc['from']);
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      DocumentSnapshot userSnapshot = await transaction.get(userRef);
-      DocumentSnapshot friendSnapshot = await transaction.get(friendRef);
-
-      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>? ?? {};
-      Map<String, dynamic> friendData = friendSnapshot.data() as Map<String, dynamic>? ?? {};
-
-      List<dynamic> userFriends = userData.containsKey('friends') ? List.from(userData['friends']) : [];
-      List<dynamic> friendFriends = friendData.containsKey('friends') ? List.from(friendData['friends']) : [];
-
-      if (!userFriends.contains(friendEmail)) {
-        userFriends.add(friendEmail);
-      }
-      if (!friendFriends.contains(userEmail)) {
-        friendFriends.add(userEmail);
-      }
-
-      transaction.update(userRef, {'friends': userFriends});
-      transaction.update(friendRef, {'friends': friendFriends});
-
-      await doc.reference.delete();
-    });
-  }
-
-
-
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 0, 
-          child: Tooltip(
-            message: "Friends/Teams",
-            child: IconButton(
-              icon: const Icon(Icons.people_alt_sharp),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
-                );
-              },
-            ),
-          ),
-        ),
-        title: const Text(
-          "Invite to Team/Join Team", 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
-        ),
-        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text("Team Management"), backgroundColor: const Color.fromRGBO(53, 150, 207, 1)),
       body: Container(
-        padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg4.png'),
-            fit: BoxFit.cover,
-          ),
+          image: DecorationImage(image: AssetImage('assets/bg4.png'), fit: BoxFit.cover),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            const SizedBox(height: 40),
-            _title(),
-            const SizedBox(height: 40),
-            _entryFieldFriend("Enter Friend's Email to Invite", _friendEmailController),
-            const SizedBox(height: 20),
-            _addFriendSubmitButton(),
-            const SizedBox(height: 20),
-            _friendRequestsSection(),
+            _toggleView(),
+            _showCreateTeam ? _teamCreationSection() : Column(
+              children: [
+                _teamInviteSection()]),
           ],
         ),
       ),
@@ -458,3 +434,4 @@ class _InviteTeamPageState extends State<InviteTeamPage> {
     );
   }
 }
+    
