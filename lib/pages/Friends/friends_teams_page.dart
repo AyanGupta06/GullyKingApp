@@ -99,20 +99,20 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
     );
   } 
  
-  Widget _yourTeams() {
-    return FloatingActionButton.extended(
-      onPressed:() {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const YourTeamsPage()),
-        );
-      },
+  // Widget _yourTeams() {
+  //   return FloatingActionButton.extended(
+  //     onPressed:() {Navigator.push(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const YourTeamsPage()),
+  //       );
+  //     },
     
-      label: const Text(
-        "                                 Your Teams                                 ",
-        style: TextStyle(color: Colors.black, fontSize: 18),
-      )
-    );
-  } 
+  //     label: const Text(
+  //       "                                 Your Teams                                 ",
+  //       style: TextStyle(color: Colors.black, fontSize: 18),
+  //     )
+  //   );
+  // } 
 
  
   Widget _yourFriends() {
@@ -141,7 +141,7 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
       },
     
       label: const Text(
-        "                         Create/Invite/Join Team                         ",
+        "                         Team Management                         ",
         style: TextStyle(color: Colors.black, fontSize: 18),
       )
     );
@@ -230,11 +230,12 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
             const SizedBox(height: 20), 
             _addFriends(),
             const SizedBox(height: 20), 
-            _joinTeam(),
-            const SizedBox(height: 20), 
+            
             _yourFriends(),
             const SizedBox(height: 20), 
-            _yourTeams(),
+            _joinTeam(),
+            const SizedBox(height: 20), 
+            // _yourTeams(),
           ]
           
         ),

@@ -172,17 +172,47 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 20),
-        _styledTextField(_teamNameController, "Enter Team Name"),
+        _entryFieldTeam("Enter Team Name", _teamNameController),
         const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: _createTeam,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
-          ),
-          child: const Text("Create Team", style: TextStyle(fontSize: 18, color: Colors.white)),
-        ),
+        _submitButtonCreateTeams(),
+        
       ],
+    );
+  }
+
+  
+
+  Widget _entryFieldTeam(String hintText, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Colors.blueAccent),
+        filled: true,
+        fillColor: Colors.grey[100],
+        prefixIcon: const Icon(
+          Icons.people_alt_sharp,
+          color: Colors.blueAccent,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20.0),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _submitButtonCreateTeams() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blueAccent,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      onPressed: _createTeam,
+      child: const Text("Create Team"),
     );
   }
 
@@ -196,7 +226,7 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
         return DropdownButton<String>(
           value: _selectedTeamId,
           hint: const Text("Select a Team"),
-          isExpanded: true,
+          isExpanded: false,
           items: teams.map((doc) {
             return DropdownMenuItem<String>(
               value: doc.id,
@@ -231,23 +261,23 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
 
 
   Widget _teamInviteSection() {
-  return Column(
-    children: [
-      const SizedBox(height: 20),
-      _teamSelection(),
-      const SizedBox(height: 10),
-      _styledTextField(_inviteEmailController, "Enter Player Email"),
-      const SizedBox(height: 10),
-      _submitButton(),
-      const SizedBox(height: 10),
-      _toggleInviteView(),
-      const SizedBox(height: 10),
-      _inviteListSection(),
-    ],
-  );
-}
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        _teamSelection(),
+        const SizedBox(height: 10),
+        _entryFieldTeam("Enter Player Email", _inviteEmailController),
+        const SizedBox(height: 10),
+        _submitButton(),
+        const SizedBox(height: 10),
+        _toggleInviteView(),
+        const SizedBox(height: 10),
+        _inviteListSection(),
+      ],
+    );
+  }
 
-Widget _submitButton() {
+  Widget _submitButton() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
@@ -261,33 +291,33 @@ Widget _submitButton() {
     );
   }
 
-Widget _toggleInviteView() {
-  return ToggleButtons(
-    isSelected: [_showOutgoingInvites, !_showOutgoingInvites],
-    onPressed: (index) {
-      setState(() {
-        _showOutgoingInvites = index == 0;
-      });
-    },
-    borderRadius: BorderRadius.circular(10),
-    selectedColor: Colors.white,
-    color: Colors.black,
-    fillColor: Colors.blue,
-    borderWidth: 2,
-    borderColor: Colors.blue,
-    selectedBorderColor: Colors.blue,
-    children: const [
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Text("Outgoing Invites", style: TextStyle(fontSize: 16)),
-      ),
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Text("Incoming Invites", style: TextStyle(fontSize: 16)),
-      ),
-    ],
-  );
-}
+  Widget _toggleInviteView() {
+    return ToggleButtons(
+      isSelected: [_showOutgoingInvites, !_showOutgoingInvites],
+      onPressed: (index) {
+        setState(() {
+          _showOutgoingInvites = index == 0;
+        });
+      },
+      borderRadius: BorderRadius.circular(10),
+      selectedColor: Colors.white,
+      color: Colors.black,
+      fillColor: Colors.blue,
+      borderWidth: 2,
+      borderColor: Colors.blue,
+      selectedBorderColor: Colors.blue,
+      children: const [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text("Outgoing Invites", style: TextStyle(fontSize: 16)),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text("Incoming Invites", style: TextStyle(fontSize: 16)),
+        ),
+      ],
+    );
+  }
 
   Widget _inviteListSection() {
     return StreamBuilder<QuerySnapshot>(
@@ -353,23 +383,42 @@ Widget _toggleInviteView() {
     );
   }
 
-
-
-  Widget _styledTextField(TextEditingController controller, String hintText) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hintText,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+  Widget _title() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        "Team Management",
+        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
       ),
     );
   }
 
+
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Team Management"), backgroundColor: const Color.fromRGBO(53, 150, 207, 1)),
+      appBar: AppBar(
+        leading: Transform.rotate(
+          angle: 0, 
+          child: Tooltip(
+            message: "Friends/Teams",
+            child: IconButton(
+              icon: const Icon(Icons.people_alt_sharp),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
+                );
+              },
+            ),
+          ),
+        ),
+        title: const Text(
+          "Team Management", 
+          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
+        ),
+        backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        elevation: 0,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(image: AssetImage('assets/bg4.png'), fit: BoxFit.cover),
@@ -377,6 +426,9 @@ Widget _toggleInviteView() {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
+            const SizedBox(height: 40),
+            _title(),
+            const SizedBox(height: 40),
             _toggleView(),
             _showCreateTeam ? _teamCreationSection() : Column(
               children: [
