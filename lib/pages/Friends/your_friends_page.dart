@@ -57,33 +57,7 @@ class _YourFriendsPageState extends State<YourFriendsPage> {
     _fetchUserData();
   }
 
-  Widget _infoRow({required String label, required String value}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 25,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  
  
 
   void _navigateToPage(int index) {

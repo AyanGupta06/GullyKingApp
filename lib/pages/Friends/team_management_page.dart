@@ -254,6 +254,16 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
     players.add({'email': user!.email});
 
     await teamRef.update({'players': players});
+    
+    // await inviteDoc.reference.delete();
+
+    // DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
+    // DocumentSnapshot userSnapshot = await userRef.get();
+    // List<dynamic> teams = userSnapshot['teams'] ?? [];
+
+    // teams.add({'teamNames': teamName});
+
+    // await userRef.update({'teams': teams});
     await inviteDoc.reference.delete();
   }
 
@@ -393,6 +403,62 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
     );
   }
 
+  Widget _teamsList() {
+    return Expanded(
+      child: FutureBuilder<DocumentSnapshot>(
+        future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+          List<dynamic> friends = userData.containsKey('friends') ? List.from(userData['friends']) : [];
+
+          if (friends.isEmpty) {
+            return const Center(
+              child: Text(
+                "You have no friends yet.",
+                style: TextStyle(fontSize: 18, color: Colors.black),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: friends.length,
+            itemBuilder: (context, index) {
+              String friendEmail = friends[index];
+
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance.collection('users').where('email', isEqualTo: friendEmail).limit(1).get().then((query) => query.docs.first),
+                builder: (context, friendSnapshot) {
+                  if (!friendSnapshot.hasData) return const SizedBox();
+
+                  String friendName = friendSnapshot.data!['username'] ?? "Unknown";
+
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    child: ListTile(
+                      leading: const Icon(Icons.person, color: Colors.blue),
+                      title: Text(friendName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      subtitle: Text(friendEmail, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.black),
+                      onTap: () {
+                        //add functionality here
+                       
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -426,9 +492,9 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            const SizedBox(height: 40),
-            _title(),
-            const SizedBox(height: 40),
+            // const SizedBox(height: 40),
+            // _title(),
+            // const SizedBox(height: 40),
             _toggleView(),
             _showCreateTeam ? _teamCreationSection() : Column(
               children: [
