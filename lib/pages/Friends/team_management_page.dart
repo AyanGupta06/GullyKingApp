@@ -31,9 +31,8 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
 
     String teamId = _generateUniqueCode();
     String teamName = _teamNameController.text.trim();
-    DocumentReference teamRef = FirebaseFirestore.instance.collection('teams').doc(teamId);
 
-    await teamRef.set({
+    await FirebaseFirestore.instance.collection('teams').doc(teamId).set({
       'teamId': teamId,
       'teamName': _teamNameController.text.trim(),
       'players': [
@@ -41,17 +40,21 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
       ],
     });
 
+    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
+    await userRef.update({
+      'teams': FieldValue.arrayUnion([teamId]),
+    });
+
     setState(() {
       _selectedTeamId = teamId;
       _teamNameController.clear();
     });
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Team '$teamName' created successfully!"),
-        backgroundColor: Colors.green,
-      ),
+      const SnackBar(content: Text("Team created successfully!"), backgroundColor: Colors.green),
     );
   }
+
 
   String _generateUniqueCode() {
     Random random = Random();
@@ -114,12 +117,24 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
 
     if (userQuery.docs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("User does not exist!"),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text("User does not exist!"), backgroundColor: Colors.red),
       );
-      return; 
+      return;
+    }
+
+    var inviteQuery = await FirebaseFirestore.instance
+        .collection('team_invites')
+        .where('to', isEqualTo: inviteEmail)
+        .where('teamId', isEqualTo: _selectedTeamId)
+        .where('status', whereIn: ['pending', 'accepted'])
+        .limit(1)
+        .get();
+
+    if (inviteQuery.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("This user has already been invited to the team."), backgroundColor: Colors.orange),
+      );
+      return;
     }
 
     DocumentSnapshot teamSnapshot =
@@ -128,14 +143,19 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
 
     await FirebaseFirestore.instance.collection('team_invites').add({
       'from': user!.email,
-      'to': _inviteEmailController.text.trim(),
+      'to': inviteEmail,
       'teamId': _selectedTeamId,
       'teamName': teamName,
       'status': 'pending',
     });
 
     _inviteEmailController.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Invite sent successfully!"), backgroundColor: Colors.green),
+    );
   }
+
 
   Widget _toggleView() {
     return Center(
@@ -246,26 +266,43 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
   Future<void> _acceptInvite(DocumentSnapshot inviteDoc) async {
     String teamId = inviteDoc['teamId'];
     String teamName = inviteDoc['teamName'];
+    String userEmail = user!.email!;
 
     DocumentReference teamRef = FirebaseFirestore.instance.collection('teams').doc(teamId);
-    DocumentSnapshot teamSnapshot = await teamRef.get();
-    List<dynamic> players = teamSnapshot['players'] ?? [];
+    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
 
-    players.add({'email': user!.email});
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot teamSnapshot = await transaction.get(teamRef);
+      DocumentSnapshot userSnapshot = await transaction.get(userRef);
 
-    await teamRef.update({'players': players});
-    
-    // await inviteDoc.reference.delete();
+      Map<String, dynamic> teamData = teamSnapshot.data() as Map<String, dynamic>? ?? {};
+      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>? ?? {};
 
-    // DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
-    // DocumentSnapshot userSnapshot = await userRef.get();
-    // List<dynamic> teams = userSnapshot['teams'] ?? [];
+      List<dynamic> teamPlayers = teamData['players'] != null ? List.from(teamData['players']) : [];
 
-    // teams.add({'teamNames': teamName});
+      List<dynamic> userTeams = userData['teams'] != null ? List.from(userData['teams']) : [];
 
-    // await userRef.update({'teams': teams});
-    await inviteDoc.reference.delete();
+      if (!teamPlayers.any((player) => player['email'] == userEmail)) {
+        teamPlayers.add({'email': userEmail});
+      }
+
+      if (!userTeams.contains(teamId)) {
+        userTeams.add(teamId);
+      }
+
+      transaction.update(teamRef, {'players': teamPlayers});
+      transaction.update(userRef, {'teams': userTeams});
+
+      await inviteDoc.reference.delete();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("You joined $teamName!"), backgroundColor: Colors.green),
+    );
   }
+
+
+
 
 
 
@@ -403,61 +440,49 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
     );
   }
 
-  Widget _teamsList() {
-    return Expanded(
-      child: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  Widget _userTeamsList() {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').doc(user!.uid).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const CircularProgressIndicator();
 
-          Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>? ?? {};
-          List<dynamic> friends = userData.containsKey('friends') ? List.from(userData['friends']) : [];
+        List<dynamic> userTeams = snapshot.data!.get('teams') ?? [];
 
-          if (friends.isEmpty) {
-            return const Center(
-              child: Text(
-                "You have no friends yet.",
-                style: TextStyle(fontSize: 18, color: Colors.black),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: friends.length,
-            itemBuilder: (context, index) {
-              String friendEmail = friends[index];
-
-              return FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance.collection('users').where('email', isEqualTo: friendEmail).limit(1).get().then((query) => query.docs.first),
-                builder: (context, friendSnapshot) {
-                  if (!friendSnapshot.hasData) return const SizedBox();
-
-                  String friendName = friendSnapshot.data!['username'] ?? "Unknown";
-
-                  return Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    child: ListTile(
-                      leading: const Icon(Icons.person, color: Colors.blue),
-                      title: Text(friendName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      subtitle: Text(friendEmail, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.black),
-                      onTap: () {
-                        //add functionality here
-                       
-                      },
-                    ),
-                  );
-                },
-              );
-            },
+        if (userTeams.isEmpty) {
+          return const Center(
+            child: Text("You are not in any teams.", style: TextStyle(fontSize: 16, color: Colors.red)),
           );
-        },
-      ),
+        }
+
+        return FutureBuilder<QuerySnapshot>(
+          future: FirebaseFirestore.instance.collection('teams').where('teamId', whereIn: userTeams).get(),
+          builder: (context, teamSnapshot) {
+            if (!teamSnapshot.hasData) return const CircularProgressIndicator();
+
+            var teams = teamSnapshot.data!.docs;
+
+            return Column(
+              children: teams.map((doc) {
+                return Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  child: ListTile(
+                    title: Text(doc['teamName'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    subtitle: Text("Team ID: ${doc['teamId']}", style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    trailing: const Icon(Icons.arrow_forward_ios, color: Colors.black),
+                    onTap: () {
+                      // Future functionality for team details can be added here
+                    },
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        );
+      },
     );
   }
+
 
 
   Widget build(BuildContext context) {
@@ -492,13 +517,15 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            // const SizedBox(height: 40),
-            // _title(),
-            // const SizedBox(height: 40),
             _toggleView(),
-            _showCreateTeam ? _teamCreationSection() : Column(
-              children: [
-                _teamInviteSection()]),
+            if (_showCreateTeam) ...[
+              _teamCreationSection(),
+              const SizedBox(height: 20),
+              const Text("Your Teams", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              _userTeamsList(), 
+            ] else ...[
+              _teamInviteSection(),
+            ],
           ],
         ),
       ),
