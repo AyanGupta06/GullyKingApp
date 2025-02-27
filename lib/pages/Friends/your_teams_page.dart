@@ -9,14 +9,14 @@ import '../home_page.dart';
 import '../New Game/new_game_page.dart';
 import '../new_profile_page.dart';
 
-class YourTeamsPage extends StatefulWidget {
-  const YourTeamsPage({super.key});
+class TeamsProfilePage extends StatefulWidget {
+  const TeamsProfilePage({super.key});
 
   @override
-  State<YourTeamsPage> createState() => _NewProfilePageState();
+  State<TeamsProfilePage> createState() => _TeamsProfilePageState();
 }
 
-class _NewProfilePageState extends State<YourTeamsPage> {
+class _TeamsProfilePageState extends State<TeamsProfilePage> {
   int _selectedIndex = 3; // Default home index
   final User? user = Auth().currentUser;
 

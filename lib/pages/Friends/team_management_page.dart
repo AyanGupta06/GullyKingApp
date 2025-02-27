@@ -4,6 +4,7 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/Friends/your_teams_page.dart';
 import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
 
 import '../home_page.dart';
@@ -471,7 +472,10 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
                     subtitle: Text("Team ID: ${doc['teamId']}", style: const TextStyle(fontSize: 14, color: Colors.grey)),
                     trailing: const Icon(Icons.arrow_forward_ios, color: Colors.black),
                     onTap: () {
-                      // Future functionality for team details can be added here
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TeamsProfilePage()),
+                      );
                     },
                   ),
                 );
@@ -517,6 +521,9 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
+            const SizedBox(height: 20),
+            _title(),
+            const SizedBox(height: 20),
             _toggleView(),
             if (_showCreateTeam) ...[
               _teamCreationSection(),
