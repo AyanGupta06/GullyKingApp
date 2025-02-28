@@ -21,6 +21,7 @@ class _AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
   final TextEditingController _dobController = TextEditingController();
   String? _selectedPosition;
   bool _isLoading = false; 
+  List<dynamic> teamPlayers = [];
 
   Future<void> _submitDetails() async {
     if (_usernameController.text.isEmpty ||
@@ -53,6 +54,7 @@ class _AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
         'dob': _dobController.text,
         'position': _selectedPosition,
         'created_at': FieldValue.serverTimestamp(),
+        'teams': teamPlayers,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
