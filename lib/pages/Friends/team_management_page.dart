@@ -474,7 +474,12 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const TeamsProfilePage()),
+                        MaterialPageRoute(
+                          builder: (context) => TeamsProfilePage(
+                            teamId: doc['teamId'],
+                            teamName: doc['teamName'],
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -486,6 +491,7 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
       },
     );
   }
+
 
 
 
