@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/Friends/friends_profile_page.dart';
 
 import '../home_page.dart';
 import '../New Game/new_game_page.dart';
@@ -61,7 +62,6 @@ class _TeamsProfilePageState extends State<TeamsProfilePage> {
 
       transaction.update(teamRef, {'players': teamPlayers});
 
-      // Remove the team from the removed user's "teams" array
       QuerySnapshot userQuery = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: playerEmail)
@@ -76,7 +76,7 @@ class _TeamsProfilePageState extends State<TeamsProfilePage> {
       }
     });
 
-    _fetchTeamPlayers(); // Refresh list after removal
+    _fetchTeamPlayers(); 
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Player removed successfully!"), backgroundColor: Colors.red),
@@ -123,12 +123,25 @@ class _TeamsProfilePageState extends State<TeamsProfilePage> {
                     child: ListTile(
                       title: Text(playerName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       subtitle: Text(playerEmail, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                      trailing: isCreator && playerEmail != user!.email
+                      leading: isCreator && playerEmail != user!.email
                           ? IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => _removePlayer(playerEmail),
                             )
                           : null,
+                      trailing: playerEmail != user!.email
+                          ? IconButton(
+                              icon: const Icon(Icons.arrow_forward_ios, color: Colors.black),
+                              onPressed: () {
+                                //add functionality here
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => FriendsProfilePage(friendEmail: playerEmail)),
+                                );
+                              },
+                            )
+                          : null,
+                      
                     ),
                   );
                 },

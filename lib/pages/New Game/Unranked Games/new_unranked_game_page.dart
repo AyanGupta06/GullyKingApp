@@ -259,7 +259,7 @@ class _NewUnrankedGamePageState extends State<NewUnrankedGamePage> {
                   return ListTile(
                     leading: const Icon(Icons.person, color: Colors.blueAccent),
                     title: Text(
-                      player.name, // Display Player name
+                      player.name, 
                       style: const TextStyle(color: Colors.white),
                     ),
                   );
