@@ -33,6 +33,7 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
 
   String username = "";
   String position = "";
+  String friendName1 = "";
 
   Future<void> _fetchUserData() async {
     if (user == null) return;
@@ -127,6 +128,7 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
       builder: (context, friendSnapshot) {
       if (!friendSnapshot.hasData) return const SizedBox();
       String friendName = friendSnapshot.data!['username'] ?? "Unknown";
+      friendName1 = friendSnapshot.data!['username'] ?? "Unknown";
       String friendPosition = friendSnapshot.data!['position'] ?? "Unknown";
         return Card(
           elevation: 5,
@@ -202,6 +204,7 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
       builder: (context, friendSnapshot) {
       if (!friendSnapshot.hasData) return const SizedBox();
       String friendName = friendSnapshot.data!['username'] ?? "Unknown";
+      friendName1 =friendName;
       String friendNameTitle = friendName + "'s Profile";
         return  Text (
           friendNameTitle,
@@ -262,7 +265,7 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatPage(friendEmail: widget.friendEmail),
+                    builder: (context) => ChatPage(friendEmail: widget.friendEmail, friendName: friendName1),
                   ),
                 );
               },
