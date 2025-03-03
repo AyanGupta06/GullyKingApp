@@ -169,6 +169,7 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
+          const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -178,7 +179,13 @@ class _ChatPageState extends State<ChatPage> {
                     controller: _messageController,
                     decoration: InputDecoration(
                       hintText: "Type a message...",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      // border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
                     ),
                   ),
                 ),
