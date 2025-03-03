@@ -3,6 +3,7 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/Friends/add_new_friends_page.dart';
+import 'package:gully_king/pages/Friends/chat_page.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'package:gully_king/pages/Friends/friends_teams_page.dart';
 import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
@@ -255,7 +256,23 @@ class _FriendsProfilePageState extends State<FriendsProfilePage> {
             // ),
             _friendsName(),
             const SizedBox(height: 10),
-            _infoCard()
+            _infoCard(),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(friendEmail: widget.friendEmail),
+                  ),
+                );
+              },
+              icon: Icon(Icons.chat, color: Colors.white),
+              label: Text("Chat", style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+              ),
+            ),
+
           ],
         ),
       ),
