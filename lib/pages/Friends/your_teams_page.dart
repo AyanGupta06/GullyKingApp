@@ -8,6 +8,7 @@ import '../home_page.dart';
 import '../New Game/new_game_page.dart';
 import '../new_profile_page.dart';
 import '../Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/Friends/team_chat_page.dart';
 
 class TeamsProfilePage extends StatefulWidget {
   final String teamId;
@@ -172,6 +173,20 @@ class _TeamsProfilePageState extends State<TeamsProfilePage> {
             const Text("Team Players", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Expanded(child: _teamPlayersList()),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TeamChatPage(teamId: widget.teamId, teamName: widget.teamName),
+                  ),
+                );
+              },
+              icon: Icon(Icons.chat, color: Colors.white),
+              label: Text("Team Chat", style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+            ),
+
           ],
         ),
       ),
