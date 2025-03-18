@@ -34,6 +34,46 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
   }
 
+  // void _sendMessage() {
+  //   if (_messageController.text.trim().isEmpty) return;
+
+  //   String chatId = _getChatId();
+  //   FirebaseFirestore.instance.collection('chats').doc(chatId).collection('messages').add({
+  //     'sender': user!.email,
+  //     'receiver': widget.friendEmail,
+  //     'text': _messageController.text.trim(),
+  //     'timestamp': FieldValue.serverTimestamp(),
+  //   });
+
+  //   _messageController.clear();
+  // }
+
+
+  void _updateRecentDM() async {
+    if (user == null) return;
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .update({'recent_dm': widget.friendEmail});
+
+      QuerySnapshot userQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: widget.friendEmail)
+          .limit(1)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userQuery.docs.first.id)
+            .update({'recent_dm': user!.email});
+      }
+    } catch (e) {
+      print("Error updating recent DM: $e");
+    }
+  }
+
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
 
@@ -44,6 +84,8 @@ class _ChatPageState extends State<ChatPage> {
       'text': _messageController.text.trim(),
       'timestamp': FieldValue.serverTimestamp(),
     });
+
+    _updateRecentDM(); 
 
     _messageController.clear();
   }

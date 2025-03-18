@@ -38,18 +38,80 @@ class _TeamChatPageState extends State<TeamChatPage> {
     });
   }
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isEmpty || userName == null) return;
 
-    FirebaseFirestore.instance.collection('team_chats').doc(widget.teamId).collection('messages').add({
-      'senderEmail': user!.email,
-      'senderName': userName,
-      'text': _messageController.text.trim(),
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+ void _updateRecentTeam(String teamId) async {
+  if (user == null) return;
 
-    _messageController.clear();
+  try {
+    DocumentSnapshot teamDoc = await FirebaseFirestore.instance
+        .collection('teams')
+        .doc(teamId)
+        .get();
+
+    if (!teamDoc.exists) return;
+
+    var members = teamDoc['players']; 
+
+    if (members is! List) return; 
+
+    List<String> memberEmails = members.map((member) {
+      if (member is String) return member; 
+      if (member is Map<String, dynamic> && member.containsKey('email')) {
+        return member['email'] as String; 
+      }
+      return ""; 
+    }).where((email) => email.isNotEmpty).toList(); 
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .update({'recent_team': widget.teamName});
+
+    List<Future> updateTasks = [];
+
+    for (String memberEmail in memberEmails) {
+      if (memberEmail != user!.email) { 
+        var userQuery = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: memberEmail)
+            .limit(1)
+            .get();
+
+        if (userQuery.docs.isNotEmpty) {
+          String memberId = userQuery.docs.first.id;
+          updateTasks.add(FirebaseFirestore.instance
+              .collection('users')
+              .doc(memberId)
+              .update({'recent_team': widget.teamName}));
+        }
+      }
+    }
+
+    await Future.wait(updateTasks);
+
+  } catch (e) {
+    print("Error updating recent team: $e");
   }
+}
+
+
+void _sendMessage() {
+  if (_messageController.text.trim().isEmpty || user == null) return;
+
+  FirebaseFirestore.instance.collection('team_chats').doc(widget.teamId).collection('messages').add({
+    'senderEmail': user!.email,
+    'senderName': userName,
+    'text': _messageController.text.trim(),
+    'timestamp': FieldValue.serverTimestamp(),
+  }).then((_) {
+    _updateRecentTeam(widget.teamId); 
+  }).catchError((e) {
+    print("Error sending message: $e");
+  });
+
+  _messageController.clear();
+}
+
 
   void _navigateToPage(int index) {
     setState(() {
