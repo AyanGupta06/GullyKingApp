@@ -129,7 +129,8 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Text(
           "Welcome, $username",
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+          
         ),
       ),
     );
@@ -277,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                 );
               }
             }),
-            const Spacer(),
+            const SizedBox(height: 40),
             Center(child: ElevatedButton(onPressed: signOut, child: const Text("Sign Out"))),
           ],
         ),
