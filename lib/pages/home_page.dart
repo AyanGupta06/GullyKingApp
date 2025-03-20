@@ -266,9 +266,9 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             _welcome(),
            
-            _recentlyContactedCardFriend("Recently Contacted DMs", recentDM),
+            _recentlyContactedCardFriend("Recently Contacted DM", recentDM),
 
-            _recentlyContactedCard("Recently Contacted Teams", recentTeam, () {
+            _recentlyContactedCard("Recently Contacted Team", recentTeam, () {
               if (recentTeam != null) {
                 Navigator.push(
                   context,
