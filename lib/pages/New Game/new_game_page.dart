@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/New%20Game/Ranked%20Games/started_new_ranked_game_page.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
 import 'package:gully_king/pages/New%20Game/Ranked%20Games/new_ranked_game_page.dart';
@@ -78,7 +79,7 @@ class _NewGamePageState extends State<NewGamePage> {
       
       onPressed:() {Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const NewRankedGamePage()),
+          MaterialPageRoute(builder: (context) => RankedMatchSetupPage()),
         );
       },
       

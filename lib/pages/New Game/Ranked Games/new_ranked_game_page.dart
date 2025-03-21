@@ -17,7 +17,7 @@ class NewRankedGamePage extends StatefulWidget {
 }
 
 class _NewRankedGamePageState extends State<NewRankedGamePage> {
-  int _selectedIndex = 0; // Default home index
+  int _selectedIndex = 0;
   final User? user = Auth().currentUser;
 
   String username = "";
