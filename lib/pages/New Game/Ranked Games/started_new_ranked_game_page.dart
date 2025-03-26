@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gully_king/pages/New%20Game/Ranked%20Games/coin_flip_page.dart';
 
 class RankedMatchSetupPage extends StatefulWidget {
   @override
@@ -11,12 +12,14 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
   final User? user = FirebaseAuth.instance.currentUser;
   List<String> userTeams = [];
   String? selectedTeamId;
-  Map<String, String> teamPlayers = {}; // email -> username
+  Map<String, String> teamPlayers = {}; 
   List<String> selectedPlayers = [];
 
   String? opponentTeamId;
   Map<String, String> opponentPlayers = {};
   List<String> selectedOpponentPlayers = [];
+
+
 
   final TextEditingController opponentTeamCodeController = TextEditingController();
   final TextEditingController oversController = TextEditingController();
@@ -52,7 +55,6 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
       if (teamDoc.exists) {
         List<dynamic> playersList = teamDoc['players'] ?? [];
         
-        // Extract only emails (if stored as maps)
         List<String> playerEmails = [];
         for (var player in playersList) {
           if (player is String) {
@@ -72,7 +74,7 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
 
         setState(() {
           teamPlayers = playerMap;
-          selectedPlayers = [user!.email!]; // Auto-select the user
+          selectedPlayers = [user!.email!]; 
         });
       }
     } catch (e) {
@@ -90,7 +92,6 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
       if (teamDoc.exists) {
         List<dynamic> playersList = teamDoc['players'] ?? [];
         
-        // Extract only emails (if stored as maps)
         List<String> playerEmails = [];
         for (var player in playersList) {
           if (player is String) {
@@ -122,20 +123,28 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
   }
 
 
-  void _togglePlayerSelection(String player, bool isOpponent) {
+  void _togglePlayerSelection(String email, bool isOpponent) {
     setState(() {
       if (isOpponent) {
-        if (selectedPlayers.contains(player)) return; // Prevent duplicate selection
-        selectedOpponentPlayers.contains(player)
-            ? selectedOpponentPlayers.remove(player)
-            : selectedOpponentPlayers.add(player);
+        if (selectedOpponentPlayers.contains(email)) {
+          selectedOpponentPlayers.remove(email);
+        } else {
+          if (!selectedPlayers.contains(email)) {
+            selectedOpponentPlayers.add(email);
+          }
+        }
       } else {
-        selectedPlayers.contains(player)
-            ? selectedPlayers.remove(player)
-            : selectedPlayers.add(player);
+        if (selectedPlayers.contains(email)) {
+          selectedPlayers.remove(email);
+        } else {
+          if (!selectedOpponentPlayers.contains(email)) {
+            selectedPlayers.add(email);
+          }
+        }
       }
     });
   }
+
 
   void _validateAndProceed() {
     if (selectedPlayers.length < 2 || selectedOpponentPlayers.length < 2) {
@@ -146,29 +155,54 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
       _showError("Both teams must have the same number of players.");
       return;
     }
-    _showOversSelectionDialog();
+    _showOversSelectionDialog(context);
   }
 
-  void _showOversSelectionDialog() {
+  void _showOversSelectionDialog(BuildContext context) {
+    int selectedOvers = 5; 
+
+
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Enter Overs per Innings"),
-          content: TextField(
-            controller: oversController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(hintText: "Enter number of overs"),
+          title: const Text("Select Number of Overs"),
+          content: DropdownButton<int>(
+            value: selectedOvers,
+            items: [1, 2, 3, 4, 5, 10, 12, 15, 20, 20].map((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text("$value Overs"),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedOvers = value!;
+              });
+            },
           ),
           actions: [
             TextButton(
               onPressed: () {
-                if (oversController.text.isEmpty || int.tryParse(oversController.text) == null) {
-                  _showError("Please enter a valid number of overs.");
-                  return;
-                }
-                Navigator.pop(context);
-                _startRankedMatch();
+                Navigator.of(context).pop(); 
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); 
+                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CoinFlipPage(
+                      yourTeam: selectedPlayers, 
+                      opponentTeam: selectedOpponentPlayers,
+                      yourTeamID: selectedTeamId!,
+                      opponentTeamID: opponentTeamId!,
+                    ),
+                  ),
+                );
               },
               child: const Text("Confirm"),
             ),
@@ -177,6 +211,7 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
       },
     );
   }
+
 
   void _startRankedMatch() {
     print("Ranked Match Started!");
@@ -229,16 +264,25 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
             Expanded(
               child: ListView(
                 children: teamPlayers.entries.map((entry) {
+                  bool isCurrentUser = entry.key == user!.email; 
+
                   return CheckboxListTile(
-                    title: Text(entry.value), // Show username instead of email
+                    title: Text(entry.value),
                     value: selectedPlayers.contains(entry.key),
-                    onChanged: entry.key == user!.email ? null : (bool? value) {
-                      _togglePlayerSelection(entry.key, false);
-                    },
+                    onChanged: isCurrentUser
+                        ? null  
+                        : selectedOpponentPlayers.contains(entry.key)
+                            ? null  
+                            : (bool? value) {
+                                _togglePlayerSelection(entry.key, false);
+                              },
+                    controlAffinity: ListTileControlAffinity.leading,
                   );
                 }).toList(),
               ),
             ),
+
+
 
             const Text("Enter Opponent Team Code:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             TextField(
@@ -262,15 +306,18 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
               child: ListView(
                 children: opponentPlayers.entries.map((entry) {
                   return CheckboxListTile(
-                    title: Text(entry.value), // Show username instead of email
+                    title: Text(entry.value),
                     value: selectedOpponentPlayers.contains(entry.key),
-                    onChanged: (bool? value) {
-                      _togglePlayerSelection(entry.key, true);
-                    },
+                    onChanged: selectedPlayers.contains(entry.key)
+                        ? null  
+                        : (bool? value) {
+                            _togglePlayerSelection(entry.key, true);
+                          },
                   );
                 }).toList(),
               ),
             ),
+
 
             Center(child: ElevatedButton(onPressed: _validateAndProceed, child: const Text("Next"))),
           ],
