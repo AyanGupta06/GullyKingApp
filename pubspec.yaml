@@ -72,6 +72,8 @@ flutter:
     - assets/bg4.png
     - assets/coin_heads.png
     - assets/coin_tails.png
+    - assets/coin_heads1.png
+    - assets/coin_tails1.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

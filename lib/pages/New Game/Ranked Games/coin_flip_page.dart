@@ -205,7 +205,6 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
   bool isFlipping = false;
   double rotationAngle = 0;
 
-  // Coin Flip Logic
   void _flipCoin() {
     if (call == null || flippingTeam == null) return;
 
@@ -230,7 +229,6 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
       });
     });
 
-    // Simulate the coin flip rotation
     for (int i = 0; i < 5; i++) {
       Future.delayed(Duration(milliseconds: i * 300), () {
         setState(() {
@@ -240,7 +238,6 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
     }
   }
 
-  // Save Game to Firebase
   Future<void> _startGame() async {
     try {
       await FirebaseFirestore.instance.collection('started_ranked_games').add({
@@ -252,11 +249,9 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
         'finalDecision': "$winner chose to $finalDecision first",
       });
 
-      // Show confirmation after saving
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Game started successfully")));
 
-      // Navigate to next screen or home page
-      Navigator.pop(context);  // Go back or to the next screen
+      Navigator.pop(context);  // fix later
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error starting game: $e")));
     }
@@ -350,7 +345,6 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
                 ),
             ],
 
-            // Add the Start Game button
             const SizedBox(height: 20),
             if (finalDecision != null)
               Center(
