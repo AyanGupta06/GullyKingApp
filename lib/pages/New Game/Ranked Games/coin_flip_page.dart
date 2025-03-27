@@ -63,6 +63,8 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
     }
   }
 
+
+
   Future<void> _startGame() async {
     try {
       await FirebaseFirestore.instance.collection('started_ranked_games').add({
