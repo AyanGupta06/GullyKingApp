@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gully_king/pages/New%20Game/Ranked%20Games/coin_flip_page.dart';
 
+
+
 class RankedMatchSetupPage extends StatefulWidget {
   @override
   _RankedMatchSetupPageState createState() => _RankedMatchSetupPageState();
@@ -200,6 +202,7 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
                       opponentTeam: selectedOpponentPlayers,
                       yourTeamID: selectedTeamId!,
                       opponentTeamID: opponentTeamId!,
+                      overs: selectedOvers,
                     ),
                   ),
                 );

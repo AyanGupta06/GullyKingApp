@@ -1,14 +1,48 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gully_king/pages/New%20Game/Ranked%20Games/ranked_scorecard_page.dart';
 
 import '../../../player.dart';
+
+class Player {
+  String name;
+  int runs;
+  int ballsFaced;
+  int runsOnBalls;
+  int ballsBowled;
+  int wicketsTaken;
+  bool hasBatted;
+  String outMessage;
+  int oversBowled;
+  int fours;
+  int sixes;
+
+  Player({
+    required this.name,
+    this.runs = 0,
+    this.ballsFaced = 0,
+    this.runsOnBalls = 0,
+    this.ballsBowled = 0,
+    this.wicketsTaken = 0,
+    this.hasBatted = false,
+    this.outMessage = "This batter is not-out",
+    this.oversBowled = 0,
+    this.fours = 0,
+    this.sixes = 0,
+  });
+
+  void setHasBatted(bool test) {
+    hasBatted = test;
+  }
+}
 
 class CoinFlipPage extends StatefulWidget {
   final List<String> yourTeam;
   final List<String> opponentTeam;
   final String yourTeamID;
   final String opponentTeamID;
+  final int overs;
 
   const CoinFlipPage({
     Key? key,
@@ -16,6 +50,7 @@ class CoinFlipPage extends StatefulWidget {
     required this.opponentTeam,
     required this.yourTeamID,
     required this.opponentTeamID,
+    required this.overs,
   }) : super(key: key);
 
   @override
@@ -63,7 +98,6 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
         isFlipping = false;
       });
     });
-    _updateBattingDecision();
 
     for (int i = 0; i < 5; i++) {
       Future.delayed(Duration(milliseconds: i * 30), () {
@@ -91,6 +125,20 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Game started successfully")));
 
       // Navigator.pop(context);  // fix later
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RankedScorecardPage(
+            bowler: bowler,
+            batsmanOnStrike: batsmanOnStrike,
+            batsmanOnNonStrike: batsmanOnNonStrike,
+            maxOvers: widget.overs,
+            battingTeam: battingTeam,
+            bowlingTeam: bowlingTeam, 
+
+          ),
+        ),
+      );
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error starting game: $e")));
@@ -102,22 +150,61 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
       whoBattingFirst = winner;
       for(int i = 0; i < widget.yourTeam.length; i++)  {
         String temp = widget.yourTeam[i];
-        battingTeam.add(Player(name: temp));
+        setState(() {
+          battingTeam.add(Player(name: temp));
+        });
       }
       for(int j = 0; j < widget.opponentTeam.length; j++)  {
         String temp1 = widget.opponentTeam[j];
-        bowlingTeam.add(Player(name: temp1));
+        setState(() {
+          bowlingTeam.add(Player(name: temp1));
+        });
       }
     }
+
     if(finalDecision == "Batting" && winner == widget.opponentTeamID) {
       whoBattingFirst = winner;
       for(int i = 0; i < widget.opponentTeam.length; i++)  {
         String temp = widget.opponentTeam[i];
-        battingTeam.add(Player(name: temp));
+        setState(() {
+          battingTeam.add(Player(name: temp));
+        });
       }
       for(int j = 0; j < widget.yourTeam.length; j++)  {
         String temp1 = widget.yourTeam[j];
-        bowlingTeam.add(Player(name: temp1));
+        setState(() {
+          bowlingTeam.add(Player(name: temp1));
+        });      
+      }
+    }
+
+    if(finalDecision == "Fielding" && winner == widget.yourTeamID) {
+      for(int i = 0; i < widget.yourTeam.length; i++)  {
+        String temp = widget.yourTeam[i];
+        setState(() {
+          bowlingTeam.add(Player(name: temp));
+        });
+      }
+      for(int j = 0; j < widget.opponentTeam.length; j++)  {
+        String temp1 = widget.opponentTeam[j];
+        setState(() {
+          battingTeam.add(Player(name: temp1));
+        });
+      }
+    }
+
+    if(finalDecision == "Fielding" && winner == widget.opponentTeamID) {
+      for(int i = 0; i < widget.opponentTeam.length; i++)  {
+        String temp = widget.opponentTeam[i];
+        setState(() {
+          bowlingTeam.add(Player(name: temp));
+        });
+      }
+      for(int j = 0; j < widget.yourTeam.length; j++)  {
+        String temp1 = widget.yourTeam[j];
+        setState(() {
+          battingTeam.add(Player(name: temp1));
+        });      
       }
     }
 
@@ -204,8 +291,16 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
                 value: finalDecision,
                 hint: const Text("Choose Bat or Field"),
                 items: ["Batting", "Fielding"].map((choice) => DropdownMenuItem(value: choice, child: Text(choice))).toList(),
-                onChanged: (value) => setState(() => finalDecision = value),
+                onChanged: (value) {
+                  setState(() {
+                    finalDecision = value;
+                  });
+                  if (value != null) {
+                    _updateBattingDecision(); 
+                  }
+                },
               ),
+              const SizedBox(height: 10),
 
               if (finalDecision != null)
                 Text(
@@ -213,10 +308,7 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
             ],
-
-
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             DropdownButton<Player>(
               value: batsmanOnStrike,
               hint: const Text("Batsman on Strike"),

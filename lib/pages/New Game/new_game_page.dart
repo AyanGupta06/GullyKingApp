@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/New%20Game/Ranked%20Games/started_new_ranked_game_page.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/New%20Game/Ranked%20Games/new_ranked_game_page.dart';
 import 'package:gully_king/pages/New%20Game/Unranked%20Games/new_unranked_game_page.dart';
 import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
 import 'package:gully_king/pages/Friends/your_teams_page.dart';

@@ -1,33 +1,37 @@
 
 import 'package:flutter/material.dart';
+import 'package:gully_king/pages/Dialogs/new_ranked_innings_setup_dialog.dart';
+import 'package:gully_king/pages/New%20Game/Ranked%20Games/coin_flip_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/Dialogs/new_batsman_dialog.dart';
 import 'package:gully_king/pages/Dialogs/new_bowler_dialog.dart';
 
 import 'package:gully_king/pages/Dialogs/new_innings_setup_dialog.dart';
-import 'package:gully_king/pages/New%20Game/Unranked%20Games/new_unranked_game_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 
-class UnrankedScorecardPage extends StatefulWidget {
-  final String? battingFirstTeam;
-
+class RankedScorecardPage extends StatefulWidget {
+  final Player? batsmanOnStrike;
+  final Player? batsmanOnNonStrike;
+  final Player? bowler;
   final int maxOvers;
   final List<Player> battingTeam;
   final List<Player> bowlingTeam;
 
-  const UnrankedScorecardPage({
+  const RankedScorecardPage({
     super.key,
-    required this.battingFirstTeam,
+    required this.batsmanOnStrike,
+    required this.batsmanOnNonStrike,
+    required this.bowler,
     required this.maxOvers, required this.battingTeam, required this.bowlingTeam,
   });
 
   @override
-  State<UnrankedScorecardPage> createState() => _UnrankedScorecardPageState();
+  State<RankedScorecardPage> createState() => _RankedScorecardPageState();
 }
 
-class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
+class _RankedScorecardPageState extends State<RankedScorecardPage> {
   Player? batsmanOnStrike;
   Player? batsmanOnNonStrike;
   Player? bowler;
@@ -54,9 +58,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   @override
   void initState() {
     super.initState();
-    batsmanOnStrike;
-    batsmanOnNonStrike;
-    bowler;
+    batsmanOnStrike = widget.batsmanOnStrike;
+    print("Test12");
+    batsmanOnNonStrike = widget.batsmanOnNonStrike;
+    bowler = widget.bowler;
     battingTeam = widget.battingTeam;
     bowlingTeam = widget.bowlingTeam;
     batsmanOnStrike?.setHasBatted(true);
@@ -81,9 +86,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       }
       isNoBall = false;
 
+      
 
-
-
+      
 
       totalBalls++;
       if(totalBalls ==  ((6*widget.maxOvers))) {
@@ -100,10 +105,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         } else {
           _showNewBowlerDialog(bowlingTeam);
         }
-
+         
         // _changeStrike();
       }
-
+      
 
       if (totalOvers >= widget.maxOvers) {
         print("Total Overs" + totalOvers.toString());
@@ -142,9 +147,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       }
       isNoBall = false;
 
+      
 
-
-
+      
 
       totalBalls++;
       if(totalBalls ==  ((6*widget.maxOvers))) {
@@ -161,10 +166,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         } else {
           _showNewBowlerDialog(bowlingTeam);
         }
-
+         
         // _changeStrike();
       }
-
+      
 
       if (totalOvers >= widget.maxOvers) {
         print("Total Overs" + totalOvers.toString());
@@ -176,7 +181,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         }
       }
 
-
+      
       if (firstTeamScore < teamScore && isSecondInnings) {
         _endGame();
       }
@@ -198,28 +203,28 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                 child: Text(player.name),
               );
             }).toList(),
-
+            
             onChanged: (Player? selectedPlayer) {
               if (selectedPlayer != bowler) {
-                onBowlerSelected(selectedPlayer!);
+                 onBowlerSelected(selectedPlayer!);
                 Navigator.pop(context);
                 if(totalBalls%6 == 0 && totalBalls != 0) {
                   _changeStrike();
                 }
-              }
-              else if (selectedPlayer == bowler) {
+              } 
+               else if (selectedPlayer == bowler) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Select a different bowler - this bowler just bowled.')),
-                );
+                const SnackBar(content: Text('Select a different bowler - this bowler just bowled.')),
+              );
               }
-
+              
             },
-
+            
           ),
         );
       },
     );
-
+    
   }
 
 
@@ -229,8 +234,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       // _showOutMessageDialog(bowlingTeam);
       batsmanOnNonStrike?.outMessage = "This batter is not-out";
       bowler?.wicketsTaken++;
-
-
+      
+      
       if(bowler!.ballsBowled%6 == 0 && bowler!.ballsBowled != 0) {
         bowler?.oversBowled++;
       }
@@ -244,16 +249,16 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       } else {
         firstTeamWickets++;
       }
-
+      
 
       print("Length " + battingTeam.length.toString());
 
       if (currentWickets == battingTeam.length - 1) {
         _endInnings(true);
-
+        
       } else {
         List<Player> availableBatsmen = battingTeam
-            .where((player) => !player.hasBatted)
+            .where((player) => !player.hasBatted) 
             .toList();
 
         // List<Player> availableTest = [];
@@ -264,7 +269,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         _updateScoreWicket(0);
 
         if(totalOvers != widget.maxOvers && (isSecondInnings? secondTeamWickets: firstTeamWickets) != battingTeam.length - 1) {
-          _showNewBatsmanDialog(availableBatsmen);
+           _showNewBatsmanDialog(availableBatsmen);
 
         } else if ((isSecondInnings? secondTeamWickets: firstTeamWickets) == battingTeam.length - 1) {
           _endInnings(true);
@@ -276,10 +281,10 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     });
   }
 
+ 
 
 
-
-  void _showOutMessageDialog() {
+ void _showOutMessageDialog() {
     List<String> outMessagesList = ["caught", "bowled", "run-out", "stumped", "LBW"];
     Player? selectedBowler;
     String? selectedOutMessage;
@@ -339,7 +344,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
                     if (selectedOutMessage != "run-out" && isNoBall == true) {
                       Navigator.pop(context);
-
+                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('You can not get out other than a run-out when previous ball is a no-ball.'),
@@ -347,7 +352,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                       );
                     }
 
-
+                  
                     if (selectedOutMessage != null && selectedBowler != null && isNoBall == false) {
                       Navigator.pop(context);
                       _outMessageSelected(selectedOutMessage!, selectedBowler!);
@@ -401,7 +406,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         return AlertDialog(
           title: const Text("End of Innings"),
           content: const Text(
-              "The innings is over. Please follow the next instructions."
+            "The innings is over. Please follow the next instructions."
           ),
           actions: [
             TextButton(
@@ -417,7 +422,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
                   setState(() {
                     isSecondInnings = true;
                   });
-
+                  
                   // _showNewBowlerDialog();
                 } else {
                   _endGame();
@@ -438,14 +443,14 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       print("Team 1 Won by " + runsDifference.toString() + " runs!");
       temp = "Team 1 Won by " + runsDifference.toString() + " runs!";
     } else if (firstTeamScore < teamScore) {
-
+      
       int secondTeamWickets = 0;
       for(int j = 0; j < battingTeam.length; j++) {
         if(battingTeam[j].outMessage != "This batter is not-out") {
           secondTeamWickets++;
         }
       }
-
+      
       print("Team 2 Won by " + (battingTeam.length-secondTeamWickets).toString());
       temp = "Team 2 won by " + (battingTeam.length-secondTeamWickets).toString() + " wickets!";
     } else {
@@ -479,26 +484,186 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
+  // void _storeMatchData(String result) async {
+  //   try {
+  //     User? user = FirebaseAuth.instance.currentUser;
+
+  //     if (user == null) {
+  //       throw Exception("User is not logged in.");
+  //     }
+
+  //     String userEmail = user.email ?? "unknown";
+
+  //     List<Map<String, dynamic>> firstTeamPlayerData = bowlingTeam.map((player) {
+  //       return {
+  //         'name': player.name,
+  //         'runs': player.runs,
+  //         'ballsFaced': player.ballsFaced,
+  //         'wicketsTaken': player.wicketsTaken,
+  //         'ballsBowled': player.ballsBowled,
+  //         'oversBowled': player.oversBowled,
+  //         'outMessage': player.outMessage,
+  //         'wicketsTaken': player.wicketsTaken,
+  //         'runsOnBalls': player.runsOnBalls,
+  //         'fours': player.fours,
+  //         'sixes': player.sixes,
+  //       };
+  //     }).toList();
+
+  //     List<Map<String, dynamic>> secondTeamPlayerData = battingTeam.map((player) {
+  //       return {
+  //         'name': player.name,
+  //         'runs': player.runs,
+  //         'ballsFaced': player.ballsFaced,
+  //         'wicketsTaken': player.wicketsTaken,
+  //         'ballsBowled': player.ballsBowled,
+  //         'oversBowled': player.oversBowled,
+  //         'outMessage': player.outMessage,
+  //         'wicketsTaken': player.wicketsTaken,
+  //         'runsOnBalls': player.runsOnBalls,
+  //         'fours': player.fours,
+  //         'sixes': player.sixes,
+  //       };
+  //     }).toList();
+
+  //     await FirebaseFirestore.instance.collection('ranked_matches').add({
+  //       'email': userEmail,
+  //       'team1Score': "$firstTeamScore/$firstTeamWickets",
+  //       'team2Score': "$teamScore/$secondTeamWickets",
+  //       'result': result,
+  //       'timestamp': FieldValue.serverTimestamp(),
+  //       'team1Players': firstTeamPlayerData,
+  //       'team2Players': secondTeamPlayerData,
+  //       'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls%6})",
+  //       'team2Overs': "($totalOvers.${totalBalls%6})",
+  //       'team1Wide': "$firstTeamWide",
+  //       'team2Wide': "$secondTeamWide",
+  //       'team1NB': "$firstTeamNB",
+  //       'team2NB': "$firstTeamNB",
+        
+  //     });
+
+  //     print("Match data stored successfully.");
+  //   } catch (e) {
+  //     print("Failed to store match data: $e");
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error saving match data: $e')),
+  //     );
+  //   }
+  // }
+
+  // void _storeMatchData(String result) async {
+  //   try {
+  //     User? user = FirebaseAuth.instance.currentUser;
+  //     if (user == null) {
+  //       throw Exception("User is not logged in.");
+  //     }
+
+  //     String userEmail = user.email ?? "unknown";
+
+  //     List<Map<String, dynamic>> firstTeamPlayerData = bowlingTeam.map((player) {
+  //       return {
+  //         'email': player.name,
+  //         'runs': player.runs,
+  //         'ballsFaced': player.ballsFaced,
+  //         'wicketsTaken': player.wicketsTaken,
+  //         'ballsBowled': player.ballsBowled,
+  //         'oversBowled': player.oversBowled,
+  //         'outMessage': player.outMessage,
+  //         'runsOnBalls': player.runsOnBalls,
+  //         'fours': player.fours,
+  //         'sixes': player.sixes,
+  //       };
+  //     }).toList();
+
+  //     List<Map<String, dynamic>> secondTeamPlayerData = battingTeam.map((player) {
+  //       return {
+  //         'email': player.name,
+  //         'runs': player.runs,
+  //         'ballsFaced': player.ballsFaced,
+  //         'wicketsTaken': player.wicketsTaken,
+  //         'ballsBowled': player.ballsBowled,
+  //         'oversBowled': player.oversBowled,
+  //         'outMessage': player.outMessage,
+  //         'runsOnBalls': player.runsOnBalls,
+  //         'fours': player.fours,
+  //         'sixes': player.sixes,
+  //       };
+  //     }).toList();
+
+  //     DocumentReference matchRef = await FirebaseFirestore.instance.collection('ranked_matches').add({
+  //       'email': userEmail,
+  //       'team1Score': "$firstTeamScore/$firstTeamWickets",
+  //       'team2Score': "$teamScore/$secondTeamWickets",
+  //       'result': result,
+  //       'timestamp': FieldValue.serverTimestamp(),
+  //       'team1Players': firstTeamPlayerData,
+  //       'team2Players': secondTeamPlayerData,
+  //       'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls % 6})",
+  //       'team2Overs': "($totalOvers.${totalBalls % 6})",
+  //       'team1Wide': "$firstTeamWide",
+  //       'team2Wide': "$secondTeamWide",
+  //       'team1NB': "$firstTeamNB",
+  //       'team2NB': "$secondTeamNB",
+  //     });
+
+  //     String matchID = matchRef.id;
+
+  //     Future<void> storePlayerStats(List<Map<String, dynamic>> teamPlayers) async {
+  //       for (var player in teamPlayers) {
+  //         String playerEmail = player['email'];
+
+  //         DocumentReference playerMatchRef = FirebaseFirestore.instance
+  //             .collection("player's_ranked_matches")
+  //             .doc(playerEmail)
+  //             .collection("matches")
+  //             .doc(matchID);
+
+  //         await playerMatchRef.set({
+  //           'matchID': matchID,
+  //           'teamScore': playerEmail == userEmail ? "$teamScore/$secondTeamWickets" : "$firstTeamScore/$firstTeamWickets",
+  //           'result': result,
+  //           'timestamp': FieldValue.serverTimestamp(),
+  //           'runs': player['runs'],
+  //           'ballsFaced': player['ballsFaced'],
+  //           'wicketsTaken': player['wicketsTaken'],
+  //           'ballsBowled': player['ballsBowled'],
+  //           'oversBowled': player['oversBowled'],
+  //           'outMessage': player['outMessage'],
+  //           'runsOnBalls': player['runsOnBalls'],
+  //           'fours': player['fours'],
+  //           'sixes': player['sixes'],
+  //         });
+  //       }
+  //     }
+
+  //     await storePlayerStats(firstTeamPlayerData);
+  //     await storePlayerStats(secondTeamPlayerData);
+
+  //     print("Match data stored successfully.");
+  //   } catch (e) {
+  //     print("Failed to store match data: $e");
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error saving match data: $e')),
+  //     );
+  //   }
+  // }
   void _storeMatchData(String result) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        throw Exception("User is not logged in.");
-      }
+      if (user == null) throw Exception("User is not logged in.");
 
       String userEmail = user.email ?? "unknown";
 
       List<Map<String, dynamic>> firstTeamPlayerData = bowlingTeam.map((player) {
         return {
-          'name': player.name,
+          'email': player.name,
           'runs': player.runs,
           'ballsFaced': player.ballsFaced,
           'wicketsTaken': player.wicketsTaken,
           'ballsBowled': player.ballsBowled,
           'oversBowled': player.oversBowled,
           'outMessage': player.outMessage,
-          'wicketsTaken': player.wicketsTaken,
           'runsOnBalls': player.runsOnBalls,
           'fours': player.fours,
           'sixes': player.sixes,
@@ -507,21 +672,20 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
       List<Map<String, dynamic>> secondTeamPlayerData = battingTeam.map((player) {
         return {
-          'name': player.name,
+          'email': player.name,
           'runs': player.runs,
           'ballsFaced': player.ballsFaced,
           'wicketsTaken': player.wicketsTaken,
           'ballsBowled': player.ballsBowled,
           'oversBowled': player.oversBowled,
           'outMessage': player.outMessage,
-          'wicketsTaken': player.wicketsTaken,
           'runsOnBalls': player.runsOnBalls,
           'fours': player.fours,
           'sixes': player.sixes,
         };
       }).toList();
 
-      await FirebaseFirestore.instance.collection('matches').add({
+      DocumentReference matchRef = await FirebaseFirestore.instance.collection('ranked_matches').add({
         'email': userEmail,
         'team1Score': "$firstTeamScore/$firstTeamWickets",
         'team2Score': "$teamScore/$secondTeamWickets",
@@ -529,14 +693,60 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         'timestamp': FieldValue.serverTimestamp(),
         'team1Players': firstTeamPlayerData,
         'team2Players': secondTeamPlayerData,
-        'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls%6})",
-        'team2Overs': "($totalOvers.${totalBalls%6})",
+        'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls % 6})",
+        'team2Overs': "($totalOvers.${totalBalls % 6})",
         'team1Wide': "$firstTeamWide",
         'team2Wide': "$secondTeamWide",
         'team1NB': "$firstTeamNB",
-        'team2NB': "$firstTeamNB",
-
+        'team2NB': "$secondTeamNB",
       });
+
+      String matchID = matchRef.id;
+
+      Future<void> storePlayerStats(Map<String, dynamic> player) async {
+        String playerEmail = player['email'];
+
+        QuerySnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection("users")
+            .where("email", isEqualTo: playerEmail)
+            .limit(1)
+            .get();
+
+        if (userSnapshot.docs.isNotEmpty) {
+          String userId = userSnapshot.docs.first.id;
+
+          DocumentReference playerMatchRef = FirebaseFirestore.instance
+              .collection("users")
+              .doc(userId)
+              .collection("players_ranked_matches")
+              .doc(matchID);
+
+          await playerMatchRef.set({
+            'matchID': matchID,
+            'teamScore': playerEmail == userEmail ? "$teamScore/$secondTeamWickets" : "$firstTeamScore/$firstTeamWickets",
+            'result': result,
+            'timestamp': FieldValue.serverTimestamp(),
+            'runs': player['runs'],
+            'ballsFaced': player['ballsFaced'],
+            'wicketsTaken': player['wicketsTaken'],
+            'ballsBowled': player['ballsBowled'],
+            'oversBowled': player['oversBowled'],
+            'outMessage': player['outMessage'],
+            'runsOnBalls': player['runsOnBalls'],
+            'fours': player['fours'],
+            'sixes': player['sixes'],
+          });
+        } else {
+          print("User with email $playerEmail not found in Firestore.");
+        }
+      }
+
+      for (var player in firstTeamPlayerData) {
+        await storePlayerStats(player);
+      }
+      for (var player in secondTeamPlayerData) {
+        await storePlayerStats(player);
+      }
 
       print("Match data stored successfully.");
     } catch (e) {
@@ -551,10 +761,12 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
 
 
 
+
+
   void _setupSecondInnings(List<Player> battingTeam, List<Player> bowlingTeam) {
     setState(() {
-      this.battingTeam = bowlingTeam;
-      this.bowlingTeam = battingTeam;
+      this.battingTeam = bowlingTeam; 
+      this.bowlingTeam = battingTeam; 
       batsmanOnStrike = null;
       batsmanOnNonStrike = null;
       bowler = null;
@@ -568,7 +780,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       isSecondInnings = true;
       // battingTeam = bowlingTeam;
       // bowlingTeam = battingTeam;
-
+      
     });
 
     _showNewInningsSetupDialog(bowlingTeam, battingTeam);
@@ -581,15 +793,15 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return NewInningsSetupDialog(
-          availableBatsmen: battingTeam,
-          availableBowlers: bowlingTeam,
+        return NewRankedInningsSetupDialog(
+          availableBatsmen: battingTeam, 
+          availableBowlers: bowlingTeam, 
           onBatsmenAndBowlerSelected: (Player newStrike, Player newNonStrike) {
             setState(() {
               batsmanOnStrike = newStrike;
               batsmanOnNonStrike = newNonStrike;
             });
-
+            
 
           },
         );
@@ -597,7 +809,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
     );
   }
 
-  void _showNewBatsmanDialog(List<Player> availableBatsmen) {
+   void _showNewBatsmanDialog(List<Player> availableBatsmen) {
 
     showDialog(
       barrierDismissible: false,
@@ -615,7 +827,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
             }).toList(),
             onChanged: (Player? selectedPlayer) {
               if (selectedPlayer != null) {
-                onBatsmanSelected(selectedPlayer);
+                 onBatsmanSelected(selectedPlayer);
                 Navigator.pop(context);
               }
             },
@@ -633,7 +845,7 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   }
 
   void onBowlerSelected(Player player) {
-
+   
     print(player.name);
     setState(() {
       bowler = player;
@@ -656,51 +868,111 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   }
 
   Widget _batsmanCard(Player batsman, bool isOnStrike) {
-    return Card(
-      color: isOnStrike ? Colors.blue[100] : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              batsman.name,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: batsman.name) 
+          .limit(1) 
+          .get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Card(
+            child: Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text("Loading..."),
             ),
-            Text(
-              "${batsman.runs} (${batsman.ballsFaced})",
-              style: const TextStyle(fontSize: 16),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Card(
+            color: isOnStrike ? Colors.blue[100] : Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text("Unknown Player"),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        String username = snapshot.data!.docs.first['username'] ?? "Unknown Player";
+
+        return Card(
+          color: isOnStrike ? Colors.blue[100] : Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  username,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "${batsman.runs} (${batsman.ballsFaced})",
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
 
+
+  
 
   Widget _bowlerCard(Player bowler) {
-
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              bowler.name,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: bowler.name) 
+          .limit(1) 
+          .get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Card(
+            child: Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text("Loading..."),
             ),
-            Text(
-              "${bowler.wicketsTaken}/${bowler.runsOnBalls}     (${(bowler.ballsBowled~/6).round()}.${bowler.ballsBowled % 6})",
-              style: const TextStyle(fontSize: 16),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text("Unknown Player"),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        String username = snapshot.data!.docs.first['username'] ?? "Unknown Player";
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  username,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "${bowler.wicketsTaken}/${bowler.runsOnBalls}     (${(bowler.ballsBowled ~/ 6).round()}.${bowler.ballsBowled % 6})",
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
+
 
   void _wideBowled() {
     setState ((){
@@ -783,8 +1055,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
   Widget _runsLeft() {
     int runsLeft = firstTeamScore - teamScore + 1;
     return Text (
-        "Runs Needed to Win: "+ runsLeft.toString(),
-        style: const TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.black)
+      "Runs Needed to Win: "+ runsLeft.toString(), 
+      style: const TextStyle(fontSize: 20, fontWeight:FontWeight.bold, color: Colors.black)
 
     );
   }
@@ -795,8 +1067,8 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
       appBar: AppBar(
         title: Text(
           !isSecondInnings
-              ?"Team 1 Scorecard"
-              :"Team 2 Scorecard",
+                ?"Team 1 Scorecard"
+                :"Team 2 Scorecard",
           // "${widget.battingFirstTeam} Scorecard",
           style: const TextStyle(color: Colors.black),
         ),
@@ -816,9 +1088,9 @@ class _UnrankedScorecardPageState extends State<UnrankedScorecardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // backgroundColor: i == 4 || i == 6 ? Colors.green : Colors.blue,
-
-
+           // backgroundColor: i == 4 || i == 6 ? Colors.green : Colors.blue,
+            
+            
             Text(
               "Team Score: $teamScore",
               style: const TextStyle(
