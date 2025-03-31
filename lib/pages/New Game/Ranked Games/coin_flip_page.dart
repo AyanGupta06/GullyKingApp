@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../player.dart';
+
 class CoinFlipPage extends StatefulWidget {
   final List<String> yourTeam;
   final List<String> opponentTeam;
@@ -26,6 +28,13 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
   String? flipResult;
   String? winner;
   String? finalDecision;
+  String? whoBattingFirst;
+  List<Player> battingTeam = [];
+  List<Player> bowlingTeam = [];
+  Player? batsmanOnStrike;
+  Player? batsmanOnNonStrike;
+  Player? bowler;
+
 
   bool isFlipping = false;
   double rotationAngle = 0;
@@ -41,6 +50,7 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
     Future.delayed(const Duration(milliseconds: 1500), () {
       final Random random = Random();
       bool isHeads = random.nextBool();
+
       flipResult = isHeads ? 'Heads' : 'Tails';
 
       winner = flipResult == call
@@ -53,6 +63,7 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
         isFlipping = false;
       });
     });
+    _updateBattingDecision();
 
     for (int i = 0; i < 5; i++) {
       Future.delayed(Duration(milliseconds: i * 30), () {
@@ -79,11 +90,41 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Game started successfully")));
 
-      Navigator.pop(context);  // fix later
+      // Navigator.pop(context);  // fix later
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error starting game: $e")));
     }
   }
+
+  void _updateBattingDecision() {
+    if(finalDecision == "Batting" && winner == widget.yourTeamID) {
+      whoBattingFirst = winner;
+      for(int i = 0; i < widget.yourTeam.length; i++)  {
+        String temp = widget.yourTeam[i];
+        battingTeam.add(Player(name: temp));
+      }
+      for(int j = 0; j < widget.opponentTeam.length; j++)  {
+        String temp1 = widget.opponentTeam[j];
+        bowlingTeam.add(Player(name: temp1));
+      }
+    }
+    if(finalDecision == "Batting" && winner == widget.opponentTeamID) {
+      whoBattingFirst = winner;
+      for(int i = 0; i < widget.opponentTeam.length; i++)  {
+        String temp = widget.opponentTeam[i];
+        battingTeam.add(Player(name: temp));
+      }
+      for(int j = 0; j < widget.yourTeam.length; j++)  {
+        String temp1 = widget.yourTeam[j];
+        bowlingTeam.add(Player(name: temp1));
+      }
+    }
+
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -165,6 +206,7 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
                 items: ["Batting", "Fielding"].map((choice) => DropdownMenuItem(value: choice, child: Text(choice))).toList(),
                 onChanged: (value) => setState(() => finalDecision = value),
               ),
+
               if (finalDecision != null)
                 Text(
                   "$winner chose to ${finalDecision == 'Batting' ? 'bat first' : 'field first'}.",
@@ -172,7 +214,45 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
                 ),
             ],
 
+
+
             const SizedBox(height: 20),
+            DropdownButton<Player>(
+              value: batsmanOnStrike,
+              hint: const Text("Batsman on Strike"),
+              items: battingTeam.map((player) {
+                return DropdownMenuItem(value: player, child: Text(player.name));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  batsmanOnStrike = value;
+                });
+              },
+            ),
+            DropdownButton<Player>(
+              value: batsmanOnNonStrike,
+              hint: const Text("Batsman on Non-Strike"),
+              items: battingTeam.map((player) {
+                return DropdownMenuItem(value: player, child: Text(player.name));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  batsmanOnNonStrike = value;
+                });
+              },
+            ),
+            DropdownButton<Player>(
+              value: bowler,
+              hint: const Text("Select Bowler"),
+              items: bowlingTeam.map((player) {
+                return DropdownMenuItem(value: player, child: Text(player.name));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  bowler = value;
+                });
+              },
+            ),
             if (finalDecision != null)
               Center(
                 child: ElevatedButton(
