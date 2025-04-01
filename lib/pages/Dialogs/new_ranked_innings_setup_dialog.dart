@@ -40,7 +40,7 @@ class _NNewRankedInningsSetupDialogState extends State<NewRankedInningsSetupDial
             items: widget.availableBatsmen.map((Player batsman) {
               return DropdownMenuItem<Player>(
                 value: batsman,
-                child: Text(batsman.name),
+                child: Text(batsman.username),
               );
             }).toList(),
           ),
@@ -55,7 +55,7 @@ class _NNewRankedInningsSetupDialogState extends State<NewRankedInningsSetupDial
             items: widget.availableBatsmen.map((Player batsman) {
               return DropdownMenuItem<Player>(
                 value: batsman,
-                child: Text(batsman.name),
+                child: Text(batsman.username),
               );
             }).toList(),
           ),

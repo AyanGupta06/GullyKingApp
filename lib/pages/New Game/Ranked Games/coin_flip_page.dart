@@ -7,6 +7,7 @@ import '../../../player.dart';
 
 class Player {
   String name;
+  String username;
   int runs;
   int ballsFaced;
   int runsOnBalls;
@@ -20,6 +21,7 @@ class Player {
 
   Player({
     required this.name,
+    required this.username,
     this.runs = 0,
     this.ballsFaced = 0,
     this.runsOnBalls = 0,
@@ -145,19 +147,42 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
     }
   }
 
-  void _updateBattingDecision() {
+
+  Future<String> getUsernameFromEmail(String email) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first['username'] ?? "Unknown Player";
+      } else {
+        return "Unknown Player";
+      }
+    } catch (e) {
+      print("Error fetching username: $e");
+      return "Unknown Player";
+    }
+  }
+
+  Future<void> _updateBattingDecision() async {
+
     if(finalDecision == "Batting" && winner == widget.yourTeamID) {
       whoBattingFirst = winner;
       for(int i = 0; i < widget.yourTeam.length; i++)  {
         String temp = widget.yourTeam[i];
+        String username = await getUsernameFromEmail(temp);
         setState(() {
-          battingTeam.add(Player(name: temp));
+          battingTeam.add(Player(name: temp, username: username));
         });
       }
       for(int j = 0; j < widget.opponentTeam.length; j++)  {
         String temp1 = widget.opponentTeam[j];
+        String username = await getUsernameFromEmail(temp1);
         setState(() {
-          bowlingTeam.add(Player(name: temp1));
+          bowlingTeam.add(Player(name: temp1, username: username));
         });
       }
     }
@@ -166,29 +191,33 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
       whoBattingFirst = winner;
       for(int i = 0; i < widget.opponentTeam.length; i++)  {
         String temp = widget.opponentTeam[i];
+        String username = await getUsernameFromEmail(temp);
         setState(() {
-          battingTeam.add(Player(name: temp));
+          battingTeam.add(Player(name: temp, username: username));
         });
       }
       for(int j = 0; j < widget.yourTeam.length; j++)  {
         String temp1 = widget.yourTeam[j];
+        String username = await getUsernameFromEmail(temp1);
         setState(() {
-          bowlingTeam.add(Player(name: temp1));
-        });      
+          bowlingTeam.add(Player(name: temp1, username: username));
+        });
       }
     }
 
     if(finalDecision == "Fielding" && winner == widget.yourTeamID) {
       for(int i = 0; i < widget.yourTeam.length; i++)  {
         String temp = widget.yourTeam[i];
+        String username = await getUsernameFromEmail(temp);
         setState(() {
-          bowlingTeam.add(Player(name: temp));
+          bowlingTeam.add(Player(name: temp, username: username));
         });
       }
       for(int j = 0; j < widget.opponentTeam.length; j++)  {
         String temp1 = widget.opponentTeam[j];
+        String username = await getUsernameFromEmail(temp1);
         setState(() {
-          battingTeam.add(Player(name: temp1));
+          battingTeam.add(Player(name: temp1, username: username));
         });
       }
     }
@@ -196,14 +225,16 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
     if(finalDecision == "Fielding" && winner == widget.opponentTeamID) {
       for(int i = 0; i < widget.opponentTeam.length; i++)  {
         String temp = widget.opponentTeam[i];
+        String username = await getUsernameFromEmail(temp);
         setState(() {
-          bowlingTeam.add(Player(name: temp));
+          bowlingTeam.add(Player(name: temp, username: username));
         });
       }
       for(int j = 0; j < widget.yourTeam.length; j++)  {
         String temp1 = widget.yourTeam[j];
+        String username = await getUsernameFromEmail(temp1);
         setState(() {
-          battingTeam.add(Player(name: temp1));
+          battingTeam.add(Player(name: temp1, username: username));
         });      
       }
     }

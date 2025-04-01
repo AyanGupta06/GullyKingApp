@@ -200,7 +200,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
             items: team.map((Player player) {
               return DropdownMenuItem<Player>(
                 value: player,
-                child: Text(player.name),
+                child: Text(player.username),
               );
             }).toList(),
             
@@ -324,7 +324,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
                     items: bowlingTeam.map((Player player) {
                       return DropdownMenuItem<Player>(
                         value: player,
-                        child: Text(player.name),
+                        child: Text(player.username),
                       );
                     }).toList(),
                     onChanged: (Player? selectedPlayer) {
@@ -381,13 +381,13 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
     String finalOutMessage;
 
     if (outMessage == "bowled out") {
-      finalOutMessage = "bowled by ${bowler?.name}";
+      finalOutMessage = "bowled by ${bowler?.username}";
     } else if (outMessage == "LBW") {
-      finalOutMessage = "LBW by ${bowler?.name}";
-    }else if (playerWhoGotOut.name == bowler?.name) {
-      finalOutMessage = "caught and bowled by ${bowler?.name}";
+      finalOutMessage = "LBW by ${bowler?.username}";
+    }else if (playerWhoGotOut.username == bowler?.username) {
+      finalOutMessage = "caught and bowled by ${bowler?.username}";
     }else {
-      finalOutMessage = "$outMessage by ${playerWhoGotOut.name}, bowled by ${bowler?.name}";
+      finalOutMessage = "$outMessage by ${playerWhoGotOut.username}, bowled by ${bowler?.username}";
     }
 
     setState(() {
@@ -822,7 +822,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
             items: availableBatsmen.map((Player player) {
               return DropdownMenuItem<Player>(
                 value: player,
-                child: Text(player.name),
+                child: Text(player.username),
               );
             }).toList(),
             onChanged: (Player? selectedPlayer) {
