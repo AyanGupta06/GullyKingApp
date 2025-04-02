@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:gully_king/auth.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Ranked%20Games/scorecard_previous_ranked_games_page.dart';
+import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
+import 'package:gully_king/pages/Friends/friends_teams_page.dart';
+import 'package:gully_king/pages/home_page.dart';
+import 'package:gully_king/pages/New%20Game/new_game_page.dart';
+import 'package:gully_king/pages/new_profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
-import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
-import 'package:gully_king/pages/Friends/your_teams_page.dart';
 
-import '../../home_page.dart';
-import '../../New Game/new_game_page.dart';
-import '../../Friends/friends_teams_page.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class PreviousRankedGamesPage extends StatefulWidget {
   const PreviousRankedGamesPage({super.key});
@@ -19,42 +22,39 @@ class PreviousRankedGamesPage extends StatefulWidget {
 }
 
 class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
-  int _selectedIndex = 1; // Default home index
-  final User? user = Auth().currentUser;
+  int _selectedIndex = 1;
+  final User? user = FirebaseAuth.instance.currentUser;
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> matches = [];
 
-  String username = "";
-  String position = "";
-
-  Future<void> _fetchUserData() async {
+  Future<void> _fetchMatches() async {
     if (user == null) return;
 
     try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
+      final snapshot = await FirebaseFirestore.instance
+          .collection('ranked_matches')
+          .where('email', isEqualTo: user!.email)
+          .orderBy('timestamp', descending: true)
           .get();
 
       setState(() {
-        username = userDoc['username'] ?? "N/A";
-        position = userDoc['position'] ?? "N/A";
+        matches = snapshot.docs;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Error fetching user data: $e"),
+          content: Text("Error fetching matches: $e"),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
 
+
   @override
   void initState() {
     super.initState();
-    _fetchUserData();
+    _fetchMatches();
   }
-  
-
   void _navigateToPage(int index) {
     setState(() {
       _selectedIndex = index;
@@ -68,7 +68,7 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
         );
         break;
       case 1: //old games
-      Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
         );
@@ -80,7 +80,7 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
         );
         break;
       case 3: //friends
-      Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
         );
@@ -98,12 +98,69 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
     }
   }
 
+  Widget _buildMatchCard(Map<String, dynamic> matchData) {
+    final date = DateTime.fromMillisecondsSinceEpoch(matchData['timestamp'].seconds * 1000);
+    final formattedDate = DateFormat("MMMM d'th', y").format(date);
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Date: $formattedDate",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Team 1: ${matchData['team1Score']}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            Text(
+              "Team 2: ${matchData['team2Score']}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            // const SizedBox(height: 8),
+            Row(
+                children: [
+                  Text(
+                    matchData['result'],
+                    style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        //navigate to full scorecard to be added
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ScorecardPreviousRankedGamesPage(
+                              timestamp: matchData['timestamp'].toDate().toIso8601String(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ]
 
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Transform.rotate(
-          angle: 0, 
+          angle: 0,
           child: Tooltip(
             message: 'Logout',
             child: IconButton(
@@ -117,37 +174,24 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
             ),
           ),
         ),
-      
-        title: const Text(
-          'Previous Ranked Matches', 
-          style: TextStyle(fontSize: 22, fontWeight:FontWeight.normal, color: Colors.black)
-        ),
+        title: const Text("Previous Ranked Matches"),
         backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
-        elevation: 0,
-        ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg4.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     _unrankedMatchButton(),
-            //     _unrankedMatchButton(),
+      ),
+      body:
 
-            // ],)
-            
-          ],
+      matches.isEmpty
+          ? const Center(
+        child: Text(
+          "No Matches Found",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+      )
+          : ListView.builder(
+        itemCount: matches.length,
+        itemBuilder: (context, index) {
+          final matchData = matches[index].data();
+          return _buildMatchCard(matchData);
+        },
       ),
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromRGBO(53, 150, 207, 1),
@@ -187,7 +231,8 @@ class _PreviousRankedGamesPageState extends State<PreviousRankedGamesPage> {
     );
   }
 
-  Widget _buildBottomBarIcon({required IconData icon, required int index, required String label}) {
+  Widget _buildBottomBarIcon(
+      {required IconData icon, required int index, required String label}) {
     return Tooltip(
       message: label,
       child: IconButton(
