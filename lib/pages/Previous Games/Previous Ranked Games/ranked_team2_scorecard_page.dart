@@ -397,7 +397,25 @@ class _RankedTeam2ScorecardPageState extends State<RankedTeam2ScorecardPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(flex: 3, child: Text(bowlerName, style: const TextStyle(fontWeight: FontWeight.bold))),
+                          Expanded(
+                            flex: 3,
+                            child: FutureBuilder<String>(
+                              future: getNameFromEmail(player['email']),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Text("Loading...");
+                                } else if (snapshot.hasError) {
+                                  return const Text("Error");
+                                } else {
+                                  return Text(
+                                    snapshot.data ?? player['email'],
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                          // Expanded(flex: 3, child: Text(bowlerName, style: const TextStyle(fontWeight: FontWeight.bold))),
                           Expanded(child: Text("$overs2.$ballsBowled", textAlign: TextAlign.center)),
                           Expanded(child: Text("$runs", textAlign: TextAlign.center)),
                           Expanded(child: Text("$wickets", textAlign: TextAlign.center)),
