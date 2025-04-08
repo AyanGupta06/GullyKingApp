@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,12 +26,20 @@ class _HomePageState extends State<HomePage> {
   String? recentTeam;
   String recentDMName = "";
   String? recentTeamID;
+  int totalRuns = 0;
+  int totalBallsFaced = 0;
+  int totalWicketsTaken = 0;
+  int totalBallsBowled = 0;
+  int totalRunsGiven = 0;
+  double strikeRate = 0;
+
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
     _fetchRecentContacts();
+    _fetchRankedStats();
   }
 
   // Future<void> signOut() async {
@@ -229,6 +239,112 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _fetchRankedStats() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user!.uid)
+          .collection("players_ranked_matches")
+          .get();
+
+      int runs = 0;
+      int ballsFaced = 0;
+      int wicketsTaken = 0;
+      int ballsBowled = 0;
+      int runsGiven = 0;
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        runs += (data['runs'] ?? 0) as int;
+        ballsFaced += (data['ballsFaced'] ?? 0) as int;
+        wicketsTaken += (data['wicketsTaken'] ?? 0) as int;
+        ballsBowled += (data['ballsBowled'] ?? 0) as int;
+        runsGiven += (data['runsOnBalls'] ?? 0) as int;
+
+      }
+
+      print("Fetched stats: runs=$runs, ballsFaced=$ballsFaced, wicketsTaken=$wicketsTaken, ballsBowled=$ballsBowled");
+
+      setState(() {
+        totalRuns = runs;
+        totalBallsFaced = ballsFaced;
+        totalWicketsTaken = wicketsTaken;
+        totalBallsBowled = ballsBowled;
+        totalRunsGiven = runsGiven;
+        strikeRate = ballsFaced > 0 ? truncateToDecimalPlaces((runs / ballsFaced) * 100, 1) : 0.00;
+
+      });
+    } catch (e) {
+      print("Error fetching ranked stats: $e");
+    }
+  }
+
+  double truncateToDecimalPlaces(num value, int fractionalDigits) => (value * pow(10, fractionalDigits)).truncate() / pow(10, fractionalDigits);
+
+
+  Widget _rankedStatsCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Ranked Stats", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _statItem("Balls Faced", totalBallsFaced),
+                _statItem("Runs", totalRuns),
+                _statItemDouble("Avg S/R", strikeRate),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _statItem("Balls Bowled", totalBallsBowled),
+                _statItem("Runs Given", totalRunsGiven),
+                _statItem("Wickets Taken", totalWicketsTaken),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _statItem(String label, int value) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+        const SizedBox(height: 5),
+        Text(value.toString(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _statItemDouble(String label, double value) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+        const SizedBox(height: 5),
+        Text(value.toString(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -278,6 +394,8 @@ class _HomePageState extends State<HomePage> {
                 );
               }
             }),
+            _rankedStatsCard(),
+
             const SizedBox(height: 40),
             Center(child: ElevatedButton(onPressed: signOut, child: const Text("Sign Out"))),
           ],

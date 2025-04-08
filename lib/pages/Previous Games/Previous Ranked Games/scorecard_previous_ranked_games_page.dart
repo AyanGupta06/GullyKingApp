@@ -3,13 +3,14 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Ranked%20Games/ranked_team1_scorecard_page.dart';
+import 'package:gully_king/pages/Previous%20Games/Previous%20Ranked%20Games/ranked_team2_scorecard_page.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'package:gully_king/pages/Friends/friends_teams_page.dart';
 import 'package:gully_king/pages/home_page.dart';
 import 'package:gully_king/pages/New%20Game/new_game_page.dart';
 import 'package:gully_king/pages/new_profile_page.dart';
-import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/unranked_team1_scorecard_page.dart';
-import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/unranked_team2_scorecard_page.dart';
+
 
 class ScorecardPreviousRankedGamesPage extends StatefulWidget {
   final String timestamp;
@@ -20,10 +21,10 @@ class ScorecardPreviousRankedGamesPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ScorecardPreviousRankedGamesPage> createState() => _ScorecardPreviousUnrankedGamesPageState();
+  State<ScorecardPreviousRankedGamesPage> createState() => _ScorecardPreviousRankedGamesPageState();
 }
 
-class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousRankedGamesPage> {
+class _ScorecardPreviousRankedGamesPageState extends State<ScorecardPreviousRankedGamesPage> {
   int _selectedIndex = 1;
   int _isSelected = 0;
 
@@ -102,7 +103,7 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousRa
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UnrankedTeam1ScoreCardPage(
+        builder: (context) => RankedTeam1ScorecardPage(
           timestamp: matchData['timestamp'].toDate().toIso8601String(),
         ),
       ),
@@ -113,11 +114,25 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousRa
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UnrankedTeam2ScoreCardPage(
+        builder: (context) => RankedTeam2ScorecardPage(
           timestamp: matchData['timestamp'].toDate().toIso8601String(),
         ),
       ),
     );
+  }
+
+  Future<String> getNameFromEmail(String email) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first['username'] ?? email;
+    } else {
+      return email; 
+    }
   }
 
 
@@ -292,14 +307,43 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousRa
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(bestBatsman1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        FutureBuilder<String>(
+                          future: getNameFromEmail(bestBatsman1['email']),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Text("Loading...");
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else {
+                              return Text(
+                                snapshot.data ?? bestBatsman1['email'],
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              );
+                            }
+                          },
+                        ),
+
                         Text("${bestBatsman1['runs']} (${bestBatsman1['ballsFaced']})"),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(bestBowler2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        FutureBuilder<String>(
+                          future: getNameFromEmail(bestBowler2['email']),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Text("Loading...");
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else {
+                              return Text(
+                                snapshot.data ?? bestBatsman1['email'],
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              );
+                            }
+                          },
+                        ),
                         Text("${bestBowler2['wicketsTaken']}/${bestBowler2['runsOnBalls']} (${(bestBowler2['ballsBowled']~/6).round()}.${bestBowler2['ballsBowled'] == 6? 0: bestBowler2['ballsBowled']})")
                       ],
                     ),
@@ -314,14 +358,42 @@ class _ScorecardPreviousUnrankedGamesPageState extends State<ScorecardPreviousRa
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(bestBatsman2['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        FutureBuilder<String>(
+                          future: getNameFromEmail(bestBatsman2['email']),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Text("Loading...");
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else {
+                              return Text(
+                                snapshot.data ?? bestBatsman1['email'],
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              );
+                            }
+                          },
+                        ),
                         Text("${bestBatsman2['runs']} (${bestBatsman2['ballsFaced']})"),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(bestBowler1['name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        FutureBuilder<String>(
+                          future: getNameFromEmail(bestBowler1['email']),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Text("Loading...");
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else {
+                              return Text(
+                                snapshot.data ?? bestBatsman1['email'],
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              );
+                            }
+                          },
+                        ),
                         Text("${bestBowler1['wicketsTaken']}/${bestBowler1['runsOnBalls']} (${(bestBowler1['ballsBowled']~/6).round()}.${bestBowler1['ballsBowled'] == 6 ? 0: bestBowler1['ballsBowled']})")
                       ],
                     ),

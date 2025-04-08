@@ -200,7 +200,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
             items: team.map((Player player) {
               return DropdownMenuItem<Player>(
                 value: player,
-                child: Text(player.username),
+                child: Text(player.name),
               );
             }).toList(),
             
@@ -324,7 +324,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
                     items: bowlingTeam.map((Player player) {
                       return DropdownMenuItem<Player>(
                         value: player,
-                        child: Text(player.username),
+                        child: Text(player.name),
                       );
                     }).toList(),
                     onChanged: (Player? selectedPlayer) {
@@ -381,13 +381,13 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
     String finalOutMessage;
 
     if (outMessage == "bowled out") {
-      finalOutMessage = "bowled by ${bowler?.username}";
+      finalOutMessage = "bowled by ${bowler?.name}";
     } else if (outMessage == "LBW") {
-      finalOutMessage = "LBW by ${bowler?.username}";
-    }else if (playerWhoGotOut.username == bowler?.username) {
-      finalOutMessage = "caught and bowled by ${bowler?.username}";
+      finalOutMessage = "LBW by ${bowler?.name}";
+    }else if (playerWhoGotOut.name == bowler?.name) {
+      finalOutMessage = "caught and bowled by ${bowler?.name}";
     }else {
-      finalOutMessage = "$outMessage by ${playerWhoGotOut.username}, bowled by ${bowler?.username}";
+      finalOutMessage = "$outMessage by ${playerWhoGotOut.name}, bowled by ${bowler?.name}";
     }
 
     setState(() {
@@ -484,170 +484,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
     );
   }
 
-  // void _storeMatchData(String result) async {
-  //   try {
-  //     User? user = FirebaseAuth.instance.currentUser;
-
-  //     if (user == null) {
-  //       throw Exception("User is not logged in.");
-  //     }
-
-  //     String userEmail = user.email ?? "unknown";
-
-  //     List<Map<String, dynamic>> firstTeamPlayerData = bowlingTeam.map((player) {
-  //       return {
-  //         'name': player.name,
-  //         'runs': player.runs,
-  //         'ballsFaced': player.ballsFaced,
-  //         'wicketsTaken': player.wicketsTaken,
-  //         'ballsBowled': player.ballsBowled,
-  //         'oversBowled': player.oversBowled,
-  //         'outMessage': player.outMessage,
-  //         'wicketsTaken': player.wicketsTaken,
-  //         'runsOnBalls': player.runsOnBalls,
-  //         'fours': player.fours,
-  //         'sixes': player.sixes,
-  //       };
-  //     }).toList();
-
-  //     List<Map<String, dynamic>> secondTeamPlayerData = battingTeam.map((player) {
-  //       return {
-  //         'name': player.name,
-  //         'runs': player.runs,
-  //         'ballsFaced': player.ballsFaced,
-  //         'wicketsTaken': player.wicketsTaken,
-  //         'ballsBowled': player.ballsBowled,
-  //         'oversBowled': player.oversBowled,
-  //         'outMessage': player.outMessage,
-  //         'wicketsTaken': player.wicketsTaken,
-  //         'runsOnBalls': player.runsOnBalls,
-  //         'fours': player.fours,
-  //         'sixes': player.sixes,
-  //       };
-  //     }).toList();
-
-  //     await FirebaseFirestore.instance.collection('ranked_matches').add({
-  //       'email': userEmail,
-  //       'team1Score': "$firstTeamScore/$firstTeamWickets",
-  //       'team2Score': "$teamScore/$secondTeamWickets",
-  //       'result': result,
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //       'team1Players': firstTeamPlayerData,
-  //       'team2Players': secondTeamPlayerData,
-  //       'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls%6})",
-  //       'team2Overs': "($totalOvers.${totalBalls%6})",
-  //       'team1Wide': "$firstTeamWide",
-  //       'team2Wide': "$secondTeamWide",
-  //       'team1NB': "$firstTeamNB",
-  //       'team2NB': "$firstTeamNB",
-        
-  //     });
-
-  //     print("Match data stored successfully.");
-  //   } catch (e) {
-  //     print("Failed to store match data: $e");
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error saving match data: $e')),
-  //     );
-  //   }
-  // }
-
-  // void _storeMatchData(String result) async {
-  //   try {
-  //     User? user = FirebaseAuth.instance.currentUser;
-  //     if (user == null) {
-  //       throw Exception("User is not logged in.");
-  //     }
-
-  //     String userEmail = user.email ?? "unknown";
-
-  //     List<Map<String, dynamic>> firstTeamPlayerData = bowlingTeam.map((player) {
-  //       return {
-  //         'email': player.name,
-  //         'runs': player.runs,
-  //         'ballsFaced': player.ballsFaced,
-  //         'wicketsTaken': player.wicketsTaken,
-  //         'ballsBowled': player.ballsBowled,
-  //         'oversBowled': player.oversBowled,
-  //         'outMessage': player.outMessage,
-  //         'runsOnBalls': player.runsOnBalls,
-  //         'fours': player.fours,
-  //         'sixes': player.sixes,
-  //       };
-  //     }).toList();
-
-  //     List<Map<String, dynamic>> secondTeamPlayerData = battingTeam.map((player) {
-  //       return {
-  //         'email': player.name,
-  //         'runs': player.runs,
-  //         'ballsFaced': player.ballsFaced,
-  //         'wicketsTaken': player.wicketsTaken,
-  //         'ballsBowled': player.ballsBowled,
-  //         'oversBowled': player.oversBowled,
-  //         'outMessage': player.outMessage,
-  //         'runsOnBalls': player.runsOnBalls,
-  //         'fours': player.fours,
-  //         'sixes': player.sixes,
-  //       };
-  //     }).toList();
-
-  //     DocumentReference matchRef = await FirebaseFirestore.instance.collection('ranked_matches').add({
-  //       'email': userEmail,
-  //       'team1Score': "$firstTeamScore/$firstTeamWickets",
-  //       'team2Score': "$teamScore/$secondTeamWickets",
-  //       'result': result,
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //       'team1Players': firstTeamPlayerData,
-  //       'team2Players': secondTeamPlayerData,
-  //       'team1Overs': "($firstTeamOvers.${firstTeamTotalBalls % 6})",
-  //       'team2Overs': "($totalOvers.${totalBalls % 6})",
-  //       'team1Wide': "$firstTeamWide",
-  //       'team2Wide': "$secondTeamWide",
-  //       'team1NB': "$firstTeamNB",
-  //       'team2NB': "$secondTeamNB",
-  //     });
-
-  //     String matchID = matchRef.id;
-
-  //     Future<void> storePlayerStats(List<Map<String, dynamic>> teamPlayers) async {
-  //       for (var player in teamPlayers) {
-  //         String playerEmail = player['email'];
-
-  //         DocumentReference playerMatchRef = FirebaseFirestore.instance
-  //             .collection("player's_ranked_matches")
-  //             .doc(playerEmail)
-  //             .collection("matches")
-  //             .doc(matchID);
-
-  //         await playerMatchRef.set({
-  //           'matchID': matchID,
-  //           'teamScore': playerEmail == userEmail ? "$teamScore/$secondTeamWickets" : "$firstTeamScore/$firstTeamWickets",
-  //           'result': result,
-  //           'timestamp': FieldValue.serverTimestamp(),
-  //           'runs': player['runs'],
-  //           'ballsFaced': player['ballsFaced'],
-  //           'wicketsTaken': player['wicketsTaken'],
-  //           'ballsBowled': player['ballsBowled'],
-  //           'oversBowled': player['oversBowled'],
-  //           'outMessage': player['outMessage'],
-  //           'runsOnBalls': player['runsOnBalls'],
-  //           'fours': player['fours'],
-  //           'sixes': player['sixes'],
-  //         });
-  //       }
-  //     }
-
-  //     await storePlayerStats(firstTeamPlayerData);
-  //     await storePlayerStats(secondTeamPlayerData);
-
-  //     print("Match data stored successfully.");
-  //   } catch (e) {
-  //     print("Failed to store match data: $e");
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error saving match data: $e')),
-  //     );
-  //   }
-  // }
+  
   void _storeMatchData(String result) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -822,7 +659,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
             items: availableBatsmen.map((Player player) {
               return DropdownMenuItem<Player>(
                 value: player,
-                child: Text(player.username),
+                child: Text(player.name),
               );
             }).toList(),
             onChanged: (Player? selectedPlayer) {
