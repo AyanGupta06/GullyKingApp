@@ -217,7 +217,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
           children: [
             const SizedBox(height: 20),
             const Text(
-              "GullyKing",
+              "Profile Settings",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 46,

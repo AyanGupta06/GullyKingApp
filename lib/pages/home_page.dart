@@ -303,18 +303,54 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _statItem("Balls Faced", totalBallsFaced),
-                _statItem("Runs", totalRuns),
-                _statItemDouble("Avg S/R", strikeRate),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statItem("Balls Faced", totalBallsFaced),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statItem("Runs", totalRuns),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statItemDouble("Avg S/R", strikeRate),
+                  ],
+                ),
+                // _statItem("Balls Faced ", totalBallsFaced),
+                // _statItem("Runs      ", totalRuns),
+                // _statItemDouble("Avg S/R      ", strikeRate),
               ],
             ),
             const SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _statItem("Balls Bowled", totalBallsBowled),
-                _statItem("Runs Given", totalRunsGiven),
-                _statItem("Wickets Taken", totalWicketsTaken),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statItem("Balls Bowled", totalBallsBowled),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statItem("Runs Given", totalRunsGiven),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statItem("Wickets Taken", totalWicketsTaken),
+                  ],
+                ),
+                // _statItem("Balls Bowled", totalBallsBowled),
+                // _statItem("Runs Given", totalRunsGiven),
+                // _statItem("Wickets Taken", totalWicketsTaken),
               ],
             ),
           ],
