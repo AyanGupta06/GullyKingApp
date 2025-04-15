@@ -3,6 +3,7 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/Friends/add_new_friends_page.dart';
+import 'package:gully_king/pages/Friends/league_page.dart';
 import 'package:gully_king/pages/Friends/team_management_page.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
 import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
@@ -145,9 +146,25 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
         style: TextStyle(color: Colors.black, fontSize: 18),
       )
     );
-  } 
+  }
 
-  
+  Widget _createLeague() {
+    return FloatingActionButton.extended(
+      // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
+        onPressed:() {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LeaguePage()),
+        );
+        },
+
+        label: const Text(
+          "                       League Management                         ",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )
+    );
+  }
+
+
 
   void _navigateToPage(int index) {
     setState(() {
@@ -234,7 +251,9 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
             _yourFriends(),
             const SizedBox(height: 20), 
             _joinTeam(),
-            const SizedBox(height: 20), 
+            const SizedBox(height: 20),
+            _createLeague(),
+            const SizedBox(height: 20),
             // _yourTeams(),
           ]
           
