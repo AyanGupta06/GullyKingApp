@@ -27,15 +27,15 @@ class _LeaguePageState extends State<LeaguePage> {
   bool _showOutgoingInvites = true;
   int _selectedIndex = 3;
 
-  Future<void> _createTeam() async {
+  Future<void> _createLeague() async {
     if (user == null || _teamNameController.text.trim().isEmpty) return;
 
-    String teamId = _generateUniqueCode();
-    String teamName = _teamNameController.text.trim();
+    String leagueID = _generateUniqueCode();
+    String leagueName = _teamNameController.text.trim();
 
-    await FirebaseFirestore.instance.collection('teams').doc(teamId).set({
-      'teamId': teamId,
-      'teamName': _teamNameController.text.trim(),
+    await FirebaseFirestore.instance.collection('teams').doc(leagueID).set({
+      'leagueID': leagueID,
+      'leagueName': _teamNameController.text.trim(),
       'players': [
         {'email': user!.email}
       ],
@@ -43,11 +43,11 @@ class _LeaguePageState extends State<LeaguePage> {
 
     DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
     await userRef.update({
-      'teams': FieldValue.arrayUnion([teamId]),
+      'teams': FieldValue.arrayUnion([leagueID]),
     });
 
     setState(() {
-      _selectedTeamId = teamId;
+      _selectedTeamId = leagueID;
       _teamNameController.clear();
     });
 
@@ -142,6 +142,9 @@ class _LeaguePageState extends State<LeaguePage> {
     await FirebaseFirestore.instance.collection('teams').doc(_selectedTeamId).get();
     String teamName = teamSnapshot['teamName'];
 
+
+
+
     await FirebaseFirestore.instance.collection('team_invites').add({
       'from': user!.email,
       'to': inviteEmail,
@@ -177,7 +180,7 @@ class _LeaguePageState extends State<LeaguePage> {
         children: const [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text("Create Team", style: TextStyle(fontSize: 16)),
+            child: Text("Create League", style: TextStyle(fontSize: 16)),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -193,7 +196,7 @@ class _LeaguePageState extends State<LeaguePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 20),
-        _entryFieldTeam("Enter Team Name", _teamNameController),
+        _entryFieldTeam("Enter League Name", _teamNameController),
         const SizedBox(height: 10),
         _submitButtonCreateTeams(),
 
@@ -232,8 +235,8 @@ class _LeaguePageState extends State<LeaguePage> {
           borderRadius: BorderRadius.circular(30.0),
         ),
       ),
-      onPressed: _createTeam,
-      child: const Text("Create Team"),
+      onPressed: _createLeague,
+      child: const Text("Create League"),
     );
   }
 
@@ -534,7 +537,7 @@ class _LeaguePageState extends State<LeaguePage> {
             if (_showCreateTeam) ...[
               _teamCreationSection(),
               const SizedBox(height: 20),
-              const Text("Your Teams", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text("Your Leagues", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               _userTeamsList(),
             ] else ...[
               _teamInviteSection(),
