@@ -3,12 +3,11 @@ import 'package:gully_king/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/Previous%20Games/all_previous_games_page.dart';
-
+import 'package:intl/intl.dart';
 import 'home_page.dart';
 import 'New Game/new_game_page.dart';
 import 'Friends/friends_teams_page.dart';
 import 'dart:math' as math;
-
 
 class NewProfilePage extends StatefulWidget {
   const NewProfilePage({super.key});
@@ -24,7 +23,9 @@ class _NewProfilePageState extends State<NewProfilePage> {
   String position = "";
   String email = "";
   bool isEditingUsername = false;
+  bool isEditingPosition = false;
   TextEditingController usernameController = TextEditingController();
+  TextEditingController positionController = TextEditingController();
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
         position = userDoc['position'] ?? "N/A";
         email = userDoc['email'] ?? "N/A";
         usernameController.text = username;
+        positionController.text = position;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,14 +60,59 @@ class _NewProfilePageState extends State<NewProfilePage> {
   }
 
   Future<void> _updateUsername() async {
-    await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
-      'username': usernameController.text.trim(),
-    });
+    if (usernameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username cannot be empty")),
+      );
+      return;
+    }
 
-    setState(() {
-      username = usernameController.text.trim();
-      isEditingUsername = false;
-    });
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+        'username': usernameController.text.trim(),
+      });
+
+      setState(() {
+        username = usernameController.text.trim();
+        isEditingUsername = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username updated successfully!"), backgroundColor: Colors.green),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating username: $e"), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> _updatePosition() async {
+    if (positionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Position cannot be empty")),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+        'position': positionController.text.trim(),
+      });
+
+      setState(() {
+        position = positionController.text.trim();
+        isEditingPosition = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Position updated successfully!"), backgroundColor: Colors.green),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating position: $e"), backgroundColor: Colors.red),
+      );
+    }
   }
 
   Widget _infoCard() {
@@ -78,28 +125,38 @@ class _NewProfilePageState extends State<NewProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Username Row
             isEditingUsername
                 ? TextField(
                     controller: usernameController,
                     decoration: InputDecoration(
                       hintText: "Enter new username",
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.check, color: Colors.green),
-                        onPressed: _updateUsername,
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.check, color: Colors.green),
+                            onPressed: _updateUsername,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                isEditingUsername = false;
+                                usernameController.text = username;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   )
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.person, color: Colors.blue),
-                        onPressed: () {
-                        
-                        },
-                      ),
-                      const Text("Name:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      const Spacer(flex: 1),
+                      const Icon(Icons.person, color: Colors.blue),
+                      const SizedBox(width: 10),
+                      const Text("Username:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const Spacer(),
                       Text(username, style: const TextStyle(fontSize: 18)),
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
@@ -112,39 +169,63 @@ class _NewProfilePageState extends State<NewProfilePage> {
                     ],
                   ),
             const Divider(),
+            // Email Row (non-editable)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                        icon: const Icon(Icons.person, color: Colors.blue),
-                        onPressed: () {
-                        
-                        },
-                      ),
+                const Icon(Icons.email, color: Colors.blue),
+                const SizedBox(width: 10),
                 const Text("Email:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const Spacer(flex: 1),
+                const Spacer(),
                 Text(email, style: const TextStyle(fontSize: 18)),
               ],
             ),
             const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Transform.rotate(
-                      angle: 180 * math.pi / 180,
-                      child: const IconButton(
-                        icon: Icon(
-                          Icons.sports_cricket,
-                          color: Colors.blue,
-                        ),
-                        onPressed: null,
+            // Position Row
+            isEditingPosition
+                ? TextField(
+                    controller: positionController,
+                    decoration: InputDecoration(
+                      hintText: "Enter your cricket position",
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.check, color: Colors.green),
+                            onPressed: _updatePosition,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                isEditingPosition = false;
+                                positionController.text = position;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                const Text("Position:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const Spacer(flex: 1),
-                Text(position, style: const TextStyle(fontSize: 18)),
-              ],
-            ),
+                  )
+                : Row(
+                    children: [
+                      Transform.rotate(
+                        angle: 180 * math.pi / 180,
+                        child: const Icon(Icons.sports_cricket, color: Colors.blue),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text("Position:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const Spacer(),
+                      Text(position, style: const TextStyle(fontSize: 18)),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          setState(() {
+                            isEditingPosition = true;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
           ],
         ),
       ),
@@ -157,43 +238,27 @@ class _NewProfilePageState extends State<NewProfilePage> {
     });
 
     switch (index) {
-      case 0: //new game
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewGamePage()),
-        );
+      case 0:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const NewGamePage()));
         break;
-      case 1: //old games
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()),
-        );
+      case 1:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const AllPreviousGamesPage()));
         break;
-      case 2: //home
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+      case 2:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
         break;
-      case 3: //friends
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const FriendsTeamsPage()),
-        );
+      case 3:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const FriendsTeamsPage()));
         break;
-      case 4: //profile
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewProfilePage()),
-        );
+      case 4:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const NewProfilePage()));
         break;
-
       default:
-      //idk
         break;
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -218,9 +283,8 @@ class _NewProfilePageState extends State<NewProfilePage> {
             const SizedBox(height: 20),
             const Text(
               "Profile Settings",
-              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 46,
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),

@@ -153,7 +153,7 @@ class _NewProfilePageState extends State<FriendsTeamsPage> {
       // backgroundColor: const Color.fromRGBO(53, 150, 207, 1),
         onPressed:() {Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const LeaguePage()),
+          MaterialPageRoute(builder: (context) => LeaguePage()),
         );
         },
 
