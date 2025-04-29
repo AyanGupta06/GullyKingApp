@@ -5,6 +5,9 @@ import "package:flutter/material.dart";
 import "package:gully_king/widget_tree.dart";
 import "package:firebase_core/firebase_core.dart";
 
+//things to fix in app - ranked match you can select same person twice to start the batting
+//when you add another person to team their leagues dont get updated
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

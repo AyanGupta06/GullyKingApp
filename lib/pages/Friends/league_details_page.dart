@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gully_king/pages/Previous%20Games/Previous%20Unranked%20Games/previous_games_page.dart';
@@ -80,7 +82,12 @@ class _LeagueDetailsPageState extends State<LeagueDetailsPage> {
     );
 
     try {
-      await FirebaseFirestore.instance.collection('scheduled_matches').add({
+      String matchId = _generateUniqueCode();
+
+      await FirebaseFirestore.instance
+          .collection('scheduled_matches')
+          .doc(matchId) 
+          .set({
         'leagueId': widget.leagueId,
         'leagueName': widget.leagueName,
         'team1': _selectedTeam1,
@@ -88,6 +95,7 @@ class _LeagueDetailsPageState extends State<LeagueDetailsPage> {
         'scheduledDateTime': scheduledDateTime,
         'status': 'pending',
         'createdAt': FieldValue.serverTimestamp(),
+        'matchID': matchId, 
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -105,6 +113,11 @@ class _LeagueDetailsPageState extends State<LeagueDetailsPage> {
         SnackBar(content: Text("Error scheduling match: ${e.toString()}")),
       );
     }
+  }
+
+  String _generateUniqueCode() {
+    Random random = Random();
+    return (100000 + random.nextInt(900000)).toString();
   }
 
   Widget _buildTeamDropdown(bool isFirstTeam) {

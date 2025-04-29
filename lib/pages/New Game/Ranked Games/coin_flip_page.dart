@@ -45,6 +45,7 @@ class CoinFlipPage extends StatefulWidget {
   final String yourTeamID;
   final String opponentTeamID;
   final int overs;
+  final bool leagueMatch;
 
   const CoinFlipPage({
     Key? key,
@@ -53,6 +54,7 @@ class CoinFlipPage extends StatefulWidget {
     required this.yourTeamID,
     required this.opponentTeamID,
     required this.overs,
+    required this.leagueMatch
   }) : super(key: key);
 
   @override
@@ -126,7 +128,6 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Game started successfully")));
 
-      // Navigator.pop(context);  // fix later
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -136,7 +137,8 @@ class _CoinFlipPageState extends State<CoinFlipPage> {
             batsmanOnNonStrike: batsmanOnNonStrike,
             maxOvers: widget.overs,
             battingTeam: battingTeam,
-            bowlingTeam: bowlingTeam, 
+            bowlingTeam: bowlingTeam,
+            isLeague: widget.leagueMatch, 
 
           ),
         ),

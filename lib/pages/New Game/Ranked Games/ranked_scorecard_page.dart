@@ -18,13 +18,14 @@ class RankedScorecardPage extends StatefulWidget {
   final int maxOvers;
   final List<Player> battingTeam;
   final List<Player> bowlingTeam;
+  final bool isLeague;
 
   const RankedScorecardPage({
     super.key,
     required this.batsmanOnStrike,
     required this.batsmanOnNonStrike,
     required this.bowler,
-    required this.maxOvers, required this.battingTeam, required this.bowlingTeam,
+    required this.maxOvers, required this.battingTeam, required this.bowlingTeam, required this.isLeague
   });
 
   @override
@@ -54,6 +55,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
   int firstTeamNB = 0;
   int secondTeamWide = 0;
   int secondTeamNB = 0;
+  bool isLeague1 = false;
 
   @override
   void initState() {
@@ -66,6 +68,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
     bowlingTeam = widget.bowlingTeam;
     batsmanOnStrike?.setHasBatted(true);
     batsmanOnNonStrike?.setHasBatted(true);
+    isLeague1 = widget.isLeague;
   }
 
   void _updateScore(int runs) {
@@ -536,6 +539,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
         'team2Wide': "$secondTeamWide",
         'team1NB': "$firstTeamNB",
         'team2NB': "$secondTeamNB",
+        'leagueMatch': isLeague1,
       });
 
       String matchID = matchRef.id;
@@ -572,6 +576,7 @@ class _RankedScorecardPageState extends State<RankedScorecardPage> {
             'runsOnBalls': player['runsOnBalls'],
             'fours': player['fours'],
             'sixes': player['sixes'],
+            
           });
         } else {
           print("User with email $playerEmail not found in Firestore.");

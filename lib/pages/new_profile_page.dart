@@ -125,7 +125,6 @@ class _NewProfilePageState extends State<NewProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Username Row
             isEditingUsername
                 ? TextField(
                     controller: usernameController,
@@ -169,7 +168,6 @@ class _NewProfilePageState extends State<NewProfilePage> {
                     ],
                   ),
             const Divider(),
-            // Email Row (non-editable)
             Row(
               children: [
                 const Icon(Icons.email, color: Colors.blue),
@@ -180,7 +178,6 @@ class _NewProfilePageState extends State<NewProfilePage> {
               ],
             ),
             const Divider(),
-            // Position Row
             isEditingPosition
                 ? TextField(
                     controller: positionController,

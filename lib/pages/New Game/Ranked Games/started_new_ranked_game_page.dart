@@ -203,6 +203,7 @@ class _RankedMatchSetupPageState extends State<RankedMatchSetupPage> {
                       yourTeamID: selectedTeamId!,
                       opponentTeamID: opponentTeamId!,
                       overs: selectedOvers,
+                      leagueMatch: false
                     ),
                   ),
                 );
