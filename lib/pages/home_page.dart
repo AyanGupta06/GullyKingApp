@@ -596,7 +596,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               _welcome(),
             
               _recentlyContactedCardFriend("Recently Contacted DM", recentDM),
@@ -614,7 +614,7 @@ class _HomePageState extends State<HomePage> {
               _rankedStatsCard(),
               _upcomingMatchesCard(),  
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
               Center(child: ElevatedButton(onPressed: signOut, child: const Text("Sign Out"))),
               const SizedBox(height: 20),  
             ],
