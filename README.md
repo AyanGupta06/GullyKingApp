@@ -33,9 +33,3 @@ A simple yet powerful app to keep track of **player scores, friends, and teams**
 - Install [Firebase CLI](https://firebase.google.com/docs/cli)
 - A Firebase project set up in the [Firebase Console](https://console.firebase.google.com/)
 
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/gully-cricket-app.git
-   cd gully-cricket-app
