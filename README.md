@@ -1,16 +1,34 @@
-# gully_king
+# 🏏 Gully Cricket App
 
-A new Flutter project.
+A simple yet powerful app to keep track of **player scores, friends, and teams** for your gully cricket matches. Built with **Flutter** and powered by **Firebase** for authentication, real-time data, and cloud storage.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## ✨ Features
 
-A few resources to get you started if this is your first Flutter project:
+- 📊 **Player Score Tracking** – Add, update, and view player stats in real-time
+- 👥 **Friends & Teams** – Connect with friends and build custom teams
+- 🔥 **Firebase Integration** – Authentication, Firestore database, and cloud storage
+- 📱 **Cross-Platform** – Runs on Android and iOS with a responsive Flutter UI
+- ☁️ **Sync Anywhere** – Data stored securely in the cloud for easy access
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Tech Stack
+
+- **Frontend:** Flutter (Dart)
+- **Backend & Database:** Firebase (Firestore, Authentication, Storage)
+- **State Management:** Provider / Riverpod / Bloc (depending on your implementation)
+- **Other Tools:**
+  - Firebase Analytics (optional)
+  - Cloud Functions (optional for advanced stats)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Install [Flutter](https://docs.flutter.dev/get-started/install)
+- Install [Firebase CLI](https://firebase.google.com/docs/cli)
+- A Firebase project set up in the [Firebase Console](https://console.firebase.google.com/)
